@@ -3,6 +3,68 @@
 ## Summary
 Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expansion` stable `1.16.2`, keeping Emerald's map/story for now. Each save gets one randomizer seed; the same species always has the same randomized ability and learnset within that save, including after evolution.
 
+## Architecture Decisions
+- Randomized data is resolved at runtime from the save seed. A build-time generated
+  table cannot vary between save files.
+- Randomization uses a stateless hash, not the game's mutable RNG stream. A result is
+  keyed by the save seed, a versioned category, and explicit context values. Looking
+  up one result must not affect any other result.
+- Category identifiers and hash behavior are save-format API. Once released, changing
+  either requires incrementing the randomizer algorithm version.
+- Version 1 saves store a nonzero `u32 randomizerSeed` and a randomizer algorithm
+  version in `SaveBlock3`. New-game initialization creates both values. Save
+  compatibility with unmodified Expansion saves is not required for the initial
+  romhack release.
+- A single eligibility helper will define the general species pool. It must require an
+  enabled, real Pokemon species and exclude Mega Evolutions, Primal Reversions, Ultra
+  Burst forms, Gigantamax forms, Tera forms, Totem forms, and other forms found to be
+  unusable outside their special context. Feature-specific filters may narrow this
+  pool further.
+- Evolution-family identity and the exact randomized-ability representation remain
+  open design questions. No ability hook should be implemented until both are
+  specified together.
+- Randomized learnsets will be resolved at runtime and may use a cache if profiling
+  shows it is needed. The move pool, weighting, duplicate policy, and evolution move
+  behavior must be specified before hooking learnset access.
+
+## Development Phases
+1. Foundation:
+   - Add a master compile-time config gate, enabled for this hack.
+   - Store and initialize the per-save seed and algorithm version.
+   - Add a pure, deterministic, category-separated hash API.
+   - Add the shared species eligibility helper.
+   - Add focused unit tests for initialization, determinism, category/key separation,
+     and representative eligible/ineligible species.
+2. Encounters:
+   - Specify which normal, fishing, rock-smash, outbreak, Feebas, scripted, and
+     DexNav paths are randomized.
+   - Implement a deterministic eligible-species pool and hook the agreed paths after
+     vanilla slot and level selection.
+3. Abilities:
+   - Specify family identity, whether the result is an ability ID or an ability slot,
+     legal ability pool rules, and form/gimmick overrides.
+   - Route all Pokemon origins through the same resolver.
+4. Learnsets:
+   - Specify candidate moves and weighting, then add the runtime resolver and any
+     measured cache.
+5. Progression rules:
+   - Enable hard caps and no EV gain.
+   - Replace friendship evolutions from an explicit species-by-species conversion
+     table, preserving applicable secondary conditions.
+6. Quality of life:
+   - Implement and grant Level Capper and Portable Healer after their exact item-use
+     and level-up/evolution behavior is specified.
+
+### Phase 1 Contract
+- `RandomizerHash` is a pure function: it does not read or advance either global RNG.
+- The saved seed is nonzero. New-game initialization converts a generated zero to a
+  fixed nonzero fallback.
+- Hash callers supply all contextual identity explicitly. The foundation API does not
+  infer map, encounter, species, or slot state from globals.
+- Feature-specific config gates are added with their feature, so an enabled config
+  option never advertises behavior that has not been implemented.
+- Save structure size tests are intentionally updated for the new romhack format.
+
 ## Key Changes
 - Add randomizer config gates, default enabled for this hack:
   - Randomized encounters from all enabled Pokemon through Gen 9.
@@ -32,7 +94,7 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
   - Player, wild, gift, and trainer Pokemon all resolve through the same deterministic ability logic unless a battle gimmick/form explicitly overrides ability.
 - Moves:
   - Keep move data itself intact: move power/type/effect are not randomized.
-  - Randomize level-up learnsets at runtime or generated table time using deterministic seed logic.
+  - Randomize level-up learnsets at runtime using deterministic seed logic.
   - Weight candidate moves toward Pokemon typing: strong preference for STAB, secondary preference for coverage/status, reject unusable/special-case moves.
   - Same species gets the same learnset across encounters in the same save.
 - Level caps / EVs:
@@ -64,7 +126,7 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
 - Confirm Level Capper and Portable Healer work outside battle and are blocked or harmless in battle.
 
 ## Assumptions
-- Base branch remains `codex/stable-1.16.2`.
+- Development is based on `expansion/1.16.2` and integrated into `romhack/main`.
 - Pokemon pool is all enabled species/forms through Gen 9, filtered for validity.
 - Randomization is per-save deterministic, not build-time static and not rerolled every encounter.
 - Move randomization means randomized learnsets, not randomized move effects/power/type.
