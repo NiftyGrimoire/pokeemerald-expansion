@@ -58,16 +58,19 @@ It creates a detached Git worktree below `/tmp/pokemonromhack-opencode/`; the ac
 user worktree and its uncommitted files are not copied or modified.
 
 The worker can read, search, and edit inside that isolated worktree. Shell access is
-default-deny. Its defaults allow only Git inspection, `rg`, `make`, and Python
-unittest commands. Callers may provide up to 16 additional command patterns, which
-are validated before being added. Network tools, nested agents, external-directory
-access, commits, pushes, and interactive questions are disabled.
+default-deny. Its defaults allow only Git inspection and `rg`; builds and tests are
+left to Codex unless a caller explicitly grants one narrow command pattern. Callers
+may provide up to 16 command patterns, which are validated before being added.
+Network tools, nested agents, external-directory access, commits, pushes, and
+interactive questions are disabled.
 
-OpenCode runs in fast headless mode with project configuration, external skills,
-default plugins, model-catalog refreshes, LSP downloads, and file watching disabled.
-The generated worker configuration is passed in-memory rather than written into the
-worktree. Failed or timed-out runs include partial OpenCode debug output and remove
-their temporary worktree automatically.
+OpenCode runs with an eight-minute default timeout and a 32-step default agent limit.
+Both can be adjusted per call within bounded limits. It also runs in fast headless
+mode with project configuration, external skills, default plugins, model-catalog
+refreshes, LSP downloads, and file watching disabled. The generated worker
+configuration is passed in-memory rather than written into the worktree. A timed-out
+run returns and retains its partial worktree and diff for review. Other failed runs
+are cleaned up automatically.
 
 The tool returns the OpenCode summary, worktree path, Git status, diff stat, full
 diff (subject to an output cap), and stderr. Codex must inspect the resulting changes
@@ -82,6 +85,11 @@ Only committed `HEAD` content is present in an autonomous worktree. Staged,
 unstaged, and untracked files from the active worktree are not included. Commit task
 specifications and source changes that the worker must read; never copy credentials,
 saves, or generated ROMs into it.
+
+Keep autonomous tasks mechanical and small: name the exact files and function
+signatures, normally limit the change to two to four files, and tell the worker not
+to investigate or redesign adjacent systems. Codex should locate integration hooks,
+make architecture decisions, and run the build and tests after reviewing the diff.
 
 ## Verification
 

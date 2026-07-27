@@ -80,11 +80,25 @@ class ServerTests(unittest.TestCase):
         config = autonomous._opencode_config(
             "minimax/minimax-m3", ["git diff*", "make*"]
         )
-        permissions = config["agent"]["codex-worker"]["permission"]
+        agent = config["agent"]["codex-worker"]
+        permissions = agent["permission"]
+        self.assertEqual(agent["steps"], autonomous.DEFAULT_MAX_STEPS)
         self.assertEqual(permissions["edit"], "allow")
         self.assertEqual(permissions["external_directory"], "deny")
         self.assertEqual(permissions["bash"]["*"], "deny")
         self.assertEqual(permissions["bash"]["make*"], "allow")
+
+    def test_autonomous_defaults_exclude_expensive_checks(self):
+        commands = autonomous._allowed_commands(None)
+        self.assertNotIn("make*", commands)
+        self.assertNotIn("python3 -m unittest*", commands)
+        self.assertEqual(
+            autonomous._bounded_max_steps(None), autonomous.DEFAULT_MAX_STEPS
+        )
+        with self.assertRaisesRegex(
+            autonomous.AutonomousWorkerError, "max_steps must be between"
+        ):
+            autonomous._bounded_max_steps(autonomous.MAX_MAX_STEPS + 1)
 
     def test_finds_opencode_from_nvm_when_not_on_path(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -168,6 +182,69 @@ printf '%s\\n' '{"part":{"type":"text","text":"fake worker complete"}}'
             worktree = Path(worktree_line.split(": ", 1)[1])
             subprocess.run(
                 ["git", "worktree", "remove", "--force", str(worktree)],
+                cwd=repo,
+                check=True,
+            )
+
+    def test_timed_out_autonomous_task_retains_partial_diff(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            repo = root / "repo"
+            worktrees = root / "worktrees"
+            repo.mkdir()
+            (repo / "sample.txt").write_text("original\n", encoding="utf-8")
+            subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+            subprocess.run(["git", "add", "sample.txt"], cwd=repo, check=True)
+            subprocess.run(
+                [
+                    "git",
+                    "-c",
+                    "user.name=Test",
+                    "-c",
+                    "user.email=test@example.invalid",
+                    "commit",
+                    "-qm",
+                    "initial",
+                ],
+                cwd=repo,
+                check=True,
+            )
+
+            original_run = autonomous._run
+
+            def fake_run(args, **kwargs):
+                if args[0] == "/fake/opencode":
+                    worktree = Path(kwargs["cwd"])
+                    (worktree / "sample.txt").write_text(
+                        "partial\n", encoding="utf-8"
+                    )
+                    raise autonomous.AutonomousWorkerTimeout(
+                        "timed out", "", "partial debug output"
+                    )
+                return original_run(args, **kwargs)
+
+            with (
+                patch.object(autonomous, "WORKTREE_PARENT", worktrees),
+                patch.object(
+                    autonomous, "_find_opencode", return_value="/fake/opencode"
+                ),
+                patch.object(autonomous, "_run", side_effect=fake_run),
+                patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-key"}),
+            ):
+                output = autonomous.run_task(
+                    repo, {"task": "Edit sample.", "timeout_seconds": 60}
+                )
+
+            self.assertIn("Timed out: yes", output)
+            self.assertIn("+partial", output)
+            worktree_line = next(
+                line for line in output.splitlines()
+                if line.startswith("Isolated worktree: ")
+            )
+            retained = Path(worktree_line.split(": ", 1)[1])
+            self.assertTrue(retained.exists())
+            subprocess.run(
+                ["git", "worktree", "remove", "--force", str(retained)],
                 cwd=repo,
                 check=True,
             )

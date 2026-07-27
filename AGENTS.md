@@ -35,22 +35,27 @@ may run the configured OpenRouter model through OpenCode. It edits only an isola
 Git worktree and returns the resulting diff. Codex must:
 
 1. Keep architecture, scope decisions, and final integration in the primary session.
-2. Use the default command allowlist unless the task clearly requires another safe,
-   narrowly scoped command pattern.
-3. Inspect the autonomous worktree, diff, and reported checks before integrating.
-4. Never treat a clean build or the worker's summary as sufficient review.
-5. Remove the temporary worktree after the changes are integrated or rejected.
+2. Delegate one narrow mechanical unit at a time, normally naming two to four exact
+   files and the required function signatures.
+3. Do not ask the worker to discover architecture or repository-wide conventions;
+   inspect those first and provide the relevant facts and examples in the prompt.
+4. Use the default inspection-only command allowlist. Grant a build or test command
+   only when it is cheap, targeted, and materially useful.
+5. Inspect the autonomous worktree, diff, and reported checks before integrating.
+6. Run builds and tests independently in the primary worktree.
+7. Remove the temporary worktree after the changes are integrated or rejected.
 
 Autonomous worktrees start from committed `HEAD`. They do not include staged,
 unstaged, or untracked files from the active worktree. Commit any specification or
 source changes the worker must see before delegating. Staging alone is not
 sufficient.
 
-Successful autonomous runs remain under `/tmp/pokemonromhack-opencode/` for review.
+Successful and timed-out autonomous runs remain under
+`/tmp/pokemonromhack-opencode/` for review.
 Their changes are not automatically merged into the active worktree. Review the
 actual files and complete diff, integrate only accepted changes using normal Codex
 editing or Git tools, run independent checks, and then remove the temporary
-worktree. Failed and timed-out runs are cleaned up automatically.
+worktree. Other failed runs are cleaned up automatically.
 
 Do not run concurrent autonomous tasks that may edit overlapping files. Parallel
 delegation is appropriate only when file ownership and integration boundaries are

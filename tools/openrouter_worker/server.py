@@ -236,7 +236,7 @@ AUTONOMOUS_TOOL = {
                 "maxItems": 16,
                 "description": (
                     "Optional OpenCode bash permission patterns. Safe defaults allow "
-                    "Git inspection, rg, make, and Python unittest."
+                    "only Git inspection and rg."
                 ),
             },
             "timeout_seconds": {
@@ -244,6 +244,13 @@ AUTONOMOUS_TOOL = {
                 "minimum": 60,
                 "maximum": autonomous.MAX_TIMEOUT_SECONDS,
                 "default": autonomous.DEFAULT_TIMEOUT_SECONDS,
+            },
+            "max_steps": {
+                "type": "integer",
+                "minimum": autonomous.MIN_MAX_STEPS,
+                "maximum": autonomous.MAX_MAX_STEPS,
+                "default": autonomous.DEFAULT_MAX_STEPS,
+                "description": "Maximum OpenCode agent iterations before it must stop.",
             },
         },
         "required": ["task"],

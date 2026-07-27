@@ -15,8 +15,11 @@ from typing import Any
 
 
 DEFAULT_MODEL = "minimax/minimax-m3"
-DEFAULT_TIMEOUT_SECONDS = 900
+DEFAULT_TIMEOUT_SECONDS = 480
 MAX_TIMEOUT_SECONDS = 1800
+DEFAULT_MAX_STEPS = 32
+MIN_MAX_STEPS = 8
+MAX_MAX_STEPS = 64
 MAX_RESULT_BYTES = 160_000
 WORKTREE_PARENT = Path(tempfile.gettempdir()) / "pokemonromhack-opencode"
 SAFE_COMMAND_PATTERN = re.compile(r"^[A-Za-z0-9_./*+=:, -]+$")
@@ -27,13 +30,18 @@ DEFAULT_ALLOWED_COMMANDS = (
     "git log*",
     "git show*",
     "rg *",
-    "make*",
-    "python3 -m unittest*",
 )
 
 
 class AutonomousWorkerError(Exception):
     pass
+
+
+class AutonomousWorkerTimeout(AutonomousWorkerError):
+    def __init__(self, message: str, stdout: str, stderr: str):
+        super().__init__(message)
+        self.stdout = stdout
+        self.stderr = stderr
 
 
 def _run(
@@ -66,9 +74,11 @@ def _run(
         detail = "\n".join(
             part for part in (stdout.strip(), stderr.strip()) if part
         )
-        raise AutonomousWorkerError(
+        raise AutonomousWorkerTimeout(
             f"Command timed out after {timeout} seconds: {args[0]}"
-            + (f"\nPartial output:\n{detail[-6000:]}" if detail else "")
+            + (f"\nPartial output:\n{detail[-6000:]}" if detail else ""),
+            stdout,
+            stderr,
         ) from exc
     if check and result.returncode != 0:
         detail = (result.stderr or result.stdout).strip()
@@ -110,7 +120,21 @@ def _allowed_commands(value: Any) -> list[str]:
     return commands
 
 
-def _opencode_config(model: str, allowed_commands: list[str]) -> dict[str, Any]:
+def _bounded_max_steps(value: Any) -> int:
+    if value is None:
+        return DEFAULT_MAX_STEPS
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise AutonomousWorkerError("max_steps must be an integer.")
+    if not MIN_MAX_STEPS <= value <= MAX_MAX_STEPS:
+        raise AutonomousWorkerError(
+            f"max_steps must be between {MIN_MAX_STEPS} and {MAX_MAX_STEPS}."
+        )
+    return value
+
+
+def _opencode_config(
+    model: str, allowed_commands: list[str], max_steps: int = DEFAULT_MAX_STEPS
+) -> dict[str, Any]:
     bash_permissions = {"*": "deny"}
     bash_permissions.update({command: "allow" for command in allowed_commands})
     return {
@@ -123,6 +147,7 @@ def _opencode_config(model: str, allowed_commands: list[str]) -> dict[str, Any]:
                 "description": "Bounded implementation worker supervised by Codex",
                 "mode": "primary",
                 "temperature": 0.2,
+                "steps": max_steps,
                 "permission": {
                     "*": "deny",
                     "read": "allow",
@@ -205,6 +230,7 @@ def run_task(repo_root: Path, arguments: dict[str, Any]) -> str:
         raise AutonomousWorkerError("context must be a string.")
 
     timeout = _bounded_timeout(arguments.get("timeout_seconds"))
+    max_steps = _bounded_max_steps(arguments.get("max_steps"))
     commands = _allowed_commands(arguments.get("allowed_commands"))
     model = os.environ.get("OPENROUTER_MODEL", DEFAULT_MODEL)
 
@@ -225,6 +251,7 @@ def run_task(repo_root: Path, arguments: dict[str, Any]) -> str:
             model,
             commands,
             timeout,
+            max_steps,
             opencode,
         )
     except AutonomousWorkerError as exc:
@@ -248,6 +275,7 @@ def _run_in_worktree(
     model: str,
     commands: list[str],
     timeout: int,
+    max_steps: int,
     opencode: str,
 ) -> str:
     prompt = f"""\
@@ -263,13 +291,15 @@ SUPERVISION RULES
 - A senior Codex agent owns architecture, integration, and final review.
 - Follow the existing repository style and inspect relevant code before editing.
 - Do not broaden scope, commit, push, install dependencies, or access the network.
+- Edit only the files needed for the stated task. Stop instead of redesigning adjacent code.
 - You may edit files and run only commands permitted by the harness.
+- Do not run a full build or full test suite. Codex owns independent validation.
 - Finish with a concise summary of changed files, checks run, failures, and risks.
 """
 
     env = os.environ.copy()
     env["OPENCODE_CONFIG_CONTENT"] = json.dumps(
-        _opencode_config(model, commands)
+        _opencode_config(model, commands, max_steps)
     )
     env["OPENCODE_DISABLE_CHANNEL_DB"] = "true"
     env["OPENCODE_DISABLE_PROJECT_CONFIG"] = "true"
@@ -280,29 +310,37 @@ SUPERVISION RULES
     env["OPENCODE_DISABLE_LSP_DOWNLOAD"] = "true"
     env["OPENCODE_EXPERIMENTAL_DISABLE_FILEWATCHER"] = "true"
     env["OPENCODE_FAST_BOOT"] = "true"
-    result = _run(
-        [
-            opencode,
-            "run",
-            "--pure",
-            "--print-logs",
-            "--log-level",
-            "DEBUG",
-            "--format",
-            "json",
-            "--agent",
-            "codex-worker",
-            "--model",
-            f"openrouter/{model}",
-            "--dir",
-            str(worktree),
-            prompt,
-        ],
-        cwd=worktree,
-        env=env,
-        timeout=timeout,
-        check=False,
-    )
+    command = [
+        opencode,
+        "run",
+        "--pure",
+        "--print-logs",
+        "--log-level",
+        "DEBUG",
+        "--format",
+        "json",
+        "--agent",
+        "codex-worker",
+        "--model",
+        f"openrouter/{model}",
+        "--dir",
+        str(worktree),
+        prompt,
+    ]
+    timed_out = False
+    try:
+        result = _run(
+            command,
+            cwd=worktree,
+            env=env,
+            timeout=timeout,
+            check=False,
+        )
+    except AutonomousWorkerTimeout as exc:
+        timed_out = True
+        result = subprocess.CompletedProcess(
+            command, 124, stdout=exc.stdout, stderr=exc.stderr
+        )
 
     status = _run(
         ["git", "status", "--short"], cwd=worktree, check=False
@@ -327,7 +365,9 @@ SUPERVISION RULES
         "\n".join(
             [
                 f"OpenCode exit code: {result.returncode}",
+                f"Timed out: {'yes' if timed_out else 'no'}",
                 f"Model: openrouter/{model}",
+                f"Maximum agent steps: {max_steps}",
                 f"Isolated worktree: {worktree}",
                 "",
                 "WORKER SUMMARY",
