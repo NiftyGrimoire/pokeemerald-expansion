@@ -1,5 +1,17 @@
 # Repository agent guidance
 
+## Git remotes
+
+`origin` is the trusted NiftyGrimoire fork:
+`https://github.com/NiftyGrimoire/pokeemerald-expansion.git`.
+
+`upstream` is the original RHH repository:
+`https://github.com/rh-hideout/pokeemerald-expansion.git`.
+
+Push commits and branches only to `origin`. Never push to `upstream`. Use
+`upstream` only for fetching, comparing, and deliberately integrating upstream
+changes.
+
 ## OpenRouter worker
 
 Use the `openrouter_worker` MCP server for bounded, routine implementation work when doing so is likely to save primary-model effort. Good candidates include repetitive C edits, boilerplate, mechanical refactors, small test additions, and first-pass implementations with a clear specification.
