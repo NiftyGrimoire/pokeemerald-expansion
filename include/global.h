@@ -24,6 +24,7 @@
 #include "constants/trainer_tower.h"
 #include "constants/items.h"
 #include "constants/moves.h"
+#include "config/randomizer.h"
 #include "config/save.h"
 
 // Prevent cross-jump optimization.
@@ -255,6 +256,10 @@ struct NPCFollower
 
 struct SaveBlock3
 {
+#if RANDOMIZER_ENABLED
+    u32 randomizerSeed;
+    u16 randomizerVersion;
+#endif
 #if OW_USE_FAKE_RTC
     struct SiiRtcInfo fakeRTC;
 #endif
