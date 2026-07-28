@@ -22,6 +22,6 @@ void InitRandomizerData(void);
 u32 GetRandomizerSeed(void);
 u32 RandomizerHash(u32 seed, enum RandomizerCategory category, u32 key1, u32 key2, u32 key3);
 bool32 IsSpeciesRandomizerEligible(enum Species species);
-enum Species GetRandomizedSpeciesForEncounter(enum Species originalSpecies, u16 mapId, enum RandomizerEncounterType encounterType, u8 slot);
+enum Species GetRandomizedSpeciesForEncounter(enum Species originalSpecies, u16 mapId, enum RandomizerEncounterType encounterType, u8 slot, u8 encounterDifficulty);
 
 #endif // GUARD_RANDOMIZER_H
