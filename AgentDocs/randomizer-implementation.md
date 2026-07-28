@@ -235,24 +235,38 @@ Call-path review:
 - `wild_encounter_ow.c` references Treecko, Torchic, and Mudkip only for doll
   object graphics and is unrelated to starter selection.
 
-Policy must be finalized before adding hooks. The conservative initial policy
-under review is:
+The player-facing starter resolver is implemented:
 
 - Generate three distinct choices from the save seed and starter slot.
-- Require generally eligible, enabled, non-special base-stage Pokemon that can
-  evolve, with a starter-like base-stat range.
+- Require generally eligible, enabled, non-special base-stage Pokemon with a
+  base-stat total from 300 through 350 inclusive.
+- Require a complete three-stage evolution line: the candidate has no
+  pre-evolution, has a usable evolution, and at least one usable middle-stage
+  evolution can evolve again.
 - Exclude restricted Legendary, sub-Legendary, Mythical, Ultra Beast, Paradox,
   and battle-only species/forms.
+- Resolve through `GetStarterPokemon`, keeping the selection UI, label, sprite,
+  cry, granted Pokemon, party check, and credits consistent.
+- Build the pre-evolution lookup once and cache all three choices by save seed so
+  repeated UI lookups do not rescan the evolution graph.
+
+Focused validation:
+
+- All 16 tests in `test/randomizer.c` pass, including starter eligibility,
+  uniqueness, determinism, save separation, and invalid-slot handling.
+- A normal `make -j4` ROM build succeeds.
+
+The remaining rival policy is:
+
 - Give the rival the next choice cyclically, preserving the vanilla
   player-slot-to-rival-slot relationship.
 - Use the rival choice's base stage on Route 103 and an appropriate deterministic
   evolved stage in later fights while preserving the configured party level,
   moves, IVs, item, and party position.
 
-Before implementation, define the exact BST bounds and evolution rules for
-branched, regional, and species with fewer than two stages. Add focused tests for
-eligibility, uniqueness, seed/slot separation, player UI/grant agreement, rival
-choice mapping, and later rival evolution consistency.
+Before implementing the rival hook, define how its middle and final stages are
+selected for branched or regional lines. Add focused tests for rival choice
+mapping and later rival evolution consistency.
 
 ## Other unresolved architecture
 
