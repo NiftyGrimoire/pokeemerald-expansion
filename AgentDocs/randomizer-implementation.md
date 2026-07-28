@@ -7,13 +7,9 @@
 - Push only to the NiftyGrimoire fork through `origin`.
 - Never push to `upstream`.
 
-At the time of this handoff, the local branch contains these unpushed commits:
-
-- `c796e1202e` — Refine randomizer implementation phases.
-- `c9aac2dee8` — Add randomizer foundation.
-- `4b693b2628` — Bound autonomous worker execution.
-
-Verify the current Git state rather than assuming these commits remain unpushed.
+The completed BST encounter branch was merged locally into `romhack/main` by
+`aac5581c02`. Verify the current Git state and remote tracking state before
+committing or pushing; this handoff does not authorize a push.
 
 ## Primary plan
 
@@ -34,9 +30,9 @@ broad summary where they differ.
 - Focused tests in `test/randomizer.c`.
 - Intentional `SaveBlock3` size guard updated from 4 to 8 bytes.
 
-Wild encounter randomization and BST-scaled ordinary encounter pools are
-implemented on feature branches. Ability, learnset, progression, evolution, and
-quality-of-life hooks have not been implemented.
+Wild encounter randomization and BST-scaled ordinary encounter pools are merged
+into `romhack/main`. Scripted Legendary encounters, abilities, learnsets,
+progression, evolution, and quality-of-life hooks have not been implemented.
 
 ## Validation already performed
 
@@ -47,12 +43,12 @@ quality-of-life hooks have not been implemented.
 
 Rerun relevant checks after any new integration.
 
-## Recommended next phase
+## Completed encounter phase
 
-Phase 2 encounter work from `romhack/randomizer-encounters` has been merged into
-`romhack/main` through PR #2. BST-scaled ordinary encounter pools are implemented
-on the dependent branch `romhack/randomizer-encounter-bst`, pending review and
-approval to merge. Their scope policy is:
+Phase 2 encounter work from `romhack/randomizer-encounters` was merged through
+PR #2. BST-scaled ordinary encounter pools from
+`romhack/randomizer-encounter-bst` were subsequently merged locally into
+`romhack/main`. Their scope policy is:
 
 - Randomize standard grass/cave, Surf, fishing-rod, Rock Smash, mass-outbreak,
   and Feebas encounters.
@@ -93,7 +89,7 @@ Validation on the encounter branches:
 - All seven focused randomizer tests pass with BST-boundary and special-species
   exclusion coverage on `romhack/randomizer-encounter-bst`.
 
-Manual validation still required on the BST branch:
+Manual validation still required:
 
 - Confirm early land encounters remain in low-BST pools.
 - Confirm Surf and improved rods can access stronger pools on the same map.
@@ -106,13 +102,67 @@ review but do not have direct unit-test hooks. The configured species data conta
 candidates in every preferred band, so the fallback cannot be triggered naturally
 by the current test configuration.
 
-## Unresolved architecture
+## Next phase: scripted Legendary encounters
 
-- Legendary encounters: locate every scripted/static creation path and define
-  stable context keys that distinguish separate encounters without depending on
-  mutable RNG. The initial candidate pool is enabled, usable restricted
-  Legendary, sub-Legendary, and Paradox species; Mythicals and Ultra Beasts are
-  excluded.
+Create `romhack/randomizer-legendary-encounters` from the current
+`romhack/main`. Do not implement this phase directly on main, merge it, or push it
+without explicit approval.
+
+The initial policy is:
+
+- Randomize only scripted/static encounters whose original species is flagged
+  restricted Legendary, sub-Legendary, or Paradox.
+- Select uniformly from enabled, generally usable species with one of those same
+  three classifications.
+- Exclude Mythical Pokemon and Ultra Beasts.
+- Preserve level, held item, personality-generation flow, battle type, scripts,
+  event flags, and story progression.
+- Use the saved randomizer seed and a stable explicit encounter identity. Do not
+  read or advance either mutable RNG stream.
+
+The primary scripted path is:
+
+1. `setwildbattle` is defined in `asm/macros/event.inc`.
+2. `ScrCmd_setwildbattle` in `src/scrcmd.c` reads one or two species, levels,
+   and held items.
+3. It calls `CreateScriptedWildMon` or `CreateScriptedDoubleWildMon` in
+   `src/script_pokemon_util.c`.
+4. `ScrCmd_dowildbattle` starts the already-created opponent through
+   `BattleSetup_StartScriptedWildBattle` or its double-battle counterpart in
+   `src/battle_setup.c`.
+
+The enabled Emerald map scripts using `setwildbattle` for the initial special
+pool include Groudon, Kyogre, Rayquaza, Regirock, Regice, and Registeel. Expansion
+also contains FRLG map scripts for Mewtwo and the Kanto birds; confirm whether
+those maps are reachable in this hack before treating them as required gameplay
+coverage. Non-special scripted encounters such as Kecleon, Voltorb, Electrode,
+and Sudowoodo must remain unchanged. `CreateScriptedWildMon` also has a direct
+non-script-command caller in `src/berry.c`; the original species filter should
+make that path harmless, but it needs an explicit test or review.
+
+Resolve the stable identity before coding. Map ID plus original species is enough
+for the currently identified Emerald Legendary maps, but it is not a general
+guarantee when a map contains multiple matching statics. Prefer passing an
+explicit context from `ScrCmd_setwildbattle` (for example a stable script/map
+identity) rather than inferring identity later from party state. Double scripted
+battles also need a slot component so their two opponents cannot collide.
+
+Suggested bounded OpenRouter chunks, after Codex makes the identity decision:
+
+1. Modify only `include/randomizer.h` and `src/randomizer.c` to add the special
+   classification helper/resolver and focused pure tests if the test seam belongs
+   there.
+2. After review, modify only `src/scrcmd.c` and the minimum required declarations
+   to pass stable context and replace qualifying species before creation.
+3. After review, modify only `test/randomizer.c` to cover classification,
+   exclusions, determinism, context separation, and unchanged ordinary species.
+
+Codex retains architecture, worktree integration, source review, build/test
+validation, documentation, and commits. Workers remain isolated, uncommitted,
+and may not push or merge.
+
+## Other unresolved architecture
+
 - Ability randomization: decide whether the stored/resolved result is an ability
   ID or an ability slot. The same slot across an evolution family does not imply
   the same actual ability.

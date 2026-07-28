@@ -162,6 +162,16 @@ saved randomizer seed
 The resolver walks the eligible species a second time and returns the species
 at `selectedIndex`.
 
+This is an allocation-free two-pass selection. The first pass counts eligible
+species so the hash can be reduced without bias; the second pass stops when it
+reaches the selected eligible entry. In the worst case it examines the configured
+species ID range twice for one generated encounter. A normal ROM build and the
+focused tests pass, but encounter latency has not been benchmarked on hardware or
+an emulator. If manual profiling finds a visible delay, a small lazy cache of the
+six preferred-band counts and expanded fallback bounds is the safest first
+optimization; the final indexed selection can remain a scan so deterministic
+results and save compatibility do not change.
+
 The result has the following properties:
 
 - Repeating the same context in one save produces the same species.

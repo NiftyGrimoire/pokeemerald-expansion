@@ -28,14 +28,14 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
   behavior must be specified before hooking learnset access.
 
 ## Development Phases
-1. Foundation:
+1. Foundation (complete on `romhack/main`):
    - Add a master compile-time config gate, enabled for this hack.
    - Store and initialize the per-save seed and algorithm version.
    - Add a pure, deterministic, category-separated hash API.
    - Add the shared species eligibility helper.
    - Add focused unit tests for initialization, determinism, category/key separation,
      and representative eligible/ineligible species.
-2. Encounters:
+2. Encounters (complete on `romhack/main`; manual gameplay/performance checks remain):
    - Specify which normal, fishing, rock-smash, outbreak, Feebas, scripted, and
      DexNav paths are randomized.
    - Implement a deterministic eligible-species pool and hook the agreed paths after
@@ -44,7 +44,7 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      from lower-BST species and high-level areas draw from higher-BST species.
    - Derive the difficulty band from stable encounter-table data rather than the
      mutable level roll, preserving deterministic slot mappings.
-3. Legendary encounters:
+3. Legendary encounters (next phase; not implemented):
    - Randomize scripted/static encounters only when the original species is a
      Legendary or Paradox Pokemon.
    - Select replacements from a dedicated pool containing only enabled, usable
