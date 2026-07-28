@@ -1,5 +1,13 @@
 #include "global.h"
+#include "event_data.h"
 #include "test/battle.h"
+
+static void SetPostgameLevelCap(void)
+{
+    for (u32 flag = FLAG_BADGE01_GET; flag <= FLAG_BADGE08_GET; flag++)
+        FlagSet(flag);
+    FlagSet(FLAG_IS_CHAMPION);
+}
 
 WILD_BATTLE_TEST("Pokemon gain experience after catching a Pokemon (Gen6+)")
 {
@@ -35,6 +43,7 @@ WILD_BATTLE_TEST("Higher leveled Pokemon give more exp", s32 exp)
     PARAMETRIZE { level = 10; }
 
     GIVEN {
+        SetPostgameLevelCap();
         PLAYER(SPECIES_WOBBUFFET) { Level(20); }
         OPPONENT(SPECIES_CATERPIE) { Level(level); HP(1); }
     } WHEN {
@@ -103,6 +112,7 @@ WILD_BATTLE_TEST("Large exp gains are supported", s32 exp) // #1455
     PARAMETRIZE { level = MAX_LEVEL; }
 
     GIVEN {
+        SetPostgameLevelCap();
         PLAYER(SPECIES_WOBBUFFET) { Level(1); Item(ITEM_LUCKY_EGG); OTName("Test"); } // OT Name is different so it gets more exp as a traded mon
         OPPONENT(SPECIES_BLISSEY) { Level(level); HP(1); }
     } WHEN {
@@ -130,6 +140,7 @@ WILD_BATTLE_TEST("Exp Share(held) gives Experience to mons which did not partici
     PARAMETRIZE { item = ITEM_EXP_SHARE; }
 
     GIVEN {
+        SetPostgameLevelCap();
         PLAYER(SPECIES_WOBBUFFET);
         PLAYER(SPECIES_WYNAUT) { Level(40); Item(item); }
         OPPONENT(SPECIES_CATERPIE) { Level(10); HP(1); }
