@@ -44,39 +44,47 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      from lower-BST species and high-level areas draw from higher-BST species.
    - Derive the difficulty band from stable encounter-table data rather than the
      mutable level roll, preserving deterministic slot mappings.
-3. Legendary encounters (next phase; not implemented):
+3. Legendary encounters (implemented on
+   `romhack/randomizer-legendary-encounters`; pending integration):
+   - Route ordinary `setwildbattle` encounters through the regular BST-scaled
+     encounter resolver using their fixed scripted level.
    - Randomize scripted/static encounters only when the original species is a
-     Legendary or Paradox Pokemon.
+     Legendary or Paradox Pokemon through the dedicated special pool.
    - Select replacements from a dedicated pool containing only enabled, usable
      restricted Legendary, sub-Legendary, and Paradox species.
    - Exclude Mythical Pokemon and Ultra Beasts unless the policy is deliberately
      expanded later.
    - Preserve the scripted encounter's level, battle setup, flags, and progression
      behavior while replacing only its species.
-4. Starters:
+4. Level caps and EV removal:
+   - Enable the existing hard Emerald flag-based level-cap system.
+   - Prevent Rare Candies from exceeding the active cap.
+   - Disable EV gain.
+   - Verify battle experience and item behavior before building the Level Capper
+     on top of these rules.
+5. Starters:
    - Deterministically randomize the three starter choices for each save.
    - Define the eligible species pool, whether the choices must be unique, any
      strength or evolution-stage limits, and how the rival's starter choice follows
      the randomized selection before implementation.
-5. Abilities:
+6. Abilities:
    - Specify family identity, whether the result is an ability ID or an ability slot,
      legal ability pool rules, and form/gimmick overrides.
    - Route all Pokemon origins through the same resolver.
-6. Learnsets:
+7. Learnsets:
    - Specify candidate moves and weighting, then add the runtime resolver and any
      measured cache.
-7. Progression rules:
-   - Enable hard caps and no EV gain.
+8. Evolution rules:
    - Replace friendship evolutions from an explicit species-by-species conversion
      table, preserving applicable secondary conditions.
    - Make time-dependent and alternate-form evolution lines practical in a short
      Nuzlocke: replace day/night dependencies and deterministically randomize the
      available branch or form, including regional forms, under an explicit
      species-by-species policy.
-8. Quality of life:
+9. Quality of life:
    - Implement and grant Level Capper and Portable Healer after their exact item-use
      and level-up/evolution behavior is specified.
-9. World items:
+10. World items:
    - Deterministically randomize item pickups found in the overworld.
    - Limit replacements to items useful in a Nuzlocke, initially held items and
      evolution items; define exclusions and progression safeguards before
@@ -120,6 +128,9 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
     the mutable rolled encounter level as identity.
   - If no species is eligible in the preferred BST band, expand to the nearest
     adjacent band deterministically rather than failing the encounter.
+  - Route non-special `setwildbattle` encounters through the same ordinary pool,
+    using the fixed scripted level for difficulty and a distinct scripted
+    encounter type for hash separation.
 - Legendary encounters:
   - Detect scripted/static encounters whose original species is flagged as a
     restricted Legendary, sub-Legendary, or Paradox Pokemon.

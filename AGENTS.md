@@ -12,6 +12,17 @@ Push commits and branches only to `origin`. Never push to `upstream`. Use
 `upstream` only for fetching, comparing, and deliberately integrating upstream
 changes.
 
+## Commits and integration
+
+After reviewing and validating an implementation, Codex may create local commits
+on the active feature branch without requesting separate approval. Keep commits
+logically scoped and report them to the user.
+
+Never merge a feature branch into `romhack/main` without explicit user approval.
+Permission to implement, review, validate, or commit does not authorize a merge
+to main. Do not push unless the user separately requests it; if pushing, follow
+the remote policy above.
+
 ## OpenRouter worker
 
 Use the `openrouter_worker` MCP server for bounded mechanical work when delegation
@@ -25,6 +36,12 @@ Before delegating or handling an existing autonomous worktree, read
 Never send secrets, credentials, save files, private data, generated ROMs, or
 unrelated content to the worker. MiniMax may edit only isolated worktrees and may
 not commit or push.
+
+Autonomous delegation requires a clean active worktree because its isolated
+worktree starts from committed `HEAD`. Commit reviewed prerequisites first.
+Normally delegate one mechanical layer at a time in two or three files; do not
+delegate trivial edits whose prompt and review cost is likely to exceed the
+implementation.
 
 ## Implementation handoffs
 

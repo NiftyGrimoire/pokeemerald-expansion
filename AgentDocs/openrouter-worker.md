@@ -38,7 +38,7 @@ Codex must:
 
 1. Keep architecture, scope decisions, and final integration in the primary
    session.
-2. Delegate one narrow mechanical unit at a time, normally naming two to four
+2. Delegate one narrow mechanical unit at a time, normally naming two or three
    exact files and the required function signatures.
 3. Inspect architecture and repository conventions first, then provide the
    relevant facts, exact symbol locations, existing helper names, and examples in
@@ -55,7 +55,17 @@ Codex must:
 
 Autonomous worktrees start from committed `HEAD`; staged, unstaged, and untracked
 files from the active worktree are absent. Commit specifications or source changes
-that the worker needs before delegating.
+that the worker needs before delegating. The server rejects autonomous delegation
+when the active worktree is dirty so missing prerequisites fail fast instead of
+consuming a model run.
+
+Do not combine a cross-layer feature into one autonomous request merely because
+all edits share one policy. Split pure resolver/API work, integration hooks, and
+tests into separate requests when each chunk can be reviewed independently. In
+practice, a five-file resolver-plus-hook-plus-tests request exhausted a 24-step
+budget after only its header edits; a larger retry completed, but consumed nearly
+all 40 steps. Smaller two-to-three-file chunks are easier to supervise, cheaper to
+retry, and better aligned with the worker's early-edit limit.
 
 Successful and timed-out runs remain under
 `/tmp/pokemonromhack-opencode/` for review. They are never merged automatically.
@@ -67,16 +77,56 @@ appropriate only when file ownership and integration boundaries are disjoint.
 ## Current execution limits
 
 - Default wall-clock timeout: 8 minutes.
-- Default maximum agent steps: 24.
+- Default maximum agent steps: 16.
 - The worker must make its first edit within six inspection calls or stop with a
   blocker instead of consuming the full budget on exploration.
-- Autonomous calls require an exact one-to-eight-file edit allowlist and report
+- Autonomous calls require an exact one-to-four-file edit allowlist and report
   out-of-scope changes.
 - Configurable agent-step range: 8–64.
 - Default shell access: Git inspection and `rg` only.
 - Full builds and full test suites remain with Codex.
 - A timeout retains and reports the partial worktree and diff.
 - Results report observed agent steps and token usage when OpenCode emits it.
+
+Treat a run that reaches its step ceiling as incomplete even when OpenCode exits
+successfully. Check the worker summary, Git status, and diff against every
+acceptance criterion before integration. Remove incomplete worktrees and delegate
+the missing bounded chunk again; do not infer completion from exit code alone.
+
+## Token-efficiency policy
+
+Delegation is intended to reduce primary-model effort, not merely move work to
+another model. Account for the worker prompt, repeated repository context,
+failed/retried runs, primary review, integration, and validation.
+
+Use autonomous delegation when all of the following are true:
+
+- The architecture and acceptance criteria are already decided.
+- All required source and specifications are committed.
+- The unit is mechanical and normally spans two or three files.
+- The implementation is large enough to offset delegation overhead, generally
+  at least 30-50 straightforward lines.
+- The result has an independently reviewable boundary such as resolver/API code,
+  one call-site hook, or focused tests.
+
+Keep the work with Codex when it is architecture-heavy, ambiguous, security
+sensitive, a tiny correction, or inseparable from primary review. Start routine
+tasks at the 16-step default. Increase the budget only after narrowing the task
+and identifying why 16 steps are insufficient.
+
+Observed results motivating this policy:
+
+- A five-file cross-layer request used 24 steps and produced only header edits.
+- Retrying that broad request used 39 of 40 steps.
+- A request launched before its prerequisite commit used 24 steps and produced
+  no edits.
+- The same mechanical routing task, on a committed base and limited to three
+  files, completed in 10 steps.
+
+Reported token totals include provider/cache accounting and are not direct billing
+figures, but broad retries processed substantially more context than the accepted
+small run. Review can also erase apparent savings: one later two-file run produced
+a malformed test edit that primary review had to correct.
 
 ## Authorization and data restrictions
 
@@ -96,11 +146,36 @@ This authorization excludes:
 Task text and repository content read by the worker are sent to OpenRouter and the
 selected model provider.
 
+## Local configuration
+
+The MCP registration is intentionally local and ignored by Git. A fresh clone,
+workspace recreation, or removal of previously tracked `.codex/config.toml` can
+leave OpenCode installed while making the worker disappear from Codex tool
+discovery. Preserve or migrate the local registration before untracking editor
+configuration, then relaunch Codex.
+
+The expected repository-local configuration is:
+
+```toml
+[mcp_servers.openrouter_worker]
+command = "python3"
+args = ["/absolute/path/to/PokemonRomhack/tools/openrouter_worker/server.py"]
+env_vars = ["OPENROUTER_API_KEY", "OPENROUTER_MODEL", "OPENROUTER_MAX_TOKENS"]
+startup_timeout_sec = 10
+tool_timeout_sec = 1860
+```
+
+Use an absolute server path so startup does not depend on the editor's working
+directory. If `opencode` is installed through NVM but absent from Codex's `PATH`,
+the worker searches `~/.nvm/versions/node/*/bin/opencode`; this is not itself an
+installation failure. Diagnose registration with `codex mcp list` before
+reinstalling OpenCode.
+
 ## Task template
 
 ```text
 Task: Implement <one mechanical unit>.
-Files: Restrict edits to <two to four exact paths>.
+Files: Restrict edits to <two or three exact paths>.
 Signatures: Add or modify <exact function signatures>.
 Context: <architecture already decided by Codex>.
 Acceptance: <specific observable behavior>.
@@ -111,3 +186,13 @@ Allowed commands: Use the default inspection-only allowlist.
 Delegate only when the remaining mechanical implementation is large enough to
 offset specification and review overhead. Tiny edits and architecture-heavy work
 are usually cheaper to perform directly.
+
+After integration, use the exact repository test filename when selecting a test
+file:
+
+```sh
+make -j4 check TESTS=test/randomizer.c
+```
+
+`TESTS=randomizer` is interpreted as a test-name prefix, not a filename filter,
+and can finish with `No tests found` after building the test binary.

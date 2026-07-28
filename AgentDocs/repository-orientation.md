@@ -73,6 +73,16 @@ make check TESTS="<focused test name>"
 make pokeemerald-test.elf TESTS="<focused test name>"
 ```
 
+To select one test source file, pass its exact repository-relative filename,
+including `.c`, for example:
+
+```sh
+make -j4 check TESTS=test/randomizer.c
+```
+
+A bare value such as `TESTS=randomizer` is treated as a test-name prefix and does
+not select `test/randomizer.c`.
+
 Run the smallest relevant checks first, then a normal ROM build and broader
 tests in proportion to the change. Overworld behavior often cannot be exercised
 by the automated battle harness, so pair pure resolver tests with source review
@@ -110,9 +120,11 @@ The randomizer is runtime-resolved and deterministic per save:
 Foundation, ordinary wild encounter randomization, and BST-scaled encounter
 pools are implemented. The encounter system preserves vanilla encounter checks,
 method, weighted slot selection, and level, then replaces only the species.
-Ordinary pools exclude special classifications reserved for scripted encounters.
-DexNav, visible overworld encounters, roamers, scripted/static encounters, and
-Battle Pike/Pyramid paths remain outside the completed ordinary-encounter scope.
+Ordinary pools exclude special classifications reserved for the dedicated
+Legendary scripted pool. Ordinary `setwildbattle` encounters use the regular
+BST-scaled resolver with their fixed scripted level. DexNav, visible overworld
+encounters, roamers, and Battle Pike/Pyramid paths remain outside the completed
+ordinary-encounter scope.
 
 Before any randomizer work, read both:
 

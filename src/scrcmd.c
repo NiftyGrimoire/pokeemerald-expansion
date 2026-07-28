@@ -44,6 +44,7 @@
 #include "pokedex.h"
 #include "pokemon_storage_system.h"
 #include "random.h"
+#include "randomizer.h"
 #include "overworld.h"
 #include "rotating_tile_puzzle.h"
 #include "rtc.h"
@@ -2519,8 +2520,19 @@ bool8 ScrCmd_setwildbattle(struct ScriptContext *ctx)
     enum Species species2 = ScriptReadHalfword(ctx);
     u8 level2 = ScriptReadByte(ctx);
     enum Item item2 = ScriptReadHalfword(ctx);
+    u16 mapId = (gSaveBlock1Ptr->location.mapGroup << 8) | gSaveBlock1Ptr->location.mapNum;
 
     Script_RequestEffects(SCREFF_V1);
+
+    if (IsSpeciesRandomizerLegendaryEncounterEligible(species))
+        species = GetRandomizedSpeciesForLegendaryEncounter(species, mapId, 0);
+    else if (species != SPECIES_NONE)
+        species = GetRandomizedSpeciesForEncounter(species, mapId, RANDOMIZER_ENCOUNTER_SCRIPTED, 0, level);
+
+    if (IsSpeciesRandomizerLegendaryEncounterEligible(species2))
+        species2 = GetRandomizedSpeciesForLegendaryEncounter(species2, mapId, 1);
+    else if (species2 != SPECIES_NONE)
+        species2 = GetRandomizedSpeciesForEncounter(species2, mapId, RANDOMIZER_ENCOUNTER_SCRIPTED, 1, level2);
 
     if (species2 == SPECIES_NONE)
     {

@@ -18,11 +18,11 @@ from typing import Any
 DEFAULT_MODEL = "minimax/minimax-m3"
 DEFAULT_TIMEOUT_SECONDS = 480
 MAX_TIMEOUT_SECONDS = 1800
-DEFAULT_MAX_STEPS = 24
+DEFAULT_MAX_STEPS = 16
 MIN_MAX_STEPS = 8
 MAX_MAX_STEPS = 64
 MAX_RESULT_BYTES = 80_000
-MAX_SCOPED_FILES = 8
+MAX_SCOPED_FILES = 4
 WORKTREE_PARENT = Path(tempfile.gettempdir()) / "pokemonromhack-opencode"
 SAFE_COMMAND_PATTERN = re.compile(r"^[A-Za-z0-9_./*+=:, -]+$")
 
@@ -287,7 +287,22 @@ def _find_opencode() -> str | None:
     return str(candidates[0]) if candidates else None
 
 
+def _ensure_clean_worktree(repo_root: Path) -> None:
+    status = _run(
+        ["git", "status", "--porcelain"], cwd=repo_root, check=False
+    )
+    if status.returncode != 0:
+        raise AutonomousWorkerError(
+            f"Unable to inspect repository worktree status: {status.stderr.strip()}"
+        )
+    if status.stdout.strip():
+        raise AutonomousWorkerError(
+            "Autonomous worktrees start from committed HEAD; commit prerequisites first."
+        )
+
+
 def run_task(repo_root: Path, arguments: dict[str, Any]) -> str:
+    _ensure_clean_worktree(repo_root)
     if not os.environ.get("OPENROUTER_API_KEY"):
         raise AutonomousWorkerError(
             "OPENROUTER_API_KEY is not set in the MCP server environment."
