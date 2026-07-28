@@ -80,7 +80,8 @@ may provide up to 16 command patterns, which are validated before being added.
 Network tools, nested agents, external-directory access, commits, pushes, and
 interactive questions are disabled.
 
-OpenCode runs with an eight-minute default timeout and a 16-step default agent limit.
+OpenCode runs with a fifteen-minute default timeout and a 40-step default agent
+limit.
 Both can be adjusted per call within bounded limits. It also runs in fast headless
 mode with project configuration, external skills, default plugins, model-catalog
 refreshes, LSP downloads, and file watching disabled. The generated worker
@@ -103,26 +104,26 @@ unstaged, and untracked files from the active worktree are not included. Commit 
 specifications and source changes that the worker must read; never copy credentials,
 saves, or generated ROMs into it.
 
-Keep autonomous tasks mechanical and small: name the exact files and function
-signatures and include relevant existing helper names and locations. Normally limit
-the change to two or three files. The worker is instructed to make its first edit
-within six inspection calls and preserve part of its budget for checks. Use the
-16-step default for routine changes; increase it only after narrowing a task and
-identifying a concrete need. Codex should locate integration hooks, make
-architecture decisions, use small representative test cases, and run the build and
-tests after reviewing the diff. Complete tiny omissions directly rather than
-starting another autonomous run.
+Keep autonomous tasks bounded with an exact file allowlist and observable
+acceptance criteria. Exact symbol locations are helpful when already known, but
+Codex does not need to pre-solve routine repository discovery merely to force an
+early edit. The worker may use up to the first half of its budget for relevant
+exploration, must then converge on an implementation or concrete blocker, and
+should preserve at least one quarter of the budget for edits and focused checks.
+Use roughly 24 steps for simple one-file work, the 40-step default for normal
+two-to-three-file implementation, and 48-64 steps for unfamiliar but still bounded
+integration work. Codex retains architecture decisions, final review, and
+independent validation.
 
 Prefer separate requests for resolver/API code, call-site hooks, and tests when a
 feature crosses those boundaries. Always compare the returned diff to every
 acceptance criterion: reaching the configured step limit can yield a successful
 OpenCode process with an incomplete edit.
 
-As a practical threshold, do not delegate edits below roughly 30-50
-straightforward lines unless they are unusually repetitive. The cost of preparing
-the prompt, rereading repository context, reviewing the patch, and retrying a
-failure can exceed direct implementation. Evaluate efficiency across the whole
-workflow, not only primary-model code generation.
+When worker tokens are inexpensive relative to primary-model effort, prefer a
+longer scoped worker run over spending primary context on a patch-level
+specification. Tiny edits can still remain with Codex when delegation and review
+would add no useful leverage.
 
 ## Verification
 

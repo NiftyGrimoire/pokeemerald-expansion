@@ -76,10 +76,11 @@ appropriate only when file ownership and integration boundaries are disjoint.
 
 ## Current execution limits
 
-- Default wall-clock timeout: 8 minutes.
-- Default maximum agent steps: 16.
-- The worker must make its first edit within six inspection calls or stop with a
-  blocker instead of consuming the full budget on exploration.
+- Default wall-clock timeout: 15 minutes.
+- Default maximum agent steps: 40.
+- The worker may spend up to the first half of its budget on relevant repository
+  exploration. By the midpoint it must converge on an implementation or report a
+  concrete blocker, preserving at least one quarter for edits and focused checks.
 - Autonomous calls require an exact one-to-four-file edit allowlist and report
   out-of-scope changes.
 - Configurable agent-step range: 8–64.
@@ -95,24 +96,22 @@ the missing bounded chunk again; do not infer completion from exit code alone.
 
 ## Token-efficiency policy
 
-Delegation is intended to reduce primary-model effort, not merely move work to
-another model. Account for the worker prompt, repeated repository context,
-failed/retried runs, primary review, integration, and validation.
+Delegation is intended to reduce primary-model effort. Worker tokens are treated
+as inexpensive relative to primary-model planning and patch specification, while
+primary review, integration, and validation remain mandatory.
 
 Use autonomous delegation when all of the following are true:
 
-- The architecture and acceptance criteria are already decided.
+- The architectural boundary and acceptance criteria are decided.
 - All required source and specifications are committed.
-- The unit is mechanical and normally spans two or three files.
-- The implementation is large enough to offset delegation overhead, generally
-  at least 30-50 straightforward lines.
+- The unit is bounded by an exact one-to-four-file edit allowlist.
 - The result has an independently reviewable boundary such as resolver/API code,
   one call-site hook, or focused tests.
 
 Keep the work with Codex when it is architecture-heavy, ambiguous, security
-sensitive, a tiny correction, or inseparable from primary review. Start routine
-tasks at the 16-step default. Increase the budget only after narrowing the task
-and identifying why 16 steps are insufficient.
+sensitive, or inseparable from primary review. Use about 24 steps for simple
+one-file work, the 40-step default for ordinary two-to-three-file implementation,
+and 48-64 steps for unfamiliar but bounded integration.
 
 Observed results motivating this policy:
 
@@ -183,9 +182,9 @@ Do not: Redesign adjacent systems, run a full build, commit, or push.
 Allowed commands: Use the default inspection-only allowlist.
 ```
 
-Delegate only when the remaining mechanical implementation is large enough to
-offset specification and review overhead. Tiny edits and architecture-heavy work
-are usually cheaper to perform directly.
+Provide the architectural boundary, file scope, and observable acceptance
+criteria. Do not spend primary-model context pre-solving routine repository
+discovery or dictating patch-level edits solely to force an early worker edit.
 
 After integration, use the exact repository test filename when selecting a test
 file:

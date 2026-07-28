@@ -95,7 +95,11 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(
             autonomous._bounded_max_steps(None), autonomous.DEFAULT_MAX_STEPS
         )
-        self.assertEqual(autonomous.DEFAULT_MAX_STEPS, 16)
+        self.assertEqual(autonomous.DEFAULT_MAX_STEPS, 40)
+        self.assertEqual(
+            autonomous._bounded_timeout(None), autonomous.DEFAULT_TIMEOUT_SECONDS
+        )
+        self.assertEqual(autonomous.DEFAULT_TIMEOUT_SECONDS, 900)
         self.assertEqual(autonomous.MAX_SCOPED_FILES, 4)
         with self.assertRaisesRegex(
             autonomous.AutonomousWorkerError, "max_steps must be between"

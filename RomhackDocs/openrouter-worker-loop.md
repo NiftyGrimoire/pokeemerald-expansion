@@ -29,14 +29,15 @@ loop did not demonstrate a clear primary-model token saving.
 Every `delegate_autonomous_task` request must provide:
 
 - One bounded mechanical task.
-- An exact allowlist of one to eight repository-relative files.
+- An exact allowlist of one to four repository-relative files.
 - Existing helper names and symbol locations when known.
 - Observable acceptance criteria.
 - A step limit appropriate to the task.
 
-The default limit is 24 OpenCode steps. The worker is instructed to make its
-first edit within six inspection calls or stop and report a blocker. At least
-one quarter of its budget should remain for editing and focused checks.
+The default limit is 40 OpenCode steps with a 15-minute timeout. The worker may
+use up to the first half of that budget for relevant exploration. By the midpoint
+it must converge on an implementation or report a concrete blocker, and at least
+one quarter of the budget should remain for editing and focused checks.
 
 The generated prompt prohibits adjacent redesign, full builds, commits, pushes,
 and network access. Shell access remains default-deny except for explicitly
@@ -81,10 +82,12 @@ without delegation.
 
 ## Recommended Workflow
 
-1. Codex locates the exact integration points and existing helpers.
+1. Codex defines the architectural boundary, exact edit scope, and acceptance
+   criteria without pre-solving routine repository discovery.
 2. Split work by non-overlapping file ownership and observable behavior.
-3. Use 16-24 steps for routine mechanical changes.
-4. Increase the limit only when the implementation itself requires more work.
+3. Use about 24 steps for simple one-file changes.
+4. Use the 40-step default for normal two-to-three-file implementation and 48-64
+   steps for unfamiliar but bounded integration.
 5. Review scope status, actual files, and the complete diff.
 6. Reject out-of-scope or architecture-changing results.
 7. Apply accepted edits under Codex supervision.

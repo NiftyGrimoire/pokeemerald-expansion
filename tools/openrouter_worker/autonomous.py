@@ -16,9 +16,9 @@ from typing import Any
 
 
 DEFAULT_MODEL = "minimax/minimax-m3"
-DEFAULT_TIMEOUT_SECONDS = 480
+DEFAULT_TIMEOUT_SECONDS = 900
 MAX_TIMEOUT_SECONDS = 1800
-DEFAULT_MAX_STEPS = 16
+DEFAULT_MAX_STEPS = 40
 MIN_MAX_STEPS = 8
 MAX_MAX_STEPS = 64
 MAX_RESULT_BYTES = 80_000
@@ -387,9 +387,11 @@ ALLOWED FILES
 SUPERVISION RULES
 - A senior Codex agent owns architecture, integration, and final review.
 - Follow the existing repository style.
-- Edit only the allowed files. Inspect only those files and their direct dependencies.
-- Make the first edit within six inspection/tool calls. If that is impossible, stop
-  and explain the blocker instead of exhausting the step budget on exploration.
+- Edit only the allowed files. You may inspect repository context needed to
+  understand the bounded task, while keeping investigation relevant to it.
+- Use the first half of the step budget for exploration when needed. By the
+  midpoint, converge on the implementation or report a concrete blocker rather
+  than continuing open-ended investigation.
 - Reserve at least one quarter of the step budget for editing and focused checks.
 - Do not broaden scope, commit, push, install dependencies, or access the network.
 - Stop instead of investigating or redesigning adjacent systems.
