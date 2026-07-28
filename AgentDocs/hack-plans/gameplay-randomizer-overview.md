@@ -40,18 +40,31 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      DexNav paths are randomized.
    - Implement a deterministic eligible-species pool and hook the agreed paths after
      vanilla slot and level selection.
-3. Abilities:
+   - Scale the eligible encounter pool by route difficulty so low-level areas draw
+     from lower-BST species and high-level areas draw from higher-BST species.
+   - Derive the difficulty band from stable encounter-table data rather than the
+     mutable level roll, preserving deterministic slot mappings.
+3. Legendary encounters:
+   - Randomize scripted/static encounters only when the original species is a
+     Legendary or Paradox Pokemon.
+   - Select replacements from a dedicated pool containing only enabled, usable
+     restricted Legendary, sub-Legendary, and Paradox species.
+   - Exclude Mythical Pokemon and Ultra Beasts unless the policy is deliberately
+     expanded later.
+   - Preserve the scripted encounter's level, battle setup, flags, and progression
+     behavior while replacing only its species.
+4. Abilities:
    - Specify family identity, whether the result is an ability ID or an ability slot,
      legal ability pool rules, and form/gimmick overrides.
    - Route all Pokemon origins through the same resolver.
-4. Learnsets:
+5. Learnsets:
    - Specify candidate moves and weighting, then add the runtime resolver and any
      measured cache.
-5. Progression rules:
+6. Progression rules:
    - Enable hard caps and no EV gain.
    - Replace friendship evolutions from an explicit species-by-species conversion
      table, preserving applicable secondary conditions.
-6. Quality of life:
+7. Quality of life:
    - Implement and grant Level Capper and Portable Healer after their exact item-use
      and level-up/evolution behavior is specified.
 
@@ -86,8 +99,20 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
 - Encounters:
   - Intercept wild encounter species selection after the vanilla encounter slot is chosen.
   - Preserve encounter levels, encounter method, and slot rarity.
-  - Replace species with a deterministic random species from enabled Pokemon.
+  - Replace species with a deterministic random species from enabled Pokemon in a
+    BST band appropriate to the encounter table's level range.
   - Exclude invalid entries: `SPECIES_NONE`, eggs, disabled species, battle-only forms, unusable forms.
+  - Use stable encounter-table difficulty data as hash/filter context. Do not use
+    the mutable rolled encounter level as identity.
+  - If no species is eligible in the preferred BST band, expand to the nearest
+    adjacent band deterministically rather than failing the encounter.
+- Legendary encounters:
+  - Detect scripted/static encounters whose original species is flagged as a
+    restricted Legendary, sub-Legendary, or Paradox Pokemon.
+  - Replace those species deterministically from a separate pool containing only
+    enabled and generally usable Pokemon with one of those same classifications.
+  - Do not include Mythical Pokemon or Ultra Beasts in the initial pool.
+  - Preserve the original scripted level and progression behavior.
 - Abilities:
   - Choose one legal randomized ability per evolution family/base species.
   - Apply the same ability slot result to all members of that evolution line.

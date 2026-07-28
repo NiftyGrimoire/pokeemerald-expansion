@@ -1,0 +1,36 @@
+{
+    "configurations": [
+        {
+            "name": "pokeemerald-expansion",
+            "compilerPath": "/usr/bin/arm-none-eabi-gcc",
+            "compilerArgs": [
+                "-iquote",
+                "${workspaceFolder}/include",
+                "-mthumb",
+                "-mthumb-interwork",
+                "-mabi=apcs-gnu",
+                "-mtune=arm7tdmi",
+                "-march=armv4t"
+            ],
+            "defines": [
+                "MODERN=1",
+                "TESTING=0",
+                "EMERALD=1",
+                "__INTELLISENSE__"
+            ],
+            "cStandard": "gnu17",
+            "intelliSenseMode": "gcc-arm",
+            "includePath": [
+                "${workspaceFolder}/include/constants"
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/include",
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        }
+    ],
+    "version": 4
+}

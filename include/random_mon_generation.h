@@ -18,5 +18,6 @@ struct FilterFuncArgs
 enum Species GetRandomSpecies(u32 optionId, const struct FilterFuncArgs *filterFuncArgs);
 enum Item GetRandomItem(u32 optionId, const struct FilterFuncArgs *filterFuncArgs);
 void ResolveRandomMonGeneration(enum Species species, enum PokeBall *ball, enum Move *moves);
+bool32 IsSpeciesFormUsableOutsideSpecialContext(enum Species species, const u16 *formTable);
 
 #endif // GUARD_RANDOM_MON_GENERATION_H
