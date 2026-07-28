@@ -95,6 +95,8 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(
             autonomous._bounded_max_steps(None), autonomous.DEFAULT_MAX_STEPS
         )
+        self.assertEqual(autonomous.DEFAULT_MAX_STEPS, 16)
+        self.assertEqual(autonomous.MAX_SCOPED_FILES, 4)
         with self.assertRaisesRegex(
             autonomous.AutonomousWorkerError, "max_steps must be between"
         ):
@@ -113,6 +115,20 @@ class ServerTests(unittest.TestCase):
             autonomous.AutonomousWorkerError, "unsafe repository path"
         ):
             autonomous._scoped_files(["../outside.c"])
+
+    def test_autonomous_rejects_dirty_worktree(self):
+        with tempfile.TemporaryDirectory() as temp:
+            repo = Path(temp)
+            subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+            (repo / "dirty.txt").write_text("uncommitted\n", encoding="utf-8")
+
+            with self.assertRaisesRegex(
+                autonomous.AutonomousWorkerError,
+                "Autonomous worktrees start from committed HEAD",
+            ):
+                autonomous.run_task(
+                    repo, {"task": "Anything", "files": ["dirty.txt"]}
+                )
 
     def test_autonomous_summary_and_metrics_are_concise(self):
         raw_output = "\n".join(

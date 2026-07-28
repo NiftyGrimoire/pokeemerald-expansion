@@ -37,6 +37,12 @@ Never send secrets, credentials, save files, private data, generated ROMs, or
 unrelated content to the worker. MiniMax may edit only isolated worktrees and may
 not commit or push.
 
+Autonomous delegation requires a clean active worktree because its isolated
+worktree starts from committed `HEAD`. Commit reviewed prerequisites first.
+Normally delegate one mechanical layer at a time in two or three files; do not
+delegate trivial edits whose prompt and review cost is likely to exceed the
+implementation.
+
 ## Implementation handoffs
 
 Read the relevant document under `AgentDocs/` before beginning feature work. The
