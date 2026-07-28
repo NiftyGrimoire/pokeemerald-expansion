@@ -34,8 +34,9 @@ broad summary where they differ.
 - Focused tests in `test/randomizer.c`.
 - Intentional `SaveBlock3` size guard updated from 4 to 8 bytes.
 
-No encounter, ability, learnset, progression, evolution, or quality-of-life hook
-has been implemented yet.
+Wild encounter randomization and BST-scaled ordinary encounter pools are
+implemented on feature branches. Ability, learnset, progression, evolution, and
+quality-of-life hooks have not been implemented.
 
 ## Validation already performed
 
@@ -48,8 +49,10 @@ Rerun relevant checks after any new integration.
 
 ## Recommended next phase
 
-Phase 2 encounter work is implemented on `romhack/randomizer-encounters`,
-pending review and approval to merge. Its scope policy is:
+Phase 2 encounter work from `romhack/randomizer-encounters` has been merged into
+`romhack/main` through PR #2. BST-scaled ordinary encounter pools are implemented
+on the dependent branch `romhack/randomizer-encounter-bst`, pending review and
+approval to merge. Their scope policy is:
 
 - Randomize standard grass/cave, Surf, fishing-rod, Rock Smash, mass-outbreak,
   and Feebas encounters.
@@ -65,7 +68,21 @@ The intended core behavior is to preserve the vanilla encounter method, selected
 slot rarity, and level, then deterministically replace only the species with an
 eligible species derived from the save seed and explicit encounter context.
 
-Validation on the encounter branch:
+The BST branch derives difficulty from the weighted average of the fixed level
+ranges in each land, Surf, Rock Smash, or rod-specific encounter table. Ordinary
+encounters select uniformly from the corresponding inclusive BST band:
+
+- Level 1-10: BST 180-360.
+- Level 11-20: BST 240-420.
+- Level 21-30: BST 300-480.
+- Level 31-40: BST 360-540.
+- Level 41-50: BST 420-600.
+- Level 51+: BST 480-720.
+
+Restricted Legendary, sub-Legendary, Mythical, Ultra Beast, and Paradox species
+are excluded from ordinary pools. Empty bands expand outward by 60 BST per pass.
+
+Validation on the encounter branches:
 
 - The encounter resolver determinism, eligibility, and context-separation test
   passes.
@@ -73,17 +90,24 @@ Validation on the encounter branch:
 - All 15 existing random-mon-generation tests pass after sharing its form-safety
   helper with the gameplay randomizer.
 - A normal `make -j4` ROM build succeeds.
+- All seven focused randomizer tests pass with BST-boundary and special-species
+  exclusion coverage on `romhack/randomizer-encounter-bst`.
 
-Codex should first locate and document the smallest common hook or the necessary
-separate hooks. Once signatures and exact files are known, delegate only the
-mechanical resolver or one hook at a time.
+Manual validation still required on the BST branch:
+
+- Confirm early land encounters remain in low-BST pools.
+- Confirm Surf and improved rods can access stronger pools on the same map.
+- Confirm late-game tables select from the high-BST pools.
+- Exercise Feebas, outbreaks, Sweet Scent, and double wild battles.
+- Check that the two-pass species scan causes no perceptible encounter delay.
+
+The fixed table-weight calculation and empty-band fallback are verified by source
+review but do not have direct unit-test hooks. The configured species data contains
+candidates in every preferred band, so the fallback cannot be triggered naturally
+by the current test configuration.
 
 ## Unresolved architecture
 
-- Encounter BST scaling: define the exact route-level and BST band thresholds.
-  Route difficulty should come from stable data for the selected encounter table
-  and method, not the mutable level roll, so repeated resolution of a slot remains
-  stable. Specify deterministic adjacent-band fallback behavior for empty pools.
 - Legendary encounters: locate every scripted/static creation path and define
   stable context keys that distinguish separate encounters without depending on
   mutable RNG. The initial candidate pool is enabled, usable restricted

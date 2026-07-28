@@ -70,31 +70,106 @@ bool32 IsSpeciesRandomizerEligible(enum Species species)
           || !IsSpeciesFormUsableOutsideSpecialContext(species, formTable));
 }
 
-enum Species GetRandomizedSpeciesForEncounter(enum Species originalSpecies, u16 mapId, enum RandomizerEncounterType encounterType, u8 slot)
+static bool32 IsOrdinaryEncounterCandidate(enum Species species, u16 minBST, u16 maxBST)
 {
-#if RANDOMIZER_ENABLED && RANDOMIZER_ENCOUNTERS
-    u32 eligibleSpeciesCount = 0;
-    u32 selectedIndex;
+    const struct SpeciesInfo *speciesInfo;
+    u32 bst;
 
-    for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+    if (!IsSpeciesRandomizerEligible(species))
+        return FALSE;
+
+    speciesInfo = &gSpeciesInfo[species];
+    if (speciesInfo->isRestrictedLegendary
+     || speciesInfo->isSubLegendary
+     || speciesInfo->isMythical
+     || speciesInfo->isUltraBeast
+     || speciesInfo->isParadox)
     {
-        if (IsSpeciesRandomizerEligible(species))
-            eligibleSpeciesCount++;
+        return FALSE;
     }
 
-    if (eligibleSpeciesCount == 0)
-        return originalSpecies;
+    bst = GetSpeciesBaseStatTotal(species);
+    if (bst < minBST || bst > maxBST)
+        return FALSE;
+
+    return TRUE;
+}
+
+enum Species GetRandomizedSpeciesForEncounter(enum Species originalSpecies, u16 mapId, enum RandomizerEncounterType encounterType, u8 slot, u8 encounterDifficulty)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_ENCOUNTERS
+    u16 minBST;
+    u16 maxBST;
+    u32 ordinaryCount = 0;
+    u32 selectedIndex;
+
+    if (encounterDifficulty <= 10)
+    {
+        minBST = 180;
+        maxBST = 360;
+    }
+    else if (encounterDifficulty <= 20)
+    {
+        minBST = 240;
+        maxBST = 420;
+    }
+    else if (encounterDifficulty <= 30)
+    {
+        minBST = 300;
+        maxBST = 480;
+    }
+    else if (encounterDifficulty <= 40)
+    {
+        minBST = 360;
+        maxBST = 540;
+    }
+    else if (encounterDifficulty <= 50)
+    {
+        minBST = 420;
+        maxBST = 600;
+    }
+    else
+    {
+        minBST = 480;
+        maxBST = 720;
+    }
+
+    for (;;)
+    {
+        ordinaryCount = 0;
+        for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+        {
+            if (IsOrdinaryEncounterCandidate(species, minBST, maxBST))
+                ordinaryCount++;
+        }
+
+        if (ordinaryCount > 0)
+            break;
+
+        if (minBST == 0 && maxBST == 1530)
+            return originalSpecies;
+
+        if (minBST > 60)
+            minBST -= 60;
+        else
+            minBST = 0;
+
+        if (maxBST < 1470)
+            maxBST += 60;
+        else
+            maxBST = 1530;
+    }
 
     selectedIndex = RandomizerHash(GetRandomizerSeed(),
                                    RANDOMIZER_CATEGORY_ENCOUNTER,
                                    mapId,
                                    originalSpecies,
                                    ((u32)encounterType << 8) | slot)
-                  % eligibleSpeciesCount;
+                  % ordinaryCount;
 
     for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
     {
-        if (IsSpeciesRandomizerEligible(species) && selectedIndex-- == 0)
+        if (IsOrdinaryEncounterCandidate(species, minBST, maxBST) && selectedIndex-- == 0)
             return species;
     }
 #endif

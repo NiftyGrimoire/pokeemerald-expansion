@@ -121,14 +121,20 @@ species = GetRandomizedSpeciesForEncounter(
     originalSpecies,
     mapId,
     encounterType,
-    wildMonIndex
+    wildMonIndex,
+    encounterDifficulty
 );
 ```
+
+`encounterDifficulty` filters the candidate pool but is not part of the hash
+identity. It is derived from fixed table data and is therefore stable for a
+given map and encounter method.
 
 ## Deterministic Species Resolution
 
 `GetRandomizedSpeciesForEncounter` is implemented in `src/randomizer.c`.
-It first counts every species accepted by `IsSpeciesRandomizerEligible`.
+It first counts every ordinary species accepted by the shared eligibility
+rules and the selected BST band.
 
 It then calculates:
 
@@ -139,7 +145,7 @@ selectedIndex = RandomizerHash(
     mapId,
     originalSpecies,
     ((u32)encounterType << 8) | slot
-) % eligibleSpeciesCount;
+) % ordinarySpeciesCount;
 ```
 
 The complete mapping identity is:
@@ -188,6 +194,45 @@ It shares Expansion's existing form-safety logic from
 `src/random_mon_generation.c`. This also rejects forms such as Zen Mode
 Darmanitan and fused Kyurem that should not be generated as independent wild
 Pokemon.
+
+Ordinary randomized encounters additionally exclude restricted Legendary,
+sub-Legendary, Mythical, Ultra Beast, and Paradox species. Restricted
+Legendary, sub-Legendary, and Paradox species are reserved for the separate
+scripted Legendary encounter randomizer.
+
+## BST-Scaled Encounter Pools
+
+The randomizer calculates a stable difficulty value from each encounter table.
+For every slot, it takes the midpoint of the fixed minimum and maximum levels,
+weights that midpoint by the vanilla slot odds, and rounds the resulting table
+average down.
+
+Land, Surf, and Rock Smash use their own tables. Fishing is divided into Old
+Rod, Good Rod, and Super Rod groups, so waiting for a better rod can provide a
+stronger pool on the same route. This is intentional for player-managed
+one-encounter-per-route Nuzlocke rules.
+
+The inclusive difficulty bands are:
+
+| Encounter difficulty | Eligible BST |
+| --- | --- |
+| 1-10 | 180-360 |
+| 11-20 | 240-420 |
+| 21-30 | 300-480 |
+| 31-40 | 360-540 |
+| 41-50 | 420-600 |
+| 51+ | 480-720 |
+
+Every eligible species in the chosen band has one entry in the candidate pool.
+Vanilla slot weights affect the difficulty calculation only; they do not make
+lower-BST replacements more likely.
+
+If a band is empty, both bounds expand by 60 BST per pass until candidates
+exist. The original species is retained only if the fully expanded ordinary
+pool is empty.
+
+Feebas uses the midpoint of its fixed level range. Mass outbreaks use the
+saved outbreak level.
 
 ## Fishing
 
@@ -274,7 +319,10 @@ Repel and ability checks
 Hash(seed, map, original species, method, slot)
         |
         v
-Select an eligible replacement species
+Filter ordinary species by the method's fixed-table BST band
+        |
+        v
+Select an eligible replacement species uniformly
         |
         v
 Create the replacement at the original level
@@ -288,20 +336,6 @@ The core invariant is:
 > Vanilla determines the shape of the encounter; the randomizer
 > deterministically substitutes its species.
 
-## Planned BST-Scaled Encounter Pools
-
-Encounter pools will be refined so lower-level areas select from lower-BST
-species while higher-level areas select from higher-BST species.
-
-Route difficulty will be derived from stable encounter-table data for the map
-and method, rather than the mutable level rolled for an individual encounter.
-This keeps a given save, map, method, and slot mapped consistently.
-
-The exact route-level and BST thresholds still require tuning. If a preferred
-BST band contains no eligible species, resolution will expand
-deterministically to the nearest adjacent band instead of failing the
-encounter.
-
 ## Tests
 
 `test/randomizer.c` verifies that:
@@ -309,5 +343,17 @@ encounter.
 - Representative valid species are accepted.
 - Invalid and battle-only species are rejected.
 - Encounter resolution returns an eligible species.
+- Every difficulty boundary returns a species inside its preferred BST band.
+- Ordinary encounters exclude all special species classifications.
+- Low-level and high-level difficulties respect their intended BST limits.
 - Identical context produces an identical result.
 - Map, method, slot, and save-seed changes separate results.
+
+The focused randomizer suite passes seven tests, all 15 existing
+random-mon-generation tests pass, and a normal `make -j4` ROM build succeeds.
+
+Manual gameplay validation remains necessary for method-specific progression and
+runtime feel. In particular, test early land tables, delayed Surf or rod captures
+on the same route, late-game tables, Feebas, outbreaks, Sweet Scent, and double
+wild battles. The fixed weight calculation and empty-band fallback are currently
+reviewed in source rather than invoked through dedicated test hooks.
