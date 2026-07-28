@@ -176,3 +176,59 @@ enum Species GetRandomizedSpeciesForEncounter(enum Species originalSpecies, u16 
 
     return originalSpecies;
 }
+
+bool32 IsSpeciesRandomizerLegendaryEncounterEligible(enum Species species)
+{
+    const struct SpeciesInfo *speciesInfo;
+
+    if (!IsSpeciesRandomizerEligible(species))
+        return FALSE;
+
+    speciesInfo = &gSpeciesInfo[species];
+    if (!(speciesInfo->isRestrictedLegendary
+       || speciesInfo->isSubLegendary
+       || speciesInfo->isParadox))
+    {
+        return FALSE;
+    }
+
+    if (speciesInfo->isMythical || speciesInfo->isUltraBeast)
+        return FALSE;
+
+    return TRUE;
+}
+
+enum Species GetRandomizedSpeciesForLegendaryEncounter(enum Species originalSpecies, u16 mapId, u8 slot)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_LEGENDARY_ENCOUNTERS
+    u32 eligibleCount = 0;
+    u32 selectedIndex;
+
+    if (!IsSpeciesRandomizerLegendaryEncounterEligible(originalSpecies))
+        return originalSpecies;
+
+    for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+    {
+        if (IsSpeciesRandomizerLegendaryEncounterEligible(species))
+            eligibleCount++;
+    }
+
+    if (eligibleCount == 0)
+        return originalSpecies;
+
+    selectedIndex = RandomizerHash(GetRandomizerSeed(),
+                                   RANDOMIZER_CATEGORY_LEGENDARY_ENCOUNTER,
+                                   mapId,
+                                   (u32)originalSpecies,
+                                   slot)
+                  % eligibleCount;
+
+    for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+    {
+        if (IsSpeciesRandomizerLegendaryEncounterEligible(species) && selectedIndex-- == 0)
+            return species;
+    }
+#endif
+
+    return originalSpecies;
+}

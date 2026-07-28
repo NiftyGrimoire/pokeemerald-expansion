@@ -154,3 +154,66 @@ TEST("Encounter randomization low difficulty BST stays under high-difficulty flo
     EXPECT_LE(lowBST, 360);
     EXPECT_GE(highBST, 480);
 }
+
+TEST("Legendary encounter eligibility includes restricted, sub, and Paradox species")
+{
+    EXPECT(gSpeciesInfo[SPECIES_MEWTWO].isRestrictedLegendary);
+    EXPECT(gSpeciesInfo[SPECIES_ARTICUNO].isSubLegendary);
+    EXPECT(gSpeciesInfo[SPECIES_GREAT_TUSK].isParadox);
+
+    EXPECT(IsSpeciesRandomizerLegendaryEncounterEligible(SPECIES_MEWTWO));
+    EXPECT(IsSpeciesRandomizerLegendaryEncounterEligible(SPECIES_ARTICUNO));
+    EXPECT(IsSpeciesRandomizerLegendaryEncounterEligible(SPECIES_GREAT_TUSK));
+}
+
+TEST("Legendary encounter eligibility excludes Mythical, Ultra Beast, battle-only, and ordinary species")
+{
+    EXPECT(gSpeciesInfo[SPECIES_ARCEUS].isMythical);
+    EXPECT(gSpeciesInfo[SPECIES_NIHILEGO].isUltraBeast);
+    EXPECT(gSpeciesInfo[SPECIES_ZIGZAGOON].isRestrictedLegendary == FALSE);
+    EXPECT(gSpeciesInfo[SPECIES_ZIGZAGOON].isSubLegendary == FALSE);
+    EXPECT(gSpeciesInfo[SPECIES_ZIGZAGOON].isMythical == FALSE);
+    EXPECT(gSpeciesInfo[SPECIES_ZIGZAGOON].isUltraBeast == FALSE);
+    EXPECT(gSpeciesInfo[SPECIES_ZIGZAGOON].isParadox == FALSE);
+
+    EXPECT(!IsSpeciesRandomizerLegendaryEncounterEligible(SPECIES_ARCEUS));
+    EXPECT(!IsSpeciesRandomizerLegendaryEncounterEligible(SPECIES_NIHILEGO));
+    EXPECT(!IsSpeciesRandomizerLegendaryEncounterEligible(SPECIES_ZIGZAGOON));
+    EXPECT(!IsSpeciesRandomizerLegendaryEncounterEligible(SPECIES_NONE));
+    EXPECT(!IsSpeciesRandomizerLegendaryEncounterEligible(SPECIES_MEWTWO_MEGA_X));
+}
+
+TEST("Legendary encounter resolver is deterministic for eligible original species")
+{
+    enum Species species;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    species = GetRandomizedSpeciesForLegendaryEncounter(SPECIES_MEWTWO, 0x0050, 0);
+
+    EXPECT(IsSpeciesRandomizerLegendaryEncounterEligible(species));
+    EXPECT_EQ(species, GetRandomizedSpeciesForLegendaryEncounter(SPECIES_MEWTWO, 0x0050, 0));
+}
+
+TEST("Legendary encounter resolver separates mapId, originalSpecies, slot, and seed context")
+{
+    enum Species species;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    species = GetRandomizedSpeciesForLegendaryEncounter(SPECIES_MEWTWO, 0x0060, 0);
+
+    EXPECT_NE(species, GetRandomizedSpeciesForLegendaryEncounter(SPECIES_MEWTWO, 0x0061, 0));
+    EXPECT_NE(species, GetRandomizedSpeciesForLegendaryEncounter(SPECIES_RAYQUAZA, 0x0060, 0));
+    EXPECT_NE(species, GetRandomizedSpeciesForLegendaryEncounter(SPECIES_MEWTWO, 0x0060, 1));
+
+    gSaveBlock3Ptr->randomizerSeed = 0x87654321;
+    EXPECT_NE(species, GetRandomizedSpeciesForLegendaryEncounter(SPECIES_MEWTWO, 0x0060, 0));
+}
+
+TEST("Legendary encounter resolver leaves ordinary and SPECIES_NONE originals unchanged")
+{
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+
+    EXPECT_EQ(GetRandomizedSpeciesForLegendaryEncounter(SPECIES_ZIGZAGOON, 0x0070, 0), SPECIES_ZIGZAGOON);
+    EXPECT_EQ(GetRandomizedSpeciesForLegendaryEncounter(SPECIES_NONE, 0x0070, 0), SPECIES_NONE);
+    EXPECT_EQ(GetRandomizedSpeciesForLegendaryEncounter(SPECIES_NONE, 0x0070, 1), SPECIES_NONE);
+}

@@ -31,8 +31,10 @@ broad summary where they differ.
 - Intentional `SaveBlock3` size guard updated from 4 to 8 bytes.
 
 Wild encounter randomization and BST-scaled ordinary encounter pools are merged
-into `romhack/main`. Scripted Legendary encounters, abilities, learnsets,
-progression, evolution, and quality-of-life hooks have not been implemented.
+into `romhack/main`. Scripted Legendary encounter randomization is implemented
+and validated on `romhack/randomizer-legendary-encounters`, but is not yet
+committed or merged. Abilities, learnsets, progression, evolution, and
+quality-of-life hooks have not been implemented.
 
 ## Validation already performed
 
@@ -102,11 +104,32 @@ review but do not have direct unit-test hooks. The configured species data conta
 candidates in every preferred band, so the fallback cannot be triggered naturally
 by the current test configuration.
 
-## Next phase: scripted Legendary encounters
+## Current phase: scripted Legendary encounters
 
 Create `romhack/randomizer-legendary-encounters` from the current
 `romhack/main`. Do not implement this phase directly on main, merge it, or push it
 without explicit approval.
+
+The feature branch now contains an uncommitted implementation:
+
+- A dedicated enabled config gate and hash category.
+- A qualifying-species helper limited to enabled, generally usable restricted
+  Legendary, sub-Legendary, and Paradox species.
+- A deterministic resolver keyed by map ID, original species, and battle slot.
+- A `ScrCmd_setwildbattle` hook that replaces only qualifying species before the
+  existing creation flow.
+- Focused classification, determinism, context-separation, and passthrough tests.
+
+Validation on the feature branch:
+
+- All 12 tests in `test/randomizer.c` pass.
+- A normal `make -j4` ROM build succeeds.
+- Source review confirms the direct `src/berry.c` caller is not hooked.
+
+Manual gameplay validation is still required for Groudon, Kyogre, Rayquaza,
+Regirock, Regice, and Registeel, including capture/defeat flags and repeat-entry
+behavior. FRLG static maps remain outside required Emerald gameplay coverage
+until reachability is established.
 
 The initial policy is:
 
@@ -160,6 +183,14 @@ Suggested bounded OpenRouter chunks, after Codex makes the identity decision:
 Codex retains architecture, worktree integration, source review, build/test
 validation, documentation, and commits. Workers remain isolated, uncommitted,
 and may not push or merge.
+
+## Reordered next work
+
+After this branch is reviewed, committed, and deliberately integrated, implement
+hard level caps and no EV gain before starters. Those settings already have
+defined Expansion configuration and are prerequisites for the Level Capper, while
+starters, abilities, learnsets, evolution changes, QoL items, and world items
+still require policy or wider call-path analysis.
 
 ## Other unresolved architecture
 

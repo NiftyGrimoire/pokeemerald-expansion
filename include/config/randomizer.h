@@ -7,6 +7,9 @@
 // Randomize species selected by supported wild encounter methods.
 #define RANDOMIZER_ENCOUNTERS TRUE
 
+// Randomize supported scripted Legendary and Paradox encounters.
+#define RANDOMIZER_LEGENDARY_ENCOUNTERS TRUE
+
 // Changing the hash algorithm or category meanings requires a new version.
 #define RANDOMIZER_ALGORITHM_VERSION 1
 
