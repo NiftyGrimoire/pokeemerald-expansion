@@ -50,6 +50,11 @@ static void FeebasSeedRng(u16 seed);
 static void ApplyFluteEncounterRateMod(u32 *encRate);
 static void ApplyCleanseTagEncounterRateMod(u32 *encRate);
 static u8 GetMaxLevelOfSpeciesInWildTable(const struct WildPokemon *wildMon, enum Species species, enum WildPokemonArea area);
+static u8 ComputeEncounterDifficulty(const struct WildPokemon *wildMon, const u8 *weights, u32 count);
+static u8 ComputeLandEncounterDifficulty(const struct WildPokemon *wildMon);
+static u8 ComputeWaterEncounterDifficulty(const struct WildPokemon *wildMon);
+static u8 ComputeRocksEncounterDifficulty(const struct WildPokemon *wildMon);
+static u8 ComputeFishingEncounterDifficulty(const struct WildPokemon *wildMon, u8 rod);
 #ifdef BUGFIX
 static bool8 TryGetAbilityInfluencedWildMonIndex(const struct WildPokemon *wildMon, enum Type type, enum Ability ability, u8 *monIndex, u32 size);
 #else
@@ -65,6 +70,15 @@ EWRAM_DATA u8 gChainFishingDexNavStreak = 0;
 #include "data/wild_encounters.h"
 
 const struct WildPokemon gWildFeebas = {20, 25, SPECIES_FEEBAS};
+
+// These weights match the vanilla slot odds and keep table difficulty
+// independent of the slot and level rolled for an individual encounter.
+static const u8 sLandSlotWeights[LAND_WILD_COUNT] = {20, 20, 10, 10, 10, 10, 5, 5, 4, 4, 1, 1};
+static const u8 sWaterSlotWeights[WATER_WILD_COUNT] = {60, 30, 5, 4, 1};
+static const u8 sRockSmashSlotWeights[ROCK_WILD_COUNT] = {60, 30, 5, 4, 1};
+static const u8 sOldRodSlotWeights[2] = {70, 30};
+static const u8 sGoodRodSlotWeights[3] = {60, 20, 20};
+static const u8 sSuperRodSlotWeights[5] = {40, 40, 15, 4, 1};
 
 static const u16 sRoute119WaterTileData[] =
 {
@@ -478,6 +492,53 @@ void CreateWildMon(enum Species species, u8 level)
 #define TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildPokemon, type, ability, ptr, count) TryGetAbilityInfluencedWildMonIndex(wildPokemon, type, ability, ptr)
 #endif
 
+static u8 ComputeEncounterDifficulty(const struct WildPokemon *wildMon, const u8 *weights, u32 count)
+{
+    u32 weightedSum = 0;
+    u32 weightTotal = 0;
+
+    for (u32 i = 0; i < count; i++)
+    {
+        weightedSum += ((u32)wildMon[i].minLevel + wildMon[i].maxLevel) * weights[i];
+        weightTotal += weights[i];
+    }
+
+    if (weightTotal == 0)
+        return 1;
+
+    return weightedSum / (2 * weightTotal);
+}
+
+static u8 ComputeLandEncounterDifficulty(const struct WildPokemon *wildMon)
+{
+    return ComputeEncounterDifficulty(wildMon, sLandSlotWeights, LAND_WILD_COUNT);
+}
+
+static u8 ComputeWaterEncounterDifficulty(const struct WildPokemon *wildMon)
+{
+    return ComputeEncounterDifficulty(wildMon, sWaterSlotWeights, WATER_WILD_COUNT);
+}
+
+static u8 ComputeRocksEncounterDifficulty(const struct WildPokemon *wildMon)
+{
+    return ComputeEncounterDifficulty(wildMon, sRockSmashSlotWeights, ROCK_WILD_COUNT);
+}
+
+static u8 ComputeFishingEncounterDifficulty(const struct WildPokemon *wildMon, u8 rod)
+{
+    switch (rod)
+    {
+    case OLD_ROD:
+        return ComputeEncounterDifficulty(wildMon, sOldRodSlotWeights, 2);
+    case GOOD_ROD:
+        return ComputeEncounterDifficulty(wildMon + 2, sGoodRodSlotWeights, 3);
+    case SUPER_ROD:
+        return ComputeEncounterDifficulty(wildMon + 5, sSuperRodSlotWeights, 5);
+    default:
+        return 1;
+    }
+}
+
 bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, enum WildPokemonArea area, u8 flags)
 {
     u8 wildMonIndex = 0;
@@ -537,21 +598,25 @@ bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, enum WildPok
     if (flags & WILD_CHECK_RANDOMIZE)
     {
         enum RandomizerEncounterType encounterType;
+        u8 encounterDifficulty;
         u16 mapId = (gSaveBlock1Ptr->location.mapGroup << 8) | gSaveBlock1Ptr->location.mapNum;
 
         switch (area)
         {
         case WILD_AREA_WATER:
             encounterType = RANDOMIZER_ENCOUNTER_WATER;
+            encounterDifficulty = ComputeWaterEncounterDifficulty(wildMonInfo->wildPokemon);
             break;
         case WILD_AREA_ROCKS:
             encounterType = RANDOMIZER_ENCOUNTER_ROCK_SMASH;
+            encounterDifficulty = ComputeRocksEncounterDifficulty(wildMonInfo->wildPokemon);
             break;
         default:
             encounterType = RANDOMIZER_ENCOUNTER_LAND;
+            encounterDifficulty = ComputeLandEncounterDifficulty(wildMonInfo->wildPokemon);
             break;
         }
-        species = GetRandomizedSpeciesForEncounter(species, mapId, encounterType, wildMonIndex);
+        species = GetRandomizedSpeciesForEncounter(species, mapId, encounterType, wildMonIndex, encounterDifficulty);
     }
 
     CreateWildMon(species, level);
@@ -564,9 +629,10 @@ static u16 GenerateFishingWildMon(const struct WildPokemonInfo *wildMonInfo, u8 
     enum Species wildMonSpecies = wildMonInfo->wildPokemon[wildMonIndex].species;
     u8 level = ChooseWildMonLevel(wildMonInfo->wildPokemon, wildMonIndex, WILD_AREA_FISHING);
     u16 mapId = (gSaveBlock1Ptr->location.mapGroup << 8) | gSaveBlock1Ptr->location.mapNum;
+    u8 encounterDifficulty = ComputeFishingEncounterDifficulty(wildMonInfo->wildPokemon, rod);
 
     UpdateChainFishingStreak();
-    wildMonSpecies = GetRandomizedSpeciesForEncounter(wildMonSpecies, mapId, RANDOMIZER_ENCOUNTER_FISHING, wildMonIndex);
+    wildMonSpecies = GetRandomizedSpeciesForEncounter(wildMonSpecies, mapId, RANDOMIZER_ENCOUNTER_FISHING, wildMonIndex, encounterDifficulty);
     CreateWildMon(wildMonSpecies, level);
     return wildMonSpecies;
 }
@@ -583,7 +649,7 @@ bool8 SetUpMassOutbreakEncounter(u8 flags)
     {
         u16 mapId = (gSaveBlock1Ptr->location.mapGroup << 8) | gSaveBlock1Ptr->location.mapNum;
 
-        species = GetRandomizedSpeciesForEncounter(species, mapId, RANDOMIZER_ENCOUNTER_MASS_OUTBREAK, 0);
+        species = GetRandomizedSpeciesForEncounter(species, mapId, RANDOMIZER_ENCOUNTER_MASS_OUTBREAK, 0, gSaveBlock1Ptr->outbreakPokemonLevel);
     }
     CreateWildMon(species, gSaveBlock1Ptr->outbreakPokemonLevel);
     for (i = 0; i < MAX_MON_MOVES; i++)
@@ -969,7 +1035,8 @@ void FishingWildEncounter(u8 rod)
 
         u16 mapId = (gSaveBlock1Ptr->location.mapGroup << 8) | gSaveBlock1Ptr->location.mapNum;
 
-        species = GetRandomizedSpeciesForEncounter(gWildFeebas.species, mapId, RANDOMIZER_ENCOUNTER_FEEBAS, 0);
+        species = GetRandomizedSpeciesForEncounter(gWildFeebas.species, mapId, RANDOMIZER_ENCOUNTER_FEEBAS, 0,
+                                                   (gWildFeebas.minLevel + gWildFeebas.maxLevel) / 2);
         CreateWildMon(species, level);
     }
     else
