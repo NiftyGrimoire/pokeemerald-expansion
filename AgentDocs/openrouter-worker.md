@@ -57,6 +57,14 @@ Autonomous worktrees start from committed `HEAD`; staged, unstaged, and untracke
 files from the active worktree are absent. Commit specifications or source changes
 that the worker needs before delegating.
 
+Do not combine a cross-layer feature into one autonomous request merely because
+all edits share one policy. Split pure resolver/API work, integration hooks, and
+tests into separate requests when each chunk can be reviewed independently. In
+practice, a five-file resolver-plus-hook-plus-tests request exhausted a 24-step
+budget after only its header edits; a larger retry completed, but consumed nearly
+all 40 steps. Smaller two-to-four-file chunks are easier to supervise, cheaper to
+retry, and better aligned with the worker's early-edit limit.
+
 Successful and timed-out runs remain under
 `/tmp/pokemonromhack-opencode/` for review. They are never merged automatically.
 Other failed runs are cleaned up automatically.
@@ -78,6 +86,11 @@ appropriate only when file ownership and integration boundaries are disjoint.
 - A timeout retains and reports the partial worktree and diff.
 - Results report observed agent steps and token usage when OpenCode emits it.
 
+Treat a run that reaches its step ceiling as incomplete even when OpenCode exits
+successfully. Check the worker summary, Git status, and diff against every
+acceptance criterion before integration. Remove incomplete worktrees and delegate
+the missing bounded chunk again; do not infer completion from exit code alone.
+
 ## Authorization and data restrictions
 
 The user has authorized MiniMax M3 through OpenRouter/OpenCode to read and edit
@@ -96,6 +109,31 @@ This authorization excludes:
 Task text and repository content read by the worker are sent to OpenRouter and the
 selected model provider.
 
+## Local configuration
+
+The MCP registration is intentionally local and ignored by Git. A fresh clone,
+workspace recreation, or removal of previously tracked `.codex/config.toml` can
+leave OpenCode installed while making the worker disappear from Codex tool
+discovery. Preserve or migrate the local registration before untracking editor
+configuration, then relaunch Codex.
+
+The expected repository-local configuration is:
+
+```toml
+[mcp_servers.openrouter_worker]
+command = "python3"
+args = ["/absolute/path/to/PokemonRomhack/tools/openrouter_worker/server.py"]
+env_vars = ["OPENROUTER_API_KEY", "OPENROUTER_MODEL", "OPENROUTER_MAX_TOKENS"]
+startup_timeout_sec = 10
+tool_timeout_sec = 1860
+```
+
+Use an absolute server path so startup does not depend on the editor's working
+directory. If `opencode` is installed through NVM but absent from Codex's `PATH`,
+the worker searches `~/.nvm/versions/node/*/bin/opencode`; this is not itself an
+installation failure. Diagnose registration with `codex mcp list` before
+reinstalling OpenCode.
+
 ## Task template
 
 ```text
@@ -111,3 +149,13 @@ Allowed commands: Use the default inspection-only allowlist.
 Delegate only when the remaining mechanical implementation is large enough to
 offset specification and review overhead. Tiny edits and architecture-heavy work
 are usually cheaper to perform directly.
+
+After integration, use the exact repository test filename when selecting a test
+file:
+
+```sh
+make -j4 check TESTS=test/randomizer.c
+```
+
+`TESTS=randomizer` is interpreted as a test-name prefix, not a filename filter,
+and can finish with `No tests found` after building the test binary.

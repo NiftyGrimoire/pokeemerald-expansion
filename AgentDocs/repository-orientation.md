@@ -73,6 +73,16 @@ make check TESTS="<focused test name>"
 make pokeemerald-test.elf TESTS="<focused test name>"
 ```
 
+To select one test source file, pass its exact repository-relative filename,
+including `.c`, for example:
+
+```sh
+make -j4 check TESTS=test/randomizer.c
+```
+
+A bare value such as `TESTS=randomizer` is treated as a test-name prefix and does
+not select `test/randomizer.c`.
+
 Run the smallest relevant checks first, then a normal ROM build and broader
 tests in proportion to the change. Overworld behavior often cannot be exercised
 by the automated battle harness, so pair pure resolver tests with source review

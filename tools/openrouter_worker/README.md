@@ -28,6 +28,12 @@ model in two modes:
 The project configuration in `.codex/config.toml` starts the server automatically.
 The default model is `minimax/minimax-m3`.
 
+`.codex/` is ignored by this repository, so cloning the repository or removing a
+previously tracked editor configuration does not recreate the MCP registration.
+Keep the local file when untracking it, or restore the registration before
+relaunching Codex. Prefer an absolute path to `server.py` in that local
+configuration so server startup does not depend on the launch directory.
+
 Optional environment variables:
 
 ```sh
@@ -101,6 +107,11 @@ needs more implementation work. Codex should locate integration hooks, make
 architecture decisions, use small representative test cases, and run the build and
 tests after reviewing the diff. Complete tiny omissions directly rather than
 starting another autonomous run.
+
+Prefer separate requests for resolver/API code, call-site hooks, and tests when a
+feature crosses those boundaries. Always compare the returned diff to every
+acceptance criterion: reaching the configured step limit can yield a successful
+OpenCode process with an incomplete edit.
 
 ## Verification
 
