@@ -30,4 +30,6 @@ not commit or push.
 
 Read the relevant document under `AgentDocs/` before beginning feature work. The
 current randomizer status and next-phase guidance are in
-`AgentDocs/randomizer-implementation.md`.
+`AgentDocs/randomizer-implementation.md`. The authoritative gameplay randomizer
+plan is in `AgentDocs/hack-plans/gameplay-randomizer-overview.md`; read both before
+continuing randomizer development.
