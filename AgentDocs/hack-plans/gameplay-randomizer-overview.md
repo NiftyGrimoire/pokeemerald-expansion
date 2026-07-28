@@ -53,20 +53,34 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      expanded later.
    - Preserve the scripted encounter's level, battle setup, flags, and progression
      behavior while replacing only its species.
-4. Abilities:
+4. Starters:
+   - Deterministically randomize the three starter choices for each save.
+   - Define the eligible species pool, whether the choices must be unique, any
+     strength or evolution-stage limits, and how the rival's starter choice follows
+     the randomized selection before implementation.
+5. Abilities:
    - Specify family identity, whether the result is an ability ID or an ability slot,
      legal ability pool rules, and form/gimmick overrides.
    - Route all Pokemon origins through the same resolver.
-5. Learnsets:
+6. Learnsets:
    - Specify candidate moves and weighting, then add the runtime resolver and any
      measured cache.
-6. Progression rules:
+7. Progression rules:
    - Enable hard caps and no EV gain.
    - Replace friendship evolutions from an explicit species-by-species conversion
      table, preserving applicable secondary conditions.
-7. Quality of life:
+   - Make time-dependent and alternate-form evolution lines practical in a short
+     Nuzlocke: replace day/night dependencies and deterministically randomize the
+     available branch or form, including regional forms, under an explicit
+     species-by-species policy.
+8. Quality of life:
    - Implement and grant Level Capper and Portable Healer after their exact item-use
      and level-up/evolution behavior is specified.
+9. World items:
+   - Deterministically randomize item pickups found in the overworld.
+   - Limit replacements to items useful in a Nuzlocke, initially held items and
+     evolution items; define exclusions and progression safeguards before
+     implementation.
 
 ### Phase 1 Contract
 - `RandomizerHash` is a pure function: it does not read or advance either global RNG.
@@ -113,6 +127,14 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
     enabled and generally usable Pokemon with one of those same classifications.
   - Do not include Mythical Pokemon or Ultra Beasts in the initial pool.
   - Preserve the original scripted level and progression behavior.
+- Starters:
+  - Replace the three displayed and granted starter species deterministically from
+    the save seed while preserving each choice slot's identity.
+  - Ensure the selection UI, granted Pokemon, rival choice, subsequent rival teams,
+    and starter-dependent scripts all agree on the randomized choices.
+  - Decide whether choices must be distinct and whether the pool excludes special
+    species, unusable forms, evolved species, or Pokemon outside an approved BST
+    range before implementation.
 - Abilities:
   - Choose one legal randomized ability per evolution family/base species.
   - Apply the same ability slot result to all members of that evolution line.
@@ -139,15 +161,35 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
     - Midgame evolutions: level 30.
     - Special/late evolutions: level 40.
   - Preserve extra conditions where meaningful, such as day/night or known move type, unless they depended only on friendship.
+- Time-dependent, branched, and form evolutions:
+  - Remove day/night availability barriers for a quick Nuzlocke.
+  - For species with alternate evolution outcomes or forms, deterministically choose
+    an available result per save, including eligible regional forms.
+  - Specify the eligible form pool, branch identity, evolution trigger, and handling
+    of species whose regional form normally requires a different base form before
+    implementation.
+- World items:
+  - Randomize eligible visible and hidden overworld item pickups deterministically
+    from the save seed and a stable pickup identity.
+  - Restrict the initial replacement pool to held items and evolution items that are
+    usable during a Nuzlocke.
+  - Specify key-item/TM handling, duplicate policy, pickup respawn behavior, and any
+    progression-critical exclusions before hooking item scripts.
 
 ## Test Plan
 - Build with `make -j$(nproc)`.
 - Start two new saves and confirm encounter/ability/learnset randomization differs between saves.
+- Confirm the three starter choices are stable within a save, differ across suitable
+  seeds, and match the Pokemon granted to the player and used by the rival.
 - Within one save, confirm repeated encounters of the same species have consistent ability and learnset.
 - Confirm evolution preserves the randomized ability behavior for that evolution line.
 - Confirm Pokemon at cap gain no EXP and Rare Candy/EXP Candy cannot exceed cap.
 - Confirm EVs do not increase from battle or EV items.
 - Confirm friendship evolution species evolve by the new level thresholds.
+- Confirm day/night evolution lines and alternate/regional-form branches are
+  obtainable without waiting for a real-time window and remain stable within a save.
+- Confirm world item replacements are deterministic within a save, differ between
+  saves, and never produce an item outside the approved held/evolution-item pool.
 - Confirm Level Capper and Portable Healer work outside battle and are blocked or harmless in battle.
 
 ## Assumptions

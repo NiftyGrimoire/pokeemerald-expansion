@@ -172,4 +172,14 @@ and may not push or merge.
   move exclusions, and evolution behavior.
 - Friendship evolution replacements: create an explicit species-level conversion
   table.
+- Starter randomization: identify the selection, display, grant, rival-choice, and
+  later rival-team paths; define a deterministic three-choice policy, eligible pool,
+  uniqueness rule, and any evolution-stage or BST limits.
+- Time-dependent and alternate-form evolutions: define a species-level policy that
+  removes day/night availability barriers and deterministically selects eligible
+  alternate or regional-form outcomes for a save.
+- World item randomization: identify all visible and hidden pickup paths, define a
+  stable pickup identity, and build an approved Nuzlocke-useful replacement pool
+  limited initially to held items and evolution items. Explicitly decide key-item,
+  TM, duplicate, respawn, and progression-critical-item handling.
 - Level Capper: specify exact level-up, move-learning, and evolution behavior.
