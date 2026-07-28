@@ -49,10 +49,10 @@ Rerun relevant checks after any new integration.
 
 ## Recommended next phase
 
-Phase 2 encounter work is implemented on `romhack/randomizer-encounters`.
-BST-scaled ordinary encounter pools are implemented on the dependent branch
-`romhack/randomizer-encounter-bst`. Both are pending review and approval to
-merge. Their scope policy is:
+Phase 2 encounter work from `romhack/randomizer-encounters` has been merged into
+`romhack/main` through PR #2. BST-scaled ordinary encounter pools are implemented
+on the dependent branch `romhack/randomizer-encounter-bst`, pending review and
+approval to merge. Their scope policy is:
 
 - Randomize standard grass/cave, Surf, fishing-rod, Rock Smash, mass-outbreak,
   and Feebas encounters.
@@ -93,9 +93,18 @@ Validation on the encounter branches:
 - All seven focused randomizer tests pass with BST-boundary and special-species
   exclusion coverage on `romhack/randomizer-encounter-bst`.
 
-Codex should first locate and document the smallest common hook or the necessary
-separate hooks. Once signatures and exact files are known, delegate only the
-mechanical resolver or one hook at a time.
+Manual validation still required on the BST branch:
+
+- Confirm early land encounters remain in low-BST pools.
+- Confirm Surf and improved rods can access stronger pools on the same map.
+- Confirm late-game tables select from the high-BST pools.
+- Exercise Feebas, outbreaks, Sweet Scent, and double wild battles.
+- Check that the two-pass species scan causes no perceptible encounter delay.
+
+The fixed table-weight calculation and empty-band fallback are verified by source
+review but do not have direct unit-test hooks. The configured species data contains
+candidates in every preferred band, so the fallback cannot be triggered naturally
+by the current test configuration.
 
 ## Unresolved architecture
 

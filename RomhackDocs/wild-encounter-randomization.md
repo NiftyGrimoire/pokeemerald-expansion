@@ -348,3 +348,12 @@ The core invariant is:
 - Low-level and high-level difficulties respect their intended BST limits.
 - Identical context produces an identical result.
 - Map, method, slot, and save-seed changes separate results.
+
+The focused randomizer suite passes seven tests, all 15 existing
+random-mon-generation tests pass, and a normal `make -j4` ROM build succeeds.
+
+Manual gameplay validation remains necessary for method-specific progression and
+runtime feel. In particular, test early land tables, delayed Surf or rod captures
+on the same route, late-game tables, Feebas, outbreaks, Sweet Scent, and double
+wild battles. The fixed weight calculation and empty-band fallback are currently
+reviewed in source rather than invoked through dedicated test hooks.
