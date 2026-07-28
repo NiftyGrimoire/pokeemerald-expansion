@@ -11,16 +11,18 @@ import tempfile
 import time
 import uuid
 from pathlib import Path
+from pathlib import PurePosixPath
 from typing import Any
 
 
 DEFAULT_MODEL = "minimax/minimax-m3"
 DEFAULT_TIMEOUT_SECONDS = 480
 MAX_TIMEOUT_SECONDS = 1800
-DEFAULT_MAX_STEPS = 32
+DEFAULT_MAX_STEPS = 24
 MIN_MAX_STEPS = 8
 MAX_MAX_STEPS = 64
-MAX_RESULT_BYTES = 160_000
+MAX_RESULT_BYTES = 80_000
+MAX_SCOPED_FILES = 8
 WORKTREE_PARENT = Path(tempfile.gettempdir()) / "pokemonromhack-opencode"
 SAFE_COMMAND_PATTERN = re.compile(r"^[A-Za-z0-9_./*+=:, -]+$")
 
@@ -132,6 +134,30 @@ def _bounded_max_steps(value: Any) -> int:
     return value
 
 
+def _scoped_files(value: Any) -> list[str]:
+    if (
+        not isinstance(value, list)
+        or not value
+        or len(value) > MAX_SCOPED_FILES
+        or not all(isinstance(item, str) and item.strip() for item in value)
+    ):
+        raise AutonomousWorkerError(
+            f"files must contain between 1 and {MAX_SCOPED_FILES} repository-relative paths."
+        )
+
+    files = []
+    for item in value:
+        path = PurePosixPath(item.strip())
+        if path.is_absolute() or ".." in path.parts or str(path) in ("", "."):
+            raise AutonomousWorkerError(
+                f"files contains an unsafe repository path: {item!r}"
+            )
+        normalized = str(path)
+        if normalized not in files:
+            files.append(normalized)
+    return files
+
+
 def _opencode_config(
     model: str, allowed_commands: list[str], max_steps: int = DEFAULT_MAX_STEPS
 ) -> dict[str, Any]:
@@ -177,8 +203,58 @@ def _extract_text_events(raw_output: str) -> str:
             continue
         part = event.get("part", {})
         if part.get("type") == "text" and isinstance(part.get("text"), str):
-            text_parts.append(part["text"])
-    return "\n".join(text_parts).strip()
+            text = part["text"].strip()
+            if text:
+                text_parts.append(text)
+    return text_parts[-1] if text_parts else ""
+
+
+def _extract_metrics(raw_output: str, stderr: str) -> str:
+    max_step = 0
+    token_totals: dict[str, int] = {}
+
+    for match in re.finditer(r"\bstep=(\d+)\b", stderr):
+        max_step = max(max_step, int(match.group(1)))
+
+    for line in raw_output.splitlines():
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        part = event.get("part", {})
+        if part.get("type") not in ("step-finish", "step_finish"):
+            continue
+        usage = part.get("tokens") or part.get("usage")
+        if not isinstance(usage, dict):
+            continue
+        for key, value in usage.items():
+            if isinstance(value, int) and not isinstance(value, bool):
+                token_totals[key] = token_totals.get(key, 0) + value
+
+    metrics = [f"Observed agent steps: {max_step or 'unknown'}"]
+    if token_totals:
+        metrics.append(
+            "Reported tokens: "
+            + ", ".join(f"{key}={value}" for key, value in sorted(token_totals.items()))
+        )
+    else:
+        metrics.append("Reported tokens: unavailable")
+    return "\n".join(metrics)
+
+
+def _changed_paths(worktree: Path) -> set[str]:
+    tracked = _run(
+        ["git", "diff", "--name-only"], cwd=worktree, check=False
+    ).stdout.splitlines()
+    staged = _run(
+        ["git", "diff", "--cached", "--name-only"], cwd=worktree, check=False
+    ).stdout.splitlines()
+    untracked = _run(
+        ["git", "ls-files", "--others", "--exclude-standard"],
+        cwd=worktree,
+        check=False,
+    ).stdout.splitlines()
+    return {path for path in tracked + staged + untracked if path}
 
 
 def _truncate(text: str, limit: int = MAX_RESULT_BYTES) -> str:
@@ -231,6 +307,7 @@ def run_task(repo_root: Path, arguments: dict[str, Any]) -> str:
 
     timeout = _bounded_timeout(arguments.get("timeout_seconds"))
     max_steps = _bounded_max_steps(arguments.get("max_steps"))
+    files = _scoped_files(arguments.get("files"))
     commands = _allowed_commands(arguments.get("allowed_commands"))
     model = os.environ.get("OPENROUTER_MODEL", DEFAULT_MODEL)
 
@@ -248,6 +325,7 @@ def run_task(repo_root: Path, arguments: dict[str, Any]) -> str:
             worktree,
             task.strip(),
             context.strip(),
+            files,
             model,
             commands,
             timeout,
@@ -272,6 +350,7 @@ def _run_in_worktree(
     worktree: Path,
     task: str,
     context: str,
+    files: list[str],
     model: str,
     commands: list[str],
     timeout: int,
@@ -287,13 +366,21 @@ TASK
 CONSTRAINTS AND ACCEPTANCE CRITERIA
 {context or "(none supplied)"}
 
+ALLOWED FILES
+{chr(10).join(f"- {path}" for path in files)}
+
 SUPERVISION RULES
 - A senior Codex agent owns architecture, integration, and final review.
-- Follow the existing repository style and inspect relevant code before editing.
+- Follow the existing repository style.
+- Edit only the allowed files. Inspect only those files and their direct dependencies.
+- Make the first edit within six inspection/tool calls. If that is impossible, stop
+  and explain the blocker instead of exhausting the step budget on exploration.
+- Reserve at least one quarter of the step budget for editing and focused checks.
 - Do not broaden scope, commit, push, install dependencies, or access the network.
-- Edit only the files needed for the stated task. Stop instead of redesigning adjacent code.
+- Stop instead of investigating or redesigning adjacent systems.
 - You may edit files and run only commands permitted by the harness.
 - Do not run a full build or full test suite. Codex owns independent validation.
+- The deliverable is the actual worktree edit, not an implementation plan.
 - Finish with a concise summary of changed files, checks run, failures, and risks.
 """
 
@@ -345,6 +432,8 @@ SUPERVISION RULES
     status = _run(
         ["git", "status", "--short"], cwd=worktree, check=False
     ).stdout.strip()
+    changed_paths = _changed_paths(worktree)
+    scope_violations = sorted(changed_paths.difference(files))
     # Make new files visible to `git diff` without staging their contents so the
     # reviewer receives one patch containing tracked and untracked changes.
     _run(
@@ -360,6 +449,7 @@ SUPERVISION RULES
     ).stdout
     summary = _extract_text_events(result.stdout)
     stderr = result.stderr.strip()
+    stderr_limit = 6000 if timed_out or result.returncode != 0 else 2000
 
     return _truncate(
         "\n".join(
@@ -368,7 +458,14 @@ SUPERVISION RULES
                 f"Timed out: {'yes' if timed_out else 'no'}",
                 f"Model: openrouter/{model}",
                 f"Maximum agent steps: {max_steps}",
+                _extract_metrics(result.stdout, stderr),
                 f"Isolated worktree: {worktree}",
+                "File scope: "
+                + (
+                    "PASSED"
+                    if not scope_violations
+                    else "FAILED; out-of-scope changes: " + ", ".join(scope_violations)
+                ),
                 "",
                 "WORKER SUMMARY",
                 summary or "(no text summary returned)",
@@ -383,7 +480,7 @@ SUPERVISION RULES
                 diff or "(no diff)",
                 "",
                 "STDERR",
-                stderr[-4000:] if stderr else "(empty)",
+                stderr[-stderr_limit:] if stderr else "(empty)",
                 "",
                 "The active user worktree was not modified. Review the isolated "
                 "worktree before integrating or removing it.",

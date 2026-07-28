@@ -100,6 +100,48 @@ class ServerTests(unittest.TestCase):
         ):
             autonomous._bounded_max_steps(autonomous.MAX_MAX_STEPS + 1)
 
+    def test_autonomous_file_scope_is_required_and_repository_relative(self):
+        self.assertEqual(
+            autonomous._scoped_files(["src/sample.c", "src/sample.c"]),
+            ["src/sample.c"],
+        )
+        with self.assertRaisesRegex(
+            autonomous.AutonomousWorkerError, "between 1 and"
+        ):
+            autonomous._scoped_files(None)
+        with self.assertRaisesRegex(
+            autonomous.AutonomousWorkerError, "unsafe repository path"
+        ):
+            autonomous._scoped_files(["../outside.c"])
+
+    def test_autonomous_summary_and_metrics_are_concise(self):
+        raw_output = "\n".join(
+            [
+                json.dumps(
+                    {"part": {"type": "text", "text": "intermediate planning"}}
+                ),
+                json.dumps(
+                    {
+                        "part": {
+                            "type": "step-finish",
+                            "tokens": {"input": 10, "output": 5},
+                        }
+                    }
+                ),
+                json.dumps(
+                    {"part": {"type": "text", "text": "final implementation summary"}}
+                ),
+            ]
+        )
+        self.assertEqual(
+            autonomous._extract_text_events(raw_output),
+            "final implementation summary",
+        )
+        metrics = autonomous._extract_metrics(raw_output, "loop step=7")
+        self.assertIn("Observed agent steps: 7", metrics)
+        self.assertIn("input=10", metrics)
+        self.assertIn("output=5", metrics)
+
     def test_finds_opencode_from_nvm_when_not_on_path(self):
         with tempfile.TemporaryDirectory() as temp:
             home = Path(temp)
@@ -152,6 +194,7 @@ done
 printf 'worker edit\\n' >> "$dir/sample.txt"
 printf 'new worker file\\n' > "$dir/created.txt"
 printf '%s\\n' '{"part":{"type":"text","text":"fake worker complete"}}'
+printf '%s\\n' 'loop step=3' >&2
 """,
                 encoding="utf-8",
             )
@@ -167,14 +210,51 @@ printf '%s\\n' '{"part":{"type":"text","text":"fake worker complete"}}'
                     },
                 ),
             ):
-                output = autonomous.run_task(repo, {"task": "Edit sample."})
+                output = autonomous.run_task(
+                    repo,
+                    {
+                        "task": "Edit sample.",
+                        "files": ["sample.txt", "created.txt"],
+                    },
+                )
 
             self.assertEqual(
                 (repo / "sample.txt").read_text(encoding="utf-8"), "original\n"
             )
             self.assertIn("fake worker complete", output)
+            self.assertIn("Observed agent steps: 3", output)
+            self.assertIn("File scope: PASSED", output)
             self.assertIn("+worker edit", output)
             self.assertIn("+new worker file", output)
+            with (
+                patch.object(autonomous, "WORKTREE_PARENT", worktrees),
+                patch.dict(
+                    os.environ,
+                    {
+                        "OPENROUTER_API_KEY": "test-key",
+                        "PATH": f"{bin_dir}:{os.environ['PATH']}",
+                    },
+                ),
+            ):
+                scoped_output = autonomous.run_task(
+                    repo,
+                    {"task": "Edit sample.", "files": ["sample.txt"]},
+                )
+            self.assertIn(
+                "File scope: FAILED; out-of-scope changes: created.txt",
+                scoped_output,
+            )
+            scoped_worktree_line = next(
+                line
+                for line in scoped_output.splitlines()
+                if line.startswith("Isolated worktree: ")
+            )
+            scoped_worktree = Path(scoped_worktree_line.split(": ", 1)[1])
+            subprocess.run(
+                ["git", "worktree", "remove", "--force", str(scoped_worktree)],
+                cwd=repo,
+                check=True,
+            )
             worktree_line = next(
                 line for line in output.splitlines()
                 if line.startswith("Isolated worktree: ")
@@ -232,7 +312,12 @@ printf '%s\\n' '{"part":{"type":"text","text":"fake worker complete"}}'
                 patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-key"}),
             ):
                 output = autonomous.run_task(
-                    repo, {"task": "Edit sample.", "timeout_seconds": 60}
+                    repo,
+                    {
+                        "task": "Edit sample.",
+                        "files": ["sample.txt"],
+                        "timeout_seconds": 60,
+                    },
                 )
 
             self.assertIn("Timed out: yes", output)

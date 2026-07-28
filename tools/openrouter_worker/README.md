@@ -57,6 +57,11 @@ rejects binary files, never invokes a shell, and never writes to the working tre
 It creates a detached Git worktree below `/tmp/pokemonromhack-opencode/`; the active
 user worktree and its uncommitted files are not copied or modified.
 
+Every autonomous request must provide `files`, an exact allowlist of one to eight
+repository-relative files the worker may edit. The prompt names this scope, and the
+result reports a failed file-scope check if the worktree contains changes elsewhere.
+Never integrate a result whose file-scope check failed.
+
 The worker can read, search, and edit inside that isolated worktree. Shell access is
 default-deny. Its defaults allow only Git inspection and `rg`; builds and tests are
 left to Codex unless a caller explicitly grants one narrow command pattern. Callers
@@ -64,7 +69,7 @@ may provide up to 16 command patterns, which are validated before being added.
 Network tools, nested agents, external-directory access, commits, pushes, and
 interactive questions are disabled.
 
-OpenCode runs with an eight-minute default timeout and a 32-step default agent limit.
+OpenCode runs with an eight-minute default timeout and a 24-step default agent limit.
 Both can be adjusted per call within bounded limits. It also runs in fast headless
 mode with project configuration, external skills, default plugins, model-catalog
 refreshes, LSP downloads, and file watching disabled. The generated worker
@@ -72,10 +77,11 @@ configuration is passed in-memory rather than written into the worktree. A timed
 run returns and retains its partial worktree and diff for review. Other failed runs
 are cleaned up automatically.
 
-The tool returns the OpenCode summary, worktree path, Git status, diff stat, full
-diff (subject to an output cap), and stderr. Codex must inspect the resulting changes
-before integrating them. Worktrees are intentionally retained until review is
-complete; remove one afterward with:
+The tool returns the final OpenCode summary, observed step count, reported token
+usage when OpenCode supplies it, file-scope status, worktree path, Git status, diff
+stat, full diff (subject to an output cap), and a short stderr tail. Codex must
+inspect the resulting changes before integrating them. Worktrees are intentionally
+retained until review is complete; remove one afterward with:
 
 ```sh
 git worktree remove /tmp/pokemonromhack-opencode/task-...
@@ -87,9 +93,14 @@ specifications and source changes that the worker must read; never copy credenti
 saves, or generated ROMs into it.
 
 Keep autonomous tasks mechanical and small: name the exact files and function
-signatures, normally limit the change to two to four files, and tell the worker not
-to investigate or redesign adjacent systems. Codex should locate integration hooks,
-make architecture decisions, and run the build and tests after reviewing the diff.
+signatures and include relevant existing helper names and locations. Normally limit
+the change to two to four files. The worker is instructed to make its first edit
+within six inspection calls and preserve part of its budget for checks. Use 16-24
+steps for routine changes; increase the limit only for a task that demonstrably
+needs more implementation work. Codex should locate integration hooks, make
+architecture decisions, use small representative test cases, and run the build and
+tests after reviewing the diff. Complete tiny omissions directly rather than
+starting another autonomous run.
 
 ## Verification
 

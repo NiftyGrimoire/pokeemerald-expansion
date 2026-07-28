@@ -39,12 +39,17 @@ Codex must:
 2. Delegate one narrow mechanical unit at a time, normally naming two to four
    exact files and the required function signatures.
 3. Inspect architecture and repository conventions first, then provide the
-   relevant facts and examples in the prompt.
+   relevant facts, exact symbol locations, existing helper names, and examples in
+   the prompt.
 4. Use the default inspection-only command allowlist. Grant a build or test
    command only when it is cheap, targeted, and materially useful.
 5. Inspect the autonomous worktree, actual files, full diff, and reported checks.
-6. Run builds and tests independently in the primary worktree.
-7. Remove the temporary worktree after accepting or rejecting the changes.
+6. Reject any result whose file-scope check failed.
+7. Run small representative tests first, then builds and broader tests
+   independently in the primary worktree.
+8. Complete tiny omissions directly when another delegation would cost more than
+   the edit and review.
+9. Remove the temporary worktree after accepting or rejecting the changes.
 
 Autonomous worktrees start from committed `HEAD`; staged, unstaged, and untracked
 files from the active worktree are absent. Commit specifications or source changes
@@ -60,11 +65,16 @@ appropriate only when file ownership and integration boundaries are disjoint.
 ## Current execution limits
 
 - Default wall-clock timeout: 8 minutes.
-- Default maximum agent steps: 32.
+- Default maximum agent steps: 24.
+- The worker must make its first edit within six inspection calls or stop with a
+  blocker instead of consuming the full budget on exploration.
+- Autonomous calls require an exact one-to-eight-file edit allowlist and report
+  out-of-scope changes.
 - Configurable agent-step range: 8–64.
 - Default shell access: Git inspection and `rg` only.
 - Full builds and full test suites remain with Codex.
 - A timeout retains and reports the partial worktree and diff.
+- Results report observed agent steps and token usage when OpenCode emits it.
 
 ## Authorization and data restrictions
 

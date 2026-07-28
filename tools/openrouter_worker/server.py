@@ -230,6 +230,16 @@ AUTONOMOUS_TOOL = {
                 "description": "Constraints, acceptance criteria, and relevant facts.",
                 "default": "",
             },
+            "files": {
+                "type": "array",
+                "items": {"type": "string"},
+                "minItems": 1,
+                "maxItems": autonomous.MAX_SCOPED_FILES,
+                "description": (
+                    "Exact repository-relative files the worker may edit. "
+                    "Out-of-scope changes are reported as a failed file-scope check."
+                ),
+            },
             "allowed_commands": {
                 "type": "array",
                 "items": {"type": "string"},
@@ -253,7 +263,7 @@ AUTONOMOUS_TOOL = {
                 "description": "Maximum OpenCode agent iterations before it must stop.",
             },
         },
-        "required": ["task"],
+        "required": ["task", "files"],
         "additionalProperties": False,
     },
 }
