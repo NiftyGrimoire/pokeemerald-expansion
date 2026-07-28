@@ -55,4 +55,25 @@ TEST("Species randomizer eligibility rejects invalid and battle-only species")
     EXPECT(!IsSpeciesRandomizerEligible(SPECIES_GROUDON_PRIMAL));
     EXPECT(!IsSpeciesRandomizerEligible(SPECIES_NECROZMA_ULTRA));
     EXPECT(!IsSpeciesRandomizerEligible(SPECIES_CHARIZARD_GMAX));
+    EXPECT(!IsSpeciesRandomizerEligible(SPECIES_DARMANITAN_ZEN));
+    EXPECT(!IsSpeciesRandomizerEligible(SPECIES_KYUREM_BLACK));
+}
+
+TEST("Encounter randomization is deterministic, eligible, and context separated")
+{
+    enum Species species;
+    enum Species differentSeedSpecies;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    species = GetRandomizedSpeciesForEncounter(SPECIES_ZIGZAGOON, 0x0010, RANDOMIZER_ENCOUNTER_LAND, 3);
+
+    EXPECT(IsSpeciesRandomizerEligible(species));
+    EXPECT_EQ(species, GetRandomizedSpeciesForEncounter(SPECIES_ZIGZAGOON, 0x0010, RANDOMIZER_ENCOUNTER_LAND, 3));
+    EXPECT_NE(species, GetRandomizedSpeciesForEncounter(SPECIES_ZIGZAGOON, 0x0011, RANDOMIZER_ENCOUNTER_LAND, 3));
+    EXPECT_NE(species, GetRandomizedSpeciesForEncounter(SPECIES_ZIGZAGOON, 0x0010, RANDOMIZER_ENCOUNTER_WATER, 3));
+    EXPECT_NE(species, GetRandomizedSpeciesForEncounter(SPECIES_ZIGZAGOON, 0x0010, RANDOMIZER_ENCOUNTER_LAND, 4));
+
+    gSaveBlock3Ptr->randomizerSeed = 0x87654321;
+    differentSeedSpecies = GetRandomizedSpeciesForEncounter(SPECIES_ZIGZAGOON, 0x0010, RANDOMIZER_ENCOUNTER_LAND, 3);
+    EXPECT_NE(species, differentSeedSpecies);
 }

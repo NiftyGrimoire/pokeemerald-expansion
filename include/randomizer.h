@@ -8,9 +8,20 @@ enum RandomizerCategory
     RANDOMIZER_CATEGORY_LEARNSET,
 };
 
+enum RandomizerEncounterType
+{
+    RANDOMIZER_ENCOUNTER_LAND,
+    RANDOMIZER_ENCOUNTER_WATER,
+    RANDOMIZER_ENCOUNTER_ROCK_SMASH,
+    RANDOMIZER_ENCOUNTER_FISHING,
+    RANDOMIZER_ENCOUNTER_FEEBAS,
+    RANDOMIZER_ENCOUNTER_MASS_OUTBREAK,
+};
+
 void InitRandomizerData(void);
 u32 GetRandomizerSeed(void);
 u32 RandomizerHash(u32 seed, enum RandomizerCategory category, u32 key1, u32 key2, u32 key3);
 bool32 IsSpeciesRandomizerEligible(enum Species species);
+enum Species GetRandomizedSpeciesForEncounter(enum Species originalSpecies, u16 mapId, enum RandomizerEncounterType encounterType, u8 slot);
 
 #endif // GUARD_RANDOMIZER_H

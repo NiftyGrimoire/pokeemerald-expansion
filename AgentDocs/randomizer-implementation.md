@@ -48,21 +48,31 @@ Rerun relevant checks after any new integration.
 
 ## Recommended next phase
 
-Phase 2 is encounters, but do not code the hook until its scope policy is explicit.
-Decide how each path behaves:
+Phase 2 encounter work is implemented on `romhack/randomizer-encounters`,
+pending review and approval to merge. Its scope policy is:
 
-- Standard grass and cave encounters.
-- Surfing.
-- Fishing rods.
-- Rock Smash.
-- Mass outbreaks.
-- Feebas tiles.
-- Scripted/static encounters.
-- DexNav and overworld encounter systems.
+- Randomize standard grass/cave, Surf, fishing-rod, Rock Smash, mass-outbreak,
+  and Feebas encounters.
+- Preserve the vanilla method, selected slot, level, encounter-rate checks,
+  Repel checks, and encounter-influencing ability checks.
+- Leave roamers, scripted/static encounters, and Battle Pike/Pyramid encounters
+  unchanged.
+- Leave DexNav and overworld-visible encounters unchanged. Both systems are
+  disabled in the current build and require separate identity and UI policies
+  before being enabled.
 
 The intended core behavior is to preserve the vanilla encounter method, selected
 slot rarity, and level, then deterministically replace only the species with an
 eligible species derived from the save seed and explicit encounter context.
+
+Validation on the encounter branch:
+
+- The encounter resolver determinism, eligibility, and context-separation test
+  passes.
+- The expanded species eligibility test passes.
+- All 15 existing random-mon-generation tests pass after sharing its form-safety
+  helper with the gameplay randomizer.
+- A normal `make -j4` ROM build succeeds.
 
 Codex should first locate and document the smallest common hook or the necessary
 separate hooks. Once signatures and exact files are known, delegate only the

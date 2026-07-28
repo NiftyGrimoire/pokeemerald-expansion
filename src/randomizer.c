@@ -1,6 +1,7 @@
 #include "global.h"
 #include "pokemon.h"
 #include "random.h"
+#include "random_mon_generation.h"
 #include "randomizer.h"
 
 #define RANDOMIZER_ZERO_SEED_FALLBACK 0x6D2B79F5
@@ -51,6 +52,7 @@ u32 RandomizerHash(u32 seed, enum RandomizerCategory category, u32 key1, u32 key
 bool32 IsSpeciesRandomizerEligible(enum Species species)
 {
     const struct SpeciesInfo *speciesInfo;
+    const u16 *formTable;
 
     if (species <= SPECIES_NONE || species >= NUM_SPECIES || species == SPECIES_EGG)
         return FALSE;
@@ -58,10 +60,44 @@ bool32 IsSpeciesRandomizerEligible(enum Species species)
         return FALSE;
 
     speciesInfo = &gSpeciesInfo[species];
+    formTable = GetSpeciesFormTable(GET_BASE_SPECIES_ID(species));
     return !(speciesInfo->isMegaEvolution
           || speciesInfo->isPrimalReversion
           || speciesInfo->isUltraBurst
           || speciesInfo->isGigantamax
           || speciesInfo->isTeraForm
-          || speciesInfo->isTotem);
+          || speciesInfo->isTotem
+          || !IsSpeciesFormUsableOutsideSpecialContext(species, formTable));
+}
+
+enum Species GetRandomizedSpeciesForEncounter(enum Species originalSpecies, u16 mapId, enum RandomizerEncounterType encounterType, u8 slot)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_ENCOUNTERS
+    u32 eligibleSpeciesCount = 0;
+    u32 selectedIndex;
+
+    for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+    {
+        if (IsSpeciesRandomizerEligible(species))
+            eligibleSpeciesCount++;
+    }
+
+    if (eligibleSpeciesCount == 0)
+        return originalSpecies;
+
+    selectedIndex = RandomizerHash(GetRandomizerSeed(),
+                                   RANDOMIZER_CATEGORY_ENCOUNTER,
+                                   mapId,
+                                   originalSpecies,
+                                   ((u32)encounterType << 8) | slot)
+                  % eligibleSpeciesCount;
+
+    for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+    {
+        if (IsSpeciesRandomizerEligible(species) && selectedIndex-- == 0)
+            return species;
+    }
+#endif
+
+    return originalSpecies;
 }

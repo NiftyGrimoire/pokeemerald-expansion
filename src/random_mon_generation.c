@@ -188,7 +188,7 @@ static bool32 IsRandomSpeciesInFormOrFusionTables(enum Species species, const u1
         || IsRandomSpeciesInFusionTables(species, formTable);
 }
 
-static bool32 IsRandomSpeciesFormAllowed(enum Species species, const u16 *formTable)
+bool32 IsSpeciesFormUsableOutsideSpecialContext(enum Species species, const u16 *formTable)
 {
     const struct SpeciesInfo *speciesInfo;
     enum Species baseSpecies = GET_BASE_SPECIES_ID(species);
@@ -235,7 +235,7 @@ static enum Species GetSpeciesCandidateForm(enum Species species, const struct R
 
     for (u32 i = 0; formTable[i] != FORM_SPECIES_END; i++)
     {
-        if (IsRandomSpeciesFormAllowed(formTable[i], formTable)
+        if (IsSpeciesFormUsableOutsideSpecialContext(formTable[i], formTable)
          && !IsSpeciesBannedByRandomSpeciesOptions(formTable[i], options, filterFuncArgs))
             validForms[validFormsCount++] = i;
     }
