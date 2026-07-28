@@ -70,22 +70,10 @@ bool32 IsSpeciesRandomizerEligible(enum Species species)
           || !IsSpeciesFormUsableOutsideSpecialContext(species, formTable));
 }
 
-static u16 GetSpeciesBaseStatTotal(enum Species species)
-{
-    const struct SpeciesInfo *speciesInfo = &gSpeciesInfo[species];
-
-    return (u16)speciesInfo->baseHP
-         + (u16)speciesInfo->baseAttack
-         + (u16)speciesInfo->baseDefense
-         + (u16)speciesInfo->baseSpeed
-         + (u16)speciesInfo->baseSpAttack
-         + (u16)speciesInfo->baseSpDefense;
-}
-
 static bool32 IsOrdinaryEncounterCandidate(enum Species species, u16 minBST, u16 maxBST)
 {
     const struct SpeciesInfo *speciesInfo;
-    u16 bst;
+    u32 bst;
 
     if (!IsSpeciesRandomizerEligible(species))
         return FALSE;
