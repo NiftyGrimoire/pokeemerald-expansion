@@ -8,6 +8,7 @@ enum RandomizerCategory
     RANDOMIZER_CATEGORY_LEARNSET,
     RANDOMIZER_CATEGORY_LEGENDARY_ENCOUNTER,
     RANDOMIZER_CATEGORY_STARTER,
+    RANDOMIZER_CATEGORY_TRAINER,
 };
 
 enum RandomizerEncounterType
@@ -29,6 +30,7 @@ bool32 IsSpeciesRandomizerLegendaryEncounterEligible(enum Species species);
 bool32 IsSpeciesRandomizerStarterEligible(enum Species species);
 enum Species GetRandomizedSpeciesForEncounter(enum Species originalSpecies, u16 mapId, enum RandomizerEncounterType encounterType, u8 slot, u8 encounterDifficulty);
 enum Species GetRandomizedSpeciesForLegendaryEncounter(enum Species originalSpecies, u16 mapId, u8 slot);
+enum Species GetRandomizedSpeciesForTrainer(enum Species originalSpecies, u16 trainerId, u8 partySlot);
 enum Species GetRandomizedStarterSpecies(enum Species originalSpecies, u8 slot);
 
 #endif // GUARD_RANDOMIZER_H

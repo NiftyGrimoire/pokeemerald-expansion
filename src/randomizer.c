@@ -236,6 +236,70 @@ enum Species GetRandomizedSpeciesForLegendaryEncounter(enum Species originalSpec
     return originalSpecies;
 }
 
+enum Species GetRandomizedSpeciesForTrainer(enum Species originalSpecies, u16 trainerId, u8 partySlot)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_TRAINERS
+    u32 originalBST;
+    u16 minBST;
+    u16 maxBST;
+    u32 ordinaryCount = 0;
+    u32 selectedIndex;
+
+    if (originalSpecies <= SPECIES_NONE || originalSpecies >= NUM_SPECIES)
+        return originalSpecies;
+
+    originalBST = GetSpeciesBaseStatTotal(originalSpecies);
+    if (originalBST > 1530)
+        originalBST = 1530;
+
+    minBST = (originalBST > 50) ? (u16)(originalBST - 50) : 0;
+    maxBST = (u16)originalBST + 50;
+    if (maxBST > 1530)
+        maxBST = 1530;
+
+    for (;;)
+    {
+        ordinaryCount = 0;
+        for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+        {
+            if (IsOrdinaryEncounterCandidate(species, minBST, maxBST))
+                ordinaryCount++;
+        }
+
+        if (ordinaryCount > 0)
+            break;
+
+        if (minBST == 0 && maxBST == 1530)
+            return originalSpecies;
+
+        if (minBST > 50)
+            minBST -= 50;
+        else
+            minBST = 0;
+
+        if (maxBST < 1480)
+            maxBST += 50;
+        else
+            maxBST = 1530;
+    }
+
+    selectedIndex = RandomizerHash(GetRandomizerSeed(),
+                                   RANDOMIZER_CATEGORY_TRAINER,
+                                   trainerId,
+                                   originalSpecies,
+                                   ((u32)RANDOMIZER_ALGORITHM_VERSION << 8) | partySlot)
+                  % ordinaryCount;
+
+    for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+    {
+        if (IsOrdinaryEncounterCandidate(species, minBST, maxBST) && selectedIndex-- == 0)
+            return species;
+    }
+#endif
+
+    return originalSpecies;
+}
+
 static bool32 HasUsableEvolution(enum Species species)
 {
     const struct Evolution *evolutions = GetSpeciesEvolutions(species);
