@@ -30,11 +30,11 @@ broad summary where they differ.
 - Focused tests in `test/randomizer.c`.
 - Intentional `SaveBlock3` size guard updated from 4 to 8 bytes.
 
-Wild encounter randomization and BST-scaled ordinary encounter pools are merged
-into `romhack/main`. Scripted Legendary encounter randomization is implemented
-and validated on `romhack/randomizer-legendary-encounters`, but is not yet
-committed or merged. Abilities, learnsets, progression, evolution, and
-quality-of-life hooks have not been implemented.
+Wild encounter randomization, BST-scaled ordinary encounter pools, and scripted
+encounter randomization are merged into `romhack/main`. Level caps and EV removal
+are implemented on `romhack/randomizer-level-caps-evs` and pending integration.
+Abilities, learnsets, starters, evolution, and quality-of-life hooks have not
+been implemented.
 
 ## Validation already performed
 
@@ -104,13 +104,9 @@ review but do not have direct unit-test hooks. The configured species data conta
 candidates in every preferred band, so the fallback cannot be triggered naturally
 by the current test configuration.
 
-## Current phase: scripted Legendary encounters
+## Completed scripted encounter phase
 
-Create `romhack/randomizer-legendary-encounters` from the current
-`romhack/main`. Do not implement this phase directly on main, merge it, or push it
-without explicit approval.
-
-The feature branch now contains an implementation:
+The scripted encounter implementation was merged through PR #3. It includes:
 
 - A dedicated enabled config gate and hash category.
 - A qualifying-species helper limited to enabled, generally usable restricted
@@ -188,13 +184,37 @@ Codex retains architecture, worktree integration, source review, build/test
 validation, documentation, and commits. Workers remain isolated, uncommitted,
 and may not push or merge.
 
-## Reordered next work
+## Current phase: level caps and EV removal
 
-After this branch is reviewed, committed, and deliberately integrated, implement
-hard level caps and no EV gain before starters. Those settings already have
-defined Expansion configuration and are prerequisites for the Level Capper, while
-starters, abilities, learnsets, evolution changes, QoL items, and world items
-still require policy or wider call-path analysis.
+The implementation on `romhack/randomizer-level-caps-evs`:
+
+- Enables hard experience caps using the existing Emerald badge-flag cap table.
+- Prevents Rare Candies and EXP Candies from exceeding the active cap.
+- Disables battle EV gain.
+- Prevents EV-boosting items from bypassing the zero-EV cap.
+- Removes a malformed duplicate `B_EV_CAP_VARIABLE` definition from the existing
+  config block.
+- Adds focused tests for cap progression, hard-cap EXP behavior, and EV
+  suppression from battles and vitamins.
+
+Validation on the feature branch:
+
+- All three tests in `test/caps.c` pass.
+- A normal `make -j4` ROM build succeeds.
+
+Manual gameplay validation still required:
+
+- Confirm battle EXP stops exactly at each active cap.
+- Confirm Rare Candies and each enabled EXP Candy cannot exceed the cap.
+- Confirm badge acquisition advances through 15, 19, 24, 29, 31, 33, 42, 46,
+  and 58 before the post-Champion fallback to level 100.
+- Confirm battles, vitamins, feathers, and EV-affecting berries cannot produce
+  positive EVs from a fresh zero-EV Pokemon.
+
+After this branch is reviewed, committed, and deliberately integrated, the next
+planned phase is starters. Starter selection still requires a complete
+display/grant/rival call-path review and explicit eligible-pool, uniqueness,
+strength, and rival-choice policies before implementation.
 
 ## Other unresolved architecture
 
