@@ -80,6 +80,10 @@ mechanical resolver or one hook at a time.
 
 ## Unresolved architecture
 
+- Encounter BST scaling: define the exact route-level and BST band thresholds.
+  Route difficulty should come from stable data for the selected encounter table
+  and method, not the mutable level roll, so repeated resolution of a slot remains
+  stable. Specify deterministic adjacent-band fallback behavior for empty pools.
 - Legendary encounters: locate every scripted/static creation path and define
   stable context keys that distinguish separate encounters without depending on
   mutable RNG. The initial candidate pool is enabled, usable restricted

@@ -288,6 +288,20 @@ The core invariant is:
 > Vanilla determines the shape of the encounter; the randomizer
 > deterministically substitutes its species.
 
+## Planned BST-Scaled Encounter Pools
+
+Encounter pools will be refined so lower-level areas select from lower-BST
+species while higher-level areas select from higher-BST species.
+
+Route difficulty will be derived from stable encounter-table data for the map
+and method, rather than the mutable level rolled for an individual encounter.
+This keeps a given save, map, method, and slot mapped consistently.
+
+The exact route-level and BST thresholds still require tuning. If a preferred
+BST band contains no eligible species, resolution will expand
+deterministically to the nearest adjacent band instead of failing the
+encounter.
+
 ## Tests
 
 `test/randomizer.c` verifies that:
@@ -297,4 +311,3 @@ The core invariant is:
 - Encounter resolution returns an eligible species.
 - Identical context produces an identical result.
 - Map, method, slot, and save-seed changes separate results.
-
