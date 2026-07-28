@@ -120,9 +120,11 @@ The randomizer is runtime-resolved and deterministic per save:
 Foundation, ordinary wild encounter randomization, and BST-scaled encounter
 pools are implemented. The encounter system preserves vanilla encounter checks,
 method, weighted slot selection, and level, then replaces only the species.
-Ordinary pools exclude special classifications reserved for scripted encounters.
-DexNav, visible overworld encounters, roamers, scripted/static encounters, and
-Battle Pike/Pyramid paths remain outside the completed ordinary-encounter scope.
+Ordinary pools exclude special classifications reserved for the dedicated
+Legendary scripted pool. Ordinary `setwildbattle` encounters use the regular
+BST-scaled resolver with their fixed scripted level. DexNav, visible overworld
+encounters, roamers, and Battle Pike/Pyramid paths remain outside the completed
+ordinary-encounter scope.
 
 Before any randomizer work, read both:
 

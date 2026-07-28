@@ -92,6 +92,30 @@ TEST("Encounter randomization is deterministic, eligible, and context separated"
     EXPECT_NE(species, differentSeedSpecies);
 }
 
+TEST("Scripted ordinary encounter uses level band and distinct deterministic context")
+{
+    enum Species species;
+    const struct SpeciesInfo *info;
+    u16 bst;
+    const u8 level = 20;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    species = GetRandomizedSpeciesForEncounter(SPECIES_ZIGZAGOON, 0x0030, RANDOMIZER_ENCOUNTER_SCRIPTED, 0, level);
+    info = &gSpeciesInfo[species];
+    bst = GetTestSpeciesBaseStatTotal(species);
+
+    EXPECT(IsSpeciesRandomizerEligible(species));
+    EXPECT(!info->isRestrictedLegendary);
+    EXPECT(!info->isSubLegendary);
+    EXPECT(!info->isMythical);
+    EXPECT(!info->isUltraBeast);
+    EXPECT(!info->isParadox);
+    EXPECT_GE(bst, 240);
+    EXPECT_LE(bst, 420);
+    EXPECT_EQ(species, GetRandomizedSpeciesForEncounter(SPECIES_ZIGZAGOON, 0x0030, RANDOMIZER_ENCOUNTER_SCRIPTED, 0, level));
+    EXPECT_NE(species, GetRandomizedSpeciesForEncounter(SPECIES_ZIGZAGOON, 0x0030, RANDOMIZER_ENCOUNTER_LAND, 0, level));
+}
+
 TEST("Encounter randomization BST stays within each difficulty's preferred band")
 {
     enum Species species;

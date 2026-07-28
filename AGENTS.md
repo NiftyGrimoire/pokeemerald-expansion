@@ -12,6 +12,17 @@ Push commits and branches only to `origin`. Never push to `upstream`. Use
 `upstream` only for fetching, comparing, and deliberately integrating upstream
 changes.
 
+## Commits and integration
+
+After reviewing and validating an implementation, Codex may create local commits
+on the active feature branch without requesting separate approval. Keep commits
+logically scoped and report them to the user.
+
+Never merge a feature branch into `romhack/main` without explicit user approval.
+Permission to implement, review, validate, or commit does not authorize a merge
+to main. Do not push unless the user separately requests it; if pushing, follow
+the remote policy above.
+
 ## OpenRouter worker
 
 Use the `openrouter_worker` MCP server for bounded mechanical work when delegation

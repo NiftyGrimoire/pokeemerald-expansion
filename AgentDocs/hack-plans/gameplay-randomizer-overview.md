@@ -46,8 +46,10 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      mutable level roll, preserving deterministic slot mappings.
 3. Legendary encounters (implemented on
    `romhack/randomizer-legendary-encounters`; pending integration):
+   - Route ordinary `setwildbattle` encounters through the regular BST-scaled
+     encounter resolver using their fixed scripted level.
    - Randomize scripted/static encounters only when the original species is a
-     Legendary or Paradox Pokemon.
+     Legendary or Paradox Pokemon through the dedicated special pool.
    - Select replacements from a dedicated pool containing only enabled, usable
      restricted Legendary, sub-Legendary, and Paradox species.
    - Exclude Mythical Pokemon and Ultra Beasts unless the policy is deliberately
@@ -126,6 +128,9 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
     the mutable rolled encounter level as identity.
   - If no species is eligible in the preferred BST band, expand to the nearest
     adjacent band deterministically rather than failing the encounter.
+  - Route non-special `setwildbattle` encounters through the same ordinary pool,
+    using the fixed scripted level for difficulty and a distinct scripted
+    encounter type for hash separation.
 - Legendary encounters:
   - Detect scripted/static encounters whose original species is flagged as a
     restricted Legendary, sub-Legendary, or Paradox Pokemon.

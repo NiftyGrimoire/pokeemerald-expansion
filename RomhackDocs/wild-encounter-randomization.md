@@ -296,7 +296,9 @@ same behavior as normal land encounters.
 The following paths do not currently request species randomization:
 
 - Roamers.
-- Scripted or static Pokemon.
+- Scripted or static Pokemon in this phase. A later hook routes ordinary
+  `setwildbattle` encounters through the same BST-scaled resolver and qualifying
+  Legendary/Paradox encounters through a dedicated special pool.
 - Battle Pike encounters.
 - Battle Pyramid encounters.
 - DexNav.

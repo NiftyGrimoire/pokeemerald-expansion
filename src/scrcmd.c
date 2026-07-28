@@ -2524,8 +2524,15 @@ bool8 ScrCmd_setwildbattle(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    species = GetRandomizedSpeciesForLegendaryEncounter(species, mapId, 0);
-    species2 = GetRandomizedSpeciesForLegendaryEncounter(species2, mapId, 1);
+    if (IsSpeciesRandomizerLegendaryEncounterEligible(species))
+        species = GetRandomizedSpeciesForLegendaryEncounter(species, mapId, 0);
+    else if (species != SPECIES_NONE)
+        species = GetRandomizedSpeciesForEncounter(species, mapId, RANDOMIZER_ENCOUNTER_SCRIPTED, 0, level);
+
+    if (IsSpeciesRandomizerLegendaryEncounterEligible(species2))
+        species2 = GetRandomizedSpeciesForLegendaryEncounter(species2, mapId, 1);
+    else if (species2 != SPECIES_NONE)
+        species2 = GetRandomizedSpeciesForEncounter(species2, mapId, RANDOMIZER_ENCOUNTER_SCRIPTED, 1, level2);
 
     if (species2 == SPECIES_NONE)
     {
