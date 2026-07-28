@@ -20,6 +20,9 @@
             ],
             "cStandard": "gnu17",
             "intelliSenseMode": "gcc-arm",
+            "includePath": [
+                "${workspaceFolder}/include/constants"
+            ],
             "browse": {
                 "path": [
                     "${workspaceFolder}/include",
