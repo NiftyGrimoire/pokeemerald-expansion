@@ -228,10 +228,13 @@ Call-path review:
   on `VAR_STARTER_MON` and select fixed trainer IDs. Those parties contain the
   vanilla rival starter or its evolution as their final party member.
 - The common creation seam for ordinary trainer parties is
-  `CreateNPCTrainerPartyFromTrainer` in `src/battle_main.c`. A narrowly scoped
-  post-creation replacement keyed by the known May/Brendan trainer ID is the
-  preferred way to keep the rival's randomized starter line consistent without
-  rewriting every map script or generated trainer table.
+  `CreateNPCTrainerPartyFromTrainer` in `src/battle_main.c`.
+- `CreateNPCTrainerParty` has the trainer ID needed to give each configured
+  encounter a stable identity. Keep that ID available when resolving randomized
+  party species rather than deriving identity from a trainer pointer.
+- The public `CreateNPCTrainerPartyFromTrainer` helper is also used to construct
+  a player-controlled trainer party. Do not apply enemy randomization globally
+  inside that helper without distinguishing opponent parties.
 - `wild_encounter_ow.c` references Treecko, Torchic, and Mudkip only for doll
   object graphics and is unrelated to starter selection.
 
@@ -256,17 +259,37 @@ Focused validation:
   uniqueness, determinism, save separation, and invalid-slot handling.
 - A normal `make -j4` ROM build succeeds.
 
-The remaining rival policy is:
+## Next phase: enemy trainer parties
 
-- Give the rival the next choice cyclically, preserving the vanilla
-  player-slot-to-rival-slot relationship.
-- Use the rival choice's base stage on Route 103 and an appropriate deterministic
-  evolved stage in later fights while preserving the configured party level,
-  moves, IVs, item, and party position.
+The chosen policy is per-encounter trainer randomization:
 
-Before implementing the rival hook, define how its middle and final stages are
-selected for branched or regional lines. Add focused tests for rival choice
-mapping and later rival evolution consistency.
+- Randomize every ordinary enemy trainer party, including May and Brendan.
+- Treat each configured trainer ID as a separate encounter. Rival fights at
+  different story points may therefore have unrelated teams; the rival does not
+  need to retain or evolve one of the randomized starter choices.
+- Make a party stable within a save by resolving each slot from the saved
+  randomizer seed, randomizer algorithm version, trainer ID, and party slot.
+  Reloading or repeating the same trainer encounter must not reroll its team.
+- Different saves should normally produce different teams for the same trainer.
+- Preserve the configured party size and levels. Preserve other trainer tuning
+  only where it remains valid for the replacement species.
+- Choose replacement species near the original species' BST so gym leaders,
+  bosses, and ordinary trainers retain approximately their authored strength.
+  Define and test the exact BST band and fallback before implementation.
+- Generate a legal level-up moveset for a replacement instead of copying custom
+  moves that may be illegal or unusable for it.
+- Resolve abilities against the replacement species. The current creation code
+  validates configured abilities against the original species, so simply
+  replacing the `CreateMon` species argument is unsafe.
+- Define handling for species-specific held items and battle gimmicks before
+  enabling them on randomized replacements.
+- Initially exclude Battle Frontier, Trainer Hill, e-Reader, Secret Base, and
+  player-controlled trainer parties. The existing ordinary trainer creation path
+  already distinguishes most of these battle types.
+
+Add a dedicated trainer config gate and hash category, then add focused tests for
+determinism, save separation, trainer/slot separation, BST bounds and fallback,
+species eligibility, and rival encounters being independent trainer identities.
 
 ## Other unresolved architecture
 
@@ -279,9 +302,8 @@ mapping and later rival evolution consistency.
   move exclusions, and evolution behavior.
 - Friendship evolution replacements: create an explicit species-level conversion
   table.
-- Starter randomization: identify the selection, display, grant, rival-choice, and
-  later rival-team paths; define a deterministic three-choice policy, eligible pool,
-  uniqueness rule, and any evolution-stage or BST limits.
+- Starter randomization: the player-facing three-choice policy is implemented.
+  Rival parties are governed independently by the enemy-trainer policy above.
 - Time-dependent and alternate-form evolutions: define a species-level policy that
   removes day/night availability barriers and deterministically selects eligible
   alternate or regional-form outcomes for a save.
