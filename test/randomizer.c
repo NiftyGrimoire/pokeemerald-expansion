@@ -285,3 +285,72 @@ TEST("Starter resolver separates saves and preserves invalid slots")
     EXPECT_NE(firstSeedStarter, GetRandomizedStarterSpecies(SPECIES_TREECKO, 0));
     EXPECT_EQ(GetRandomizedStarterSpecies(SPECIES_TREECKO, 3), SPECIES_TREECKO);
 }
+
+TEST("Trainer randomization is deterministic, eligible, common, and within BST band")
+{
+    enum Species species;
+    const struct SpeciesInfo *info;
+    u16 bst;
+    u16 originalBST;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    species = GetRandomizedSpeciesForTrainer(SPECIES_BRELOOM, 0x0100, 0);
+
+    EXPECT_EQ(species, GetRandomizedSpeciesForTrainer(SPECIES_BRELOOM, 0x0100, 0));
+    EXPECT(IsSpeciesRandomizerEligible(species));
+
+    info = &gSpeciesInfo[species];
+    EXPECT(!info->isRestrictedLegendary);
+    EXPECT(!info->isSubLegendary);
+    EXPECT(!info->isMythical);
+    EXPECT(!info->isUltraBeast);
+    EXPECT(!info->isParadox);
+
+    originalBST = GetTestSpeciesBaseStatTotal(SPECIES_BRELOOM);
+    bst = GetTestSpeciesBaseStatTotal(species);
+    EXPECT_GE(bst, (originalBST > 50) ? (u16)(originalBST - 50) : 0);
+    EXPECT_LE(bst, (u16)originalBST + 50);
+}
+
+TEST("Trainer randomization separates seed, trainerId, and partySlot context")
+{
+    enum Species baseline;
+    bool32 seedDiffers = FALSE;
+    bool32 trainerDiffers = FALSE;
+    bool32 slotDiffers = FALSE;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    baseline = GetRandomizedSpeciesForTrainer(SPECIES_BRELOOM, 0x0100, 0);
+
+    for (u32 seed = 0x12345679; seed <= 0x12345688; seed++)
+    {
+        gSaveBlock3Ptr->randomizerSeed = seed;
+        if (GetRandomizedSpeciesForTrainer(SPECIES_BRELOOM, 0x0100, 0) != baseline)
+            seedDiffers = TRUE;
+    }
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    for (u32 trainerId = 0x0101; trainerId <= 0x0110; trainerId++)
+    {
+        if (GetRandomizedSpeciesForTrainer(SPECIES_BRELOOM, trainerId, 0) != baseline)
+            trainerDiffers = TRUE;
+    }
+
+    for (u32 slot = 1; slot < PARTY_SIZE; slot++)
+    {
+        if (GetRandomizedSpeciesForTrainer(SPECIES_BRELOOM, 0x0100, slot) != baseline)
+            slotDiffers = TRUE;
+    }
+
+    EXPECT(seedDiffers);
+    EXPECT(trainerDiffers);
+    EXPECT(slotDiffers);
+}
+
+TEST("Trainer randomization returns SPECIES_NONE and NUM_SPECIES unchanged")
+{
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+
+    EXPECT_EQ(GetRandomizedSpeciesForTrainer(SPECIES_NONE, 0x0100, 0), SPECIES_NONE);
+    EXPECT_EQ(GetRandomizedSpeciesForTrainer(NUM_SPECIES, 0x0100, 0), NUM_SPECIES);
+}
