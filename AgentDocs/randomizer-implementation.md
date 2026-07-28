@@ -17,9 +17,9 @@ Verify the current Git state rather than assuming these commits remain unpushed.
 
 ## Primary plan
 
-Read `docs/hack-plans/gameplay-randomizer-overview.md` before implementing another
-phase. Its Architecture Decisions and Phase 1 Contract supersede the older broad
-summary where they differ.
+Read `AgentDocs/hack-plans/gameplay-randomizer-overview.md` before implementing
+another phase. Its Architecture Decisions and Phase 1 Contract supersede the older
+broad summary where they differ.
 
 ## Completed foundation
 

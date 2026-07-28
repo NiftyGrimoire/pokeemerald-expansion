@@ -1,7 +1,5 @@
 # Summary
 
-- [Gameplay Randomizer Hack Plan](hack-plans/gameplay-randomizer-overview.md)
-
 - [README](./README.md)
 - [FEATURES](./FEATURES.md)
 - [Installation](./INSTALL.md)
