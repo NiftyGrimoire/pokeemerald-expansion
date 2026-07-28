@@ -44,8 +44,7 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      from lower-BST species and high-level areas draw from higher-BST species.
    - Derive the difficulty band from stable encounter-table data rather than the
      mutable level roll, preserving deterministic slot mappings.
-3. Legendary encounters (implemented on
-   `romhack/randomizer-legendary-encounters`; pending integration):
+3. Legendary encounters (complete on `romhack/main`; manual gameplay checks remain):
    - Route ordinary `setwildbattle` encounters through the regular BST-scaled
      encounter resolver using their fixed scripted level.
    - Randomize scripted/static encounters only when the original species is a
@@ -56,18 +55,26 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      expanded later.
    - Preserve the scripted encounter's level, battle setup, flags, and progression
      behavior while replacing only its species.
-4. Level caps and EV removal:
+   - Manually verify the Emerald Legendary encounters, including capture/defeat
+     flags and repeat-entry behavior.
+4. Level caps and EV removal (complete on `romhack/main`; manual gameplay checks
+   remain):
    - Enable the existing hard Emerald flag-based level-cap system.
-   - Prevent Rare Candies from exceeding the active cap.
-   - Disable EV gain.
-   - Verify battle experience and item behavior before building the Level Capper
-     on top of these rules.
-5. Starters:
-   - Deterministically randomize the three starter choices for each save.
-   - Define the eligible species pool, whether the choices must be unique, any
-     strength or evolution-stage limits before implementation.
+   - Prevent Rare Candies and EXP Candies from exceeding the active cap.
+   - Disable battle EV gain and prevent EV-boosting items from bypassing the
+     zero-EV cap.
+   - Manually verify battle experience, cap progression, candy behavior, and all
+     EV-changing item paths before building the Level Capper on these rules.
+5. Starters (complete on `romhack/main`; manual gameplay checks remain):
+   - Deterministically select three distinct starter choices for each save.
+   - Limit choices to enabled, generally usable, non-special base-stage Pokemon
+     with BST 300-350 and a complete three-stage evolution line.
+   - Resolve all player-facing starter uses through `GetStarterPokemon` so the
+     selection UI, granted Pokemon, party checks, and credits agree.
    - The rival is not required to choose or retain one of these species; rival
      parties follow the enemy-trainer policy below.
+   - Manually verify selection labels, sprites, cries, confirmation, the granted
+     Pokemon, party checks, and save-to-save variation in gameplay.
 6. Enemy trainer parties:
    - Randomize ordinary enemy party species per configured trainer encounter.
    - Key each slot by the save seed, algorithm version, trainer ID, and party slot
