@@ -35,7 +35,8 @@ build/
 .idea/
 porymap.*.cfg
 prefabs.json
-.vscode/
+/.vscode/
+/.codex/
 *.a
 .fuse_hidden*
 *.sna
