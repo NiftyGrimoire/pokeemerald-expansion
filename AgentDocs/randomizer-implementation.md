@@ -32,9 +32,9 @@ broad summary where they differ.
 
 Wild encounter randomization, BST-scaled ordinary encounter pools, and scripted
 encounter randomization are merged into `romhack/main`. Level caps and EV removal
-are implemented on `romhack/randomizer-level-caps-evs` and pending integration.
-Abilities, learnsets, starters, evolution, and quality-of-life hooks have not
-been implemented.
+are also merged into `romhack/main`. Starter work has begun on
+`romhack/randomizer-starters`. Abilities, learnsets, evolution, and
+quality-of-life hooks have not been implemented.
 
 ## Validation already performed
 
@@ -184,9 +184,9 @@ Codex retains architecture, worktree integration, source review, build/test
 validation, documentation, and commits. Workers remain isolated, uncommitted,
 and may not push or merge.
 
-## Current phase: level caps and EV removal
+## Completed level caps and EV removal phase
 
-The implementation on `romhack/randomizer-level-caps-evs`:
+The implementation was merged locally into `romhack/main`. It:
 
 - Enables hard experience caps using the existing Emerald badge-flag cap table.
 - Prevents Rare Candies and EXP Candies from exceeding the active cap.
@@ -211,10 +211,48 @@ Manual gameplay validation still required:
 - Confirm battles, vitamins, feathers, and EV-affecting berries cannot produce
   positive EVs from a fresh zero-EV Pokemon.
 
-After this branch is reviewed, committed, and deliberately integrated, the next
-planned phase is starters. Starter selection still requires a complete
-display/grant/rival call-path review and explicit eligible-pool, uniqueness,
-strength, and rival-choice policies before implementation.
+## Current phase: starters
+
+Work is on `romhack/randomizer-starters`. Do not implement this phase directly
+on main, merge it, or push it without explicit approval.
+
+Call-path review:
+
+- `GetStarterPokemon(slot)` in `src/starter_choose.c` is the shared player-facing
+  seam. The selection labels, sprites, cries, confirmation screen, granted
+  Pokemon, `IsStarterInParty`, and credits all resolve through it.
+- `CB2_GiveStarter` stores only the selected slot in `VAR_STARTER_MON`, then
+  grants the species returned by `GetStarterPokemon`. Keeping the slot as the
+  stable identity avoids new save fields.
+- Rival scripts on Route 103, Route 110, Route 119, Rustboro, and Lilycove switch
+  on `VAR_STARTER_MON` and select fixed trainer IDs. Those parties contain the
+  vanilla rival starter or its evolution as their final party member.
+- The common creation seam for ordinary trainer parties is
+  `CreateNPCTrainerPartyFromTrainer` in `src/battle_main.c`. A narrowly scoped
+  post-creation replacement keyed by the known May/Brendan trainer ID is the
+  preferred way to keep the rival's randomized starter line consistent without
+  rewriting every map script or generated trainer table.
+- `wild_encounter_ow.c` references Treecko, Torchic, and Mudkip only for doll
+  object graphics and is unrelated to starter selection.
+
+Policy must be finalized before adding hooks. The conservative initial policy
+under review is:
+
+- Generate three distinct choices from the save seed and starter slot.
+- Require generally eligible, enabled, non-special base-stage Pokemon that can
+  evolve, with a starter-like base-stat range.
+- Exclude restricted Legendary, sub-Legendary, Mythical, Ultra Beast, Paradox,
+  and battle-only species/forms.
+- Give the rival the next choice cyclically, preserving the vanilla
+  player-slot-to-rival-slot relationship.
+- Use the rival choice's base stage on Route 103 and an appropriate deterministic
+  evolved stage in later fights while preserving the configured party level,
+  moves, IVs, item, and party position.
+
+Before implementation, define the exact BST bounds and evolution rules for
+branched, regional, and species with fewer than two stages. Add focused tests for
+eligibility, uniqueness, seed/slot separation, player UI/grant agreement, rival
+choice mapping, and later rival evolution consistency.
 
 ## Other unresolved architecture
 
