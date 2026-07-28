@@ -80,6 +80,11 @@ mechanical resolver or one hook at a time.
 
 ## Unresolved architecture
 
+- Legendary encounters: locate every scripted/static creation path and define
+  stable context keys that distinguish separate encounters without depending on
+  mutable RNG. The initial candidate pool is enabled, usable restricted
+  Legendary, sub-Legendary, and Paradox species; Mythicals and Ultra Beasts are
+  excluded.
 - Ability randomization: decide whether the stored/resolved result is an ability
   ID or an ability slot. The same slot across an evolution family does not imply
   the same actual ability.
