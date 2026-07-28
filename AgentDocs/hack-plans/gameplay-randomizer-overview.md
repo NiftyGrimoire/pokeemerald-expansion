@@ -75,7 +75,8 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      parties follow the enemy-trainer policy below.
    - Manually verify selection labels, sprites, cries, confirmation, the granted
      Pokemon, party checks, and save-to-save variation in gameplay.
-6. Enemy trainer parties:
+6. Enemy trainer parties (resolver foundation complete on `romhack/main`;
+   party-creation integration pending):
    - Randomize ordinary enemy party species per configured trainer encounter.
    - Key each slot by the save seed, algorithm version, trainer ID, and party slot
      so the same encounter is stable within a save but differs across saves.
@@ -84,6 +85,8 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      required.
    - Preserve party size and levels, and select replacements near each original
      species' BST to retain approximate difficulty.
+   - Use an inclusive original-BST ±50 preferred pool, expanding outward by 50
+     only when that pool is empty.
    - Regenerate legal moves and validate abilities, held items, and gimmicks
      against the replacement species.
    - Initially exclude Battle Frontier, Trainer Hill, e-Reader, Secret Base, and

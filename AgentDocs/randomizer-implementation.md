@@ -30,10 +30,10 @@ broad summary where they differ.
 - Focused tests in `test/randomizer.c`.
 - Intentional `SaveBlock3` size guard updated from 4 to 8 bytes.
 
-Wild encounter randomization, BST-scaled ordinary encounter pools, and scripted
-encounter randomization are merged into `romhack/main`. Level caps and EV removal
-are also merged into `romhack/main`. Starter work has begun on
-`romhack/randomizer-starters`. Abilities, learnsets, evolution, and
+Wild encounter randomization, BST-scaled ordinary encounter pools, scripted
+encounter randomization, level caps and EV removal, and starter randomization are
+merged into `romhack/main`. Enemy trainer party work has begun with a tested pure
+species resolver on `romhack/main`. Abilities, learnsets, evolution, and
 quality-of-life hooks have not been implemented.
 
 ## Validation already performed
@@ -290,6 +290,27 @@ The chosen policy is per-encounter trainer randomization:
 Add a dedicated trainer config gate and hash category, then add focused tests for
 determinism, save separation, trainer/slot separation, BST bounds and fallback,
 species eligibility, and rival encounters being independent trainer identities.
+
+The pure resolver foundation is implemented on `romhack/main`:
+
+- `RANDOMIZER_TRAINERS` is enabled and has a dedicated version-1 hash category.
+- `GetRandomizedSpeciesForTrainer(originalSpecies, trainerId, partySlot)` keys
+  each result by the save seed, algorithm version, trainer ID, original species,
+  and configured party slot.
+- The preferred inclusive pool is within 50 BST of the original species. An empty
+  pool expands outward by 50 BST per pass.
+- Candidates use the ordinary enabled, usable, non-special species policy,
+  excluding restricted Legendary, sub-Legendary, Mythical, Ultra Beast, Paradox,
+  and battle-only species/forms.
+- Three focused tests cover determinism, eligibility, preferred BST bounds,
+  seed/trainer/slot context separation, and invalid-species passthrough. All 19
+  tests in `test/randomizer.c` pass.
+
+The resolver is not yet connected to trainer party creation. Before hooking
+`CreateNPCTrainerParty`, keep the trainer ID explicit and define the integration
+behavior for replacement moves, abilities, held items, and battle gimmicks.
+Continue excluding player-controlled trainer parties and the configured facility
+paths.
 
 ## Other unresolved architecture
 
