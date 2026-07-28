@@ -65,26 +65,40 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
 5. Starters:
    - Deterministically randomize the three starter choices for each save.
    - Define the eligible species pool, whether the choices must be unique, any
-     strength or evolution-stage limits, and how the rival's starter choice follows
-     the randomized selection before implementation.
-6. Abilities:
+     strength or evolution-stage limits before implementation.
+   - The rival is not required to choose or retain one of these species; rival
+     parties follow the enemy-trainer policy below.
+6. Enemy trainer parties:
+   - Randomize ordinary enemy party species per configured trainer encounter.
+   - Key each slot by the save seed, algorithm version, trainer ID, and party slot
+     so the same encounter is stable within a save but differs across saves.
+   - Treat separate rival trainer IDs as separate encounters. Rival teams may be
+     unrelated between story battles; no persistent rival evolution line is
+     required.
+   - Preserve party size and levels, and select replacements near each original
+     species' BST to retain approximate difficulty.
+   - Regenerate legal moves and validate abilities, held items, and gimmicks
+     against the replacement species.
+   - Initially exclude Battle Frontier, Trainer Hill, e-Reader, Secret Base, and
+     player-controlled trainer parties.
+7. Abilities:
    - Specify family identity, whether the result is an ability ID or an ability slot,
      legal ability pool rules, and form/gimmick overrides.
    - Route all Pokemon origins through the same resolver.
-7. Learnsets:
+8. Learnsets:
    - Specify candidate moves and weighting, then add the runtime resolver and any
      measured cache.
-8. Evolution rules:
+9. Evolution rules:
    - Replace friendship evolutions from an explicit species-by-species conversion
      table, preserving applicable secondary conditions.
    - Make time-dependent and alternate-form evolution lines practical in a short
      Nuzlocke: replace day/night dependencies and deterministically randomize the
      available branch or form, including regional forms, under an explicit
      species-by-species policy.
-9. Quality of life:
+10. Quality of life:
    - Implement and grant Level Capper and Portable Healer after their exact item-use
      and level-up/evolution behavior is specified.
-10. World items:
+11. World items:
    - Deterministically randomize item pickups found in the overworld.
    - Limit replacements to items useful in a Nuzlocke, initially held items and
      evolution items; define exclusions and progression safeguards before
@@ -141,11 +155,20 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
 - Starters:
   - Replace the three displayed and granted starter species deterministically from
     the save seed while preserving each choice slot's identity.
-  - Ensure the selection UI, granted Pokemon, rival choice, subsequent rival teams,
-    and starter-dependent scripts all agree on the randomized choices.
+  - Ensure the selection UI, granted Pokemon, and starter-dependent scripts agree
+    on the randomized choices.
   - Decide whether choices must be distinct and whether the pool excludes special
     species, unusable forms, evolved species, or Pokemon outside an approved BST
     range before implementation.
+- Enemy trainer parties:
+  - Resolve replacements independently for each configured trainer ID and party
+    slot. This includes each May/Brendan battle as its own encounter.
+  - Keep the result deterministic within a save; do not consume mutable battle RNG
+    or reroll the team when an encounter is reloaded.
+  - Preserve configured party size and levels while using an original-BST-relative
+    candidate pool to maintain approximate trainer difficulty.
+  - Give replacement species legal moves and valid abilities, and safely handle
+    incompatible species-specific items and battle gimmicks.
 - Abilities:
   - Choose one legal randomized ability per evolution family/base species.
   - Apply the same ability slot result to all members of that evolution line.
@@ -191,7 +214,12 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
 - Build with `make -j$(nproc)`.
 - Start two new saves and confirm encounter/ability/learnset randomization differs between saves.
 - Confirm the three starter choices are stable within a save, differ across suitable
-  seeds, and match the Pokemon granted to the player and used by the rival.
+  seeds, and match the Pokemon granted to the player.
+- Confirm an enemy trainer's randomized party is stable when repeated in one save,
+  differs across suitable saves, respects the configured levels and BST policy,
+  and contains legal moves and abilities.
+- Confirm separate rival encounters randomize independently without requiring a
+  persistent starter or evolution line.
 - Within one save, confirm repeated encounters of the same species have consistent ability and learnset.
 - Confirm evolution preserves the randomized ability behavior for that evolution line.
 - Confirm Pokemon at cap gain no EXP and Rare Candy/EXP Candy cannot exceed cap.

@@ -10,6 +10,9 @@
 // Randomize supported scripted Legendary and Paradox encounters.
 #define RANDOMIZER_LEGENDARY_ENCOUNTERS TRUE
 
+// Randomize the three Hoenn starter choices.
+#define RANDOMIZER_STARTERS TRUE
+
 // Changing the hash algorithm or category meanings requires a new version.
 #define RANDOMIZER_ALGORITHM_VERSION 1
 

@@ -32,9 +32,9 @@ broad summary where they differ.
 
 Wild encounter randomization, BST-scaled ordinary encounter pools, and scripted
 encounter randomization are merged into `romhack/main`. Level caps and EV removal
-are implemented on `romhack/randomizer-level-caps-evs` and pending integration.
-Abilities, learnsets, starters, evolution, and quality-of-life hooks have not
-been implemented.
+are also merged into `romhack/main`. Starter work has begun on
+`romhack/randomizer-starters`. Abilities, learnsets, evolution, and
+quality-of-life hooks have not been implemented.
 
 ## Validation already performed
 
@@ -184,9 +184,9 @@ Codex retains architecture, worktree integration, source review, build/test
 validation, documentation, and commits. Workers remain isolated, uncommitted,
 and may not push or merge.
 
-## Current phase: level caps and EV removal
+## Completed level caps and EV removal phase
 
-The implementation on `romhack/randomizer-level-caps-evs`:
+The implementation was merged locally into `romhack/main`. It:
 
 - Enables hard experience caps using the existing Emerald badge-flag cap table.
 - Prevents Rare Candies and EXP Candies from exceeding the active cap.
@@ -211,10 +211,85 @@ Manual gameplay validation still required:
 - Confirm battles, vitamins, feathers, and EV-affecting berries cannot produce
   positive EVs from a fresh zero-EV Pokemon.
 
-After this branch is reviewed, committed, and deliberately integrated, the next
-planned phase is starters. Starter selection still requires a complete
-display/grant/rival call-path review and explicit eligible-pool, uniqueness,
-strength, and rival-choice policies before implementation.
+## Current phase: starters
+
+Work is on `romhack/randomizer-starters`. Do not implement this phase directly
+on main, merge it, or push it without explicit approval.
+
+Call-path review:
+
+- `GetStarterPokemon(slot)` in `src/starter_choose.c` is the shared player-facing
+  seam. The selection labels, sprites, cries, confirmation screen, granted
+  Pokemon, `IsStarterInParty`, and credits all resolve through it.
+- `CB2_GiveStarter` stores only the selected slot in `VAR_STARTER_MON`, then
+  grants the species returned by `GetStarterPokemon`. Keeping the slot as the
+  stable identity avoids new save fields.
+- Rival scripts on Route 103, Route 110, Route 119, Rustboro, and Lilycove switch
+  on `VAR_STARTER_MON` and select fixed trainer IDs. Those parties contain the
+  vanilla rival starter or its evolution as their final party member.
+- The common creation seam for ordinary trainer parties is
+  `CreateNPCTrainerPartyFromTrainer` in `src/battle_main.c`.
+- `CreateNPCTrainerParty` has the trainer ID needed to give each configured
+  encounter a stable identity. Keep that ID available when resolving randomized
+  party species rather than deriving identity from a trainer pointer.
+- The public `CreateNPCTrainerPartyFromTrainer` helper is also used to construct
+  a player-controlled trainer party. Do not apply enemy randomization globally
+  inside that helper without distinguishing opponent parties.
+- `wild_encounter_ow.c` references Treecko, Torchic, and Mudkip only for doll
+  object graphics and is unrelated to starter selection.
+
+The player-facing starter resolver is implemented:
+
+- Generate three distinct choices from the save seed and starter slot.
+- Require generally eligible, enabled, non-special base-stage Pokemon with a
+  base-stat total from 300 through 350 inclusive.
+- Require a complete three-stage evolution line: the candidate has no
+  pre-evolution, has a usable evolution, and at least one usable middle-stage
+  evolution can evolve again.
+- Exclude restricted Legendary, sub-Legendary, Mythical, Ultra Beast, Paradox,
+  and battle-only species/forms.
+- Resolve through `GetStarterPokemon`, keeping the selection UI, label, sprite,
+  cry, granted Pokemon, party check, and credits consistent.
+- Build the pre-evolution lookup once and cache all three choices by save seed so
+  repeated UI lookups do not rescan the evolution graph.
+
+Focused validation:
+
+- All 16 tests in `test/randomizer.c` pass, including starter eligibility,
+  uniqueness, determinism, save separation, and invalid-slot handling.
+- A normal `make -j4` ROM build succeeds.
+
+## Next phase: enemy trainer parties
+
+The chosen policy is per-encounter trainer randomization:
+
+- Randomize every ordinary enemy trainer party, including May and Brendan.
+- Treat each configured trainer ID as a separate encounter. Rival fights at
+  different story points may therefore have unrelated teams; the rival does not
+  need to retain or evolve one of the randomized starter choices.
+- Make a party stable within a save by resolving each slot from the saved
+  randomizer seed, randomizer algorithm version, trainer ID, and party slot.
+  Reloading or repeating the same trainer encounter must not reroll its team.
+- Different saves should normally produce different teams for the same trainer.
+- Preserve the configured party size and levels. Preserve other trainer tuning
+  only where it remains valid for the replacement species.
+- Choose replacement species near the original species' BST so gym leaders,
+  bosses, and ordinary trainers retain approximately their authored strength.
+  Define and test the exact BST band and fallback before implementation.
+- Generate a legal level-up moveset for a replacement instead of copying custom
+  moves that may be illegal or unusable for it.
+- Resolve abilities against the replacement species. The current creation code
+  validates configured abilities against the original species, so simply
+  replacing the `CreateMon` species argument is unsafe.
+- Define handling for species-specific held items and battle gimmicks before
+  enabling them on randomized replacements.
+- Initially exclude Battle Frontier, Trainer Hill, e-Reader, Secret Base, and
+  player-controlled trainer parties. The existing ordinary trainer creation path
+  already distinguishes most of these battle types.
+
+Add a dedicated trainer config gate and hash category, then add focused tests for
+determinism, save separation, trainer/slot separation, BST bounds and fallback,
+species eligibility, and rival encounters being independent trainer identities.
 
 ## Other unresolved architecture
 
@@ -227,9 +302,8 @@ strength, and rival-choice policies before implementation.
   move exclusions, and evolution behavior.
 - Friendship evolution replacements: create an explicit species-level conversion
   table.
-- Starter randomization: identify the selection, display, grant, rival-choice, and
-  later rival-team paths; define a deterministic three-choice policy, eligible pool,
-  uniqueness rule, and any evolution-stage or BST limits.
+- Starter randomization: the player-facing three-choice policy is implemented.
+  Rival parties are governed independently by the enemy-trainer policy above.
 - Time-dependent and alternate-form evolutions: define a species-level policy that
   removes day/night availability barriers and deterministically selects eligible
   alternate or regional-form outcomes for a save.

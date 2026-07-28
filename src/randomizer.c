@@ -5,6 +5,9 @@
 #include "randomizer.h"
 
 #define RANDOMIZER_ZERO_SEED_FALLBACK 0x6D2B79F5
+#define RANDOMIZER_STARTER_COUNT 3
+#define RANDOMIZER_STARTER_MIN_BST 300
+#define RANDOMIZER_STARTER_MAX_BST 350
 
 static u32 MixRandomizerValue(u32 value)
 {
@@ -228,6 +231,178 @@ enum Species GetRandomizedSpeciesForLegendaryEncounter(enum Species originalSpec
         if (IsSpeciesRandomizerLegendaryEncounterEligible(species) && selectedIndex-- == 0)
             return species;
     }
+#endif
+
+    return originalSpecies;
+}
+
+static bool32 HasUsableEvolution(enum Species species)
+{
+    const struct Evolution *evolutions = GetSpeciesEvolutions(species);
+
+    if (evolutions == NULL)
+        return FALSE;
+
+    for (u32 i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
+    {
+        enum Species target = evolutions[i].targetSpecies;
+
+        if (evolutions[i].method != EVO_SPLIT_FROM_EVO
+         && target > SPECIES_NONE
+         && target < NUM_SPECIES
+         && IsSpeciesRandomizerEligible(target))
+        {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
+static bool32 IsSpeciesRandomizerStarterEligibleInternal(enum Species species, bool32 hasPreEvolution)
+{
+    const struct SpeciesInfo *speciesInfo;
+    const struct Evolution *evolutions;
+    u32 bst;
+
+    if (!IsSpeciesRandomizerEligible(species))
+        return FALSE;
+    if (hasPreEvolution)
+        return FALSE;
+
+    speciesInfo = &gSpeciesInfo[species];
+    if (speciesInfo->isRestrictedLegendary
+     || speciesInfo->isSubLegendary
+     || speciesInfo->isMythical
+     || speciesInfo->isUltraBeast
+     || speciesInfo->isParadox)
+    {
+        return FALSE;
+    }
+
+    bst = GetSpeciesBaseStatTotal(species);
+    if (bst < RANDOMIZER_STARTER_MIN_BST || bst > RANDOMIZER_STARTER_MAX_BST)
+        return FALSE;
+
+    evolutions = GetSpeciesEvolutions(species);
+    if (evolutions == NULL)
+        return FALSE;
+
+    for (u32 i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
+    {
+        enum Species middleStage = evolutions[i].targetSpecies;
+
+        if (evolutions[i].method != EVO_SPLIT_FROM_EVO
+         && middleStage > SPECIES_NONE
+         && middleStage < NUM_SPECIES
+         && IsSpeciesRandomizerEligible(middleStage)
+         && HasUsableEvolution(middleStage))
+        {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
+bool32 IsSpeciesRandomizerStarterEligible(enum Species species)
+{
+    return IsSpeciesRandomizerStarterEligibleInternal(species, GetSpeciesPreEvolution(species) != SPECIES_NONE);
+}
+
+enum Species GetRandomizedStarterSpecies(enum Species originalSpecies, u8 slot)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_STARTERS
+    static u32 sCachedSeed;
+    static enum Species sCachedChoices[RANDOMIZER_STARTER_COUNT];
+    static bool32 sCacheValid;
+    enum Species selected[RANDOMIZER_STARTER_COUNT] = {SPECIES_NONE};
+    bool8 hasPreEvolution[NUM_SPECIES] = {FALSE};
+    u32 seed = GetRandomizerSeed();
+    u32 eligibleCount = 0;
+
+    if (slot >= RANDOMIZER_STARTER_COUNT)
+        return originalSpecies;
+    if (sCacheValid && sCachedSeed == seed)
+        return sCachedChoices[slot];
+
+    for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+    {
+        const struct Evolution *evolutions;
+
+        if (!IsSpeciesEnabled(species))
+            continue;
+
+        evolutions = GetSpeciesEvolutions(species);
+
+        if (evolutions == NULL)
+            continue;
+
+        for (u32 i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
+        {
+            enum Species target = evolutions[i].targetSpecies;
+
+            if (evolutions[i].method != EVO_SPLIT_FROM_EVO
+             && target > SPECIES_NONE
+             && target < NUM_SPECIES)
+            {
+                hasPreEvolution[target] = TRUE;
+            }
+        }
+    }
+
+    for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+    {
+        if (IsSpeciesRandomizerStarterEligibleInternal(species, hasPreEvolution[species]))
+            eligibleCount++;
+    }
+
+    if (eligibleCount < RANDOMIZER_STARTER_COUNT)
+        return originalSpecies;
+
+    for (u32 choice = 0; choice < RANDOMIZER_STARTER_COUNT; choice++)
+    {
+        u32 selectedIndex = RandomizerHash(seed,
+                                           RANDOMIZER_CATEGORY_STARTER,
+                                           choice,
+                                           RANDOMIZER_STARTER_COUNT,
+                                           RANDOMIZER_ALGORITHM_VERSION)
+                          % (eligibleCount - choice);
+
+        for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+        {
+            bool32 alreadySelected = FALSE;
+
+            if (!IsSpeciesRandomizerStarterEligibleInternal(species, hasPreEvolution[species]))
+                continue;
+
+            for (u32 previous = 0; previous < choice; previous++)
+            {
+                if (selected[previous] == species)
+                {
+                    alreadySelected = TRUE;
+                    break;
+                }
+            }
+
+            if (!alreadySelected && selectedIndex-- == 0)
+            {
+                selected[choice] = species;
+                break;
+            }
+        }
+    }
+
+    for (u32 choice = 0; choice < RANDOMIZER_STARTER_COUNT; choice++)
+    {
+        if (selected[choice] == SPECIES_NONE)
+            return originalSpecies;
+        sCachedChoices[choice] = selected[choice];
+    }
+
+    sCachedSeed = seed;
+    sCacheValid = TRUE;
+    return sCachedChoices[slot];
 #endif
 
     return originalSpecies;

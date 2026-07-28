@@ -241,3 +241,47 @@ TEST("Legendary encounter resolver leaves ordinary and SPECIES_NONE originals un
     EXPECT_EQ(GetRandomizedSpeciesForLegendaryEncounter(SPECIES_NONE, 0x0070, 0), SPECIES_NONE);
     EXPECT_EQ(GetRandomizedSpeciesForLegendaryEncounter(SPECIES_NONE, 0x0070, 1), SPECIES_NONE);
 }
+
+TEST("Starter eligibility requires a balanced base species in a three-stage line")
+{
+    EXPECT(IsSpeciesRandomizerStarterEligible(SPECIES_BULBASAUR));
+    EXPECT(IsSpeciesRandomizerStarterEligible(SPECIES_TREECKO));
+    EXPECT(!IsSpeciesRandomizerStarterEligible(SPECIES_IVYSAUR));
+    EXPECT(!IsSpeciesRandomizerStarterEligible(SPECIES_VENUSAUR));
+    EXPECT(!IsSpeciesRandomizerStarterEligible(SPECIES_CATERPIE));
+    EXPECT(!IsSpeciesRandomizerStarterEligible(SPECIES_EEVEE));
+    EXPECT(!IsSpeciesRandomizerStarterEligible(SPECIES_MEWTWO));
+    EXPECT(!IsSpeciesRandomizerStarterEligible(SPECIES_NONE));
+}
+
+TEST("Starter resolver produces three distinct deterministic eligible choices")
+{
+    static const enum Species sOriginalStarters[] = {SPECIES_TREECKO, SPECIES_TORCHIC, SPECIES_MUDKIP};
+    enum Species starters[3];
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    for (u32 slot = 0; slot < ARRAY_COUNT(starters); slot++)
+    {
+        starters[slot] = GetRandomizedStarterSpecies(sOriginalStarters[slot], slot);
+        EXPECT(IsSpeciesRandomizerStarterEligible(starters[slot]));
+        EXPECT_GE(GetTestSpeciesBaseStatTotal(starters[slot]), 300);
+        EXPECT_LE(GetTestSpeciesBaseStatTotal(starters[slot]), 350);
+        EXPECT_EQ(starters[slot], GetRandomizedStarterSpecies(sOriginalStarters[slot], slot));
+    }
+
+    EXPECT_NE(starters[0], starters[1]);
+    EXPECT_NE(starters[0], starters[2]);
+    EXPECT_NE(starters[1], starters[2]);
+}
+
+TEST("Starter resolver separates saves and preserves invalid slots")
+{
+    enum Species firstSeedStarter;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    firstSeedStarter = GetRandomizedStarterSpecies(SPECIES_TREECKO, 0);
+
+    gSaveBlock3Ptr->randomizerSeed = 0x87654321;
+    EXPECT_NE(firstSeedStarter, GetRandomizedStarterSpecies(SPECIES_TREECKO, 0));
+    EXPECT_EQ(GetRandomizedStarterSpecies(SPECIES_TREECKO, 3), SPECIES_TREECKO);
+}
