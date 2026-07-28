@@ -12,7 +12,9 @@ integration, and review with Codex. Do not delegate trivial edits when describin
 and reviewing the task would cost more than implementing it directly.
 
 The configured model is `minimax/minimax-m3`. Setup and troubleshooting details
-are in `tools/openrouter_worker/README.md`.
+are in `tools/openrouter_worker/README.md`. The rationale and behavior of the
+tightened delegation loop are recorded in
+`RomhackDocs/openrouter-worker-loop.md`.
 
 ## Read-only delegation
 
