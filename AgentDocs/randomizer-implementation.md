@@ -32,9 +32,10 @@ broad summary where they differ.
 
 Wild encounter randomization, BST-scaled ordinary encounter pools, scripted
 encounter randomization, level caps and EV removal, and starter randomization are
-merged into `romhack/main`. Enemy trainer party work has begun with a tested pure
-species resolver on `romhack/main`. Abilities, learnsets, evolution, and
-quality-of-life hooks have not been implemented.
+merged into `romhack/main`. Enemy trainer randomization is implemented with a
+tested pure species resolver and party-creation integration on `romhack/main`.
+Global ability and learnset randomization, evolution changes, and quality-of-life
+hooks have not been implemented.
 
 ## Validation already performed
 
@@ -306,11 +307,44 @@ The pure resolver foundation is implemented on `romhack/main`:
   seed/trainer/slot context separation, and invalid-species passthrough. All 19
   tests in `test/randomizer.c` pass.
 
-The resolver is not yet connected to trainer party creation. Before hooking
-`CreateNPCTrainerParty`, keep the trainer ID explicit and define the integration
-behavior for replacement moves, abilities, held items, and battle gimmicks.
-Continue excluding player-controlled trainer parties and the configured facility
-paths.
+Trainer party creation is now integrated:
+
+- The private ordinary enemy path passes the configured trainer ID explicitly,
+  including override trainers. The selected source `monIndex` is the stable party
+  slot identity when trainer pools reorder entries.
+- The existing public `CreateNPCTrainerPartyFromTrainer` remains unrandomized for
+  player-controlled parties, debug/direct callers, and existing tests. The
+  explicit `CreateRandomizedNPCTrainerPartyFromTrainer` entry point is used only
+  by the ordinary enemy path and focused integration coverage.
+- Randomized enemies keep configured party size, levels, held items, IVs, EVs,
+  friendship, balls, shiny state, Dynamax level/permission, and Tera settings.
+- Replacement species receive their legal initial level-up moves instead of the
+  original custom moves and retain the legal ability selected by `CreateMon`.
+- Configured nicknames and Gigantamax factor are suppressed when the species
+  changes. Held items remain equipped; incompatible species-specific effects and
+  transformation items remain inactive through existing battle validation.
+- Secret Base, Battle Frontier, Trainer Hill, e-Reader, and player-controlled
+  parties remain excluded. Disabling the trainer-randomizer config gate preserves
+  the complete original creation behavior.
+
+Focused validation:
+
+- All 19 tests in `test/randomizer.c` pass.
+- All 21 tests in `test/battle/trainer_control.c` pass, including randomized
+  species creation, preserved trainer tuning, legal initial moves, and a valid
+  replacement-species ability.
+- A normal `make -j4` ROM build succeeds.
+
+Manual gameplay validation still required:
+
+- Repeat an ordinary trainer and confirm its party is stable in one save.
+- Compare the same trainer across new saves and confirm the party changes.
+- Exercise May/Brendan, a Gym Leader, an override trainer, and a trainer-pool
+  encounter.
+- Confirm player-controlled trainer parties and excluded facilities remain
+  unchanged.
+- Exercise held Mega/Z items, Dynamax, Gigantamax-configured originals, and Tera
+  settings on replacement species.
 
 ## Other unresolved architecture
 

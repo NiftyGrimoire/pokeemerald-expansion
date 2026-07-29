@@ -5,6 +5,7 @@
 #include "data.h"
 #include "malloc.h"
 #include "random.h"
+#include "randomizer.h"
 #include "string_util.h"
 #include "trainer_pools.h"
 #include "constants/item.h"
@@ -86,6 +87,42 @@ TEST("CreateNPCTrainerPartyForTrainer generates customized Pokémon")
 
     EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_DYNAMAX_LEVEL), 5);
     EXPECT_EQ(GetMonData(&testParty[1], MON_DATA_DYNAMAX_LEVEL), 10);
+
+    Free(testParty);
+}
+
+TEST("Randomized enemy trainer creation preserves tuning and generates species-safe data")
+{
+    struct Pokemon *testParty = Alloc(PARTY_SIZE * sizeof(struct Pokemon));
+    struct Pokemon expectedMon;
+    u32 trainerId = 3;
+    const struct Trainer *trainer = GetTrainerStructFromId(trainerId);
+    const struct TrainerMon *partyEntry = &trainer->party[0];
+    enum Species species;
+    u32 abilityNum;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    species = GetRandomizedSpeciesForTrainer(partyEntry->species, trainerId, 0);
+    EXPECT_NE(species, partyEntry->species);
+
+    CreateRandomizedNPCTrainerPartyFromTrainer(testParty, trainer, TRUE, BATTLE_TYPE_TRAINER, trainerId);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_SPECIES), species);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_LEVEL), partyEntry->lvl);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_HELD_ITEM), partyEntry->heldItem);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_FRIENDSHIP), partyEntry->friendship);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_POKEBALL), partyEntry->ball);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_HP_IV), partyEntry->iv & 31);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_HP_EV), partyEntry->ev[0]);
+    EXPECT(IsMonShiny(&testParty[0]));
+
+    CreateMon(&expectedMon, species, partyEntry->lvl, 0, OTID_STRUCT_RANDOM_NO_SHINY);
+    GiveMonInitialMoveset(&expectedMon);
+    for (u32 moveSlot = 0; moveSlot < MAX_MON_MOVES; moveSlot++)
+        EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_MOVE1 + moveSlot), GetMonData(&expectedMon, MON_DATA_MOVE1 + moveSlot));
+
+    abilityNum = GetMonData(&testParty[0], MON_DATA_ABILITY_NUM);
+    EXPECT_LT(abilityNum, ARRAY_COUNT(gSpeciesInfo[species].abilities));
+    EXPECT_EQ(GetMonAbility(&testParty[0]), gSpeciesInfo[species].abilities[abilityNum]);
 
     Free(testParty);
 }
