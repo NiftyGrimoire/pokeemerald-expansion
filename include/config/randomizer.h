@@ -16,6 +16,9 @@
 // Randomize species selected by supported enemy trainer parties.
 #define RANDOMIZER_TRAINERS TRUE
 
+// Give each ordinary evolution family one deterministic randomized ability.
+#define RANDOMIZER_ABILITIES TRUE
+
 // Changing the hash algorithm or category meanings requires a new version.
 #define RANDOMIZER_ALGORITHM_VERSION 1
 

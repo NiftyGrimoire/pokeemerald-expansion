@@ -42,6 +42,7 @@
 #include "pokemon_storage_system.h"
 #include "pokerus.h"
 #include "random.h"
+#include "randomizer.h"
 #include "recorded_battle.h"
 #include "regions.h"
 #include "rtc.h"
@@ -3142,6 +3143,7 @@ enum Ability GetAbilityBySpecies(enum Species species, u8 abilityNum)
         gLastUsedAbility = GetSpeciesAbility(species, i);
     }
 
+    gLastUsedAbility = GetRandomizedAbilityForSpecies(species, gLastUsedAbility);
     return gLastUsedAbility;
 }
 

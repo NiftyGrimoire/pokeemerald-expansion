@@ -58,6 +58,81 @@ TEST("Randomizer data initialization stores a versioned nonzero seed")
     EXPECT_EQ(gSaveBlock3Ptr->randomizerVersion, RANDOMIZER_ALGORITHM_VERSION);
 }
 
+TEST("Randomizer evolution families include linear and branched evolutions")
+{
+    EXPECT_EQ(GetRandomizerEvolutionFamily(SPECIES_BULBASAUR), SPECIES_BULBASAUR);
+    EXPECT_EQ(GetRandomizerEvolutionFamily(SPECIES_IVYSAUR), SPECIES_BULBASAUR);
+    EXPECT_EQ(GetRandomizerEvolutionFamily(SPECIES_VENUSAUR), SPECIES_BULBASAUR);
+    EXPECT_EQ(GetRandomizerEvolutionFamily(SPECIES_EEVEE), SPECIES_EEVEE);
+    EXPECT_EQ(GetRandomizerEvolutionFamily(SPECIES_VAPOREON), SPECIES_EEVEE);
+    EXPECT_EQ(GetRandomizerEvolutionFamily(SPECIES_JOLTEON), SPECIES_EEVEE);
+    EXPECT_NE(GetRandomizerEvolutionFamily(SPECIES_VULPIX),
+              GetRandomizerEvolutionFamily(SPECIES_VULPIX_ALOLA));
+    EXPECT_EQ(GetRandomizerEvolutionFamily(SPECIES_NONE), SPECIES_NONE);
+    EXPECT_EQ(GetRandomizerEvolutionFamily(SPECIES_EGG), SPECIES_EGG);
+    EXPECT_EQ(GetRandomizerEvolutionFamily(NUM_SPECIES), NUM_SPECIES);
+}
+
+TEST("Ability randomizer excludes unsafe and unimplemented abilities")
+{
+    EXPECT(IsAbilityRandomizerEligible(ABILITY_OVERGROW));
+    EXPECT(IsAbilityRandomizerEligible(ABILITY_INTIMIDATE));
+    EXPECT(!IsAbilityRandomizerEligible(ABILITY_NONE));
+    EXPECT(!IsAbilityRandomizerEligible(ABILITIES_COUNT));
+    EXPECT(!IsAbilityRandomizerEligible(ABILITY_WONDER_GUARD));
+    EXPECT(!IsAbilityRandomizerEligible(ABILITY_STANCE_CHANGE));
+    EXPECT(!IsAbilityRandomizerEligible(ABILITY_SCHOOLING));
+    EXPECT(!IsAbilityRandomizerEligible(ABILITY_DISGUISE));
+    EXPECT(!IsAbilityRandomizerEligible(ABILITY_ZERO_TO_HERO));
+    EXPECT(!IsAbilityRandomizerEligible(ABILITY_TERA_SHIFT));
+    EXPECT(!IsAbilityRandomizerEligible(ABILITY_EELEVATE));
+}
+
+TEST("Ability randomizer is deterministic and stable across evolution families")
+{
+    enum Ability ability;
+    enum Ability differentSeedAbility;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    ability = GetRandomizedAbilityForSpecies(SPECIES_BULBASAUR, ABILITY_OVERGROW);
+
+    EXPECT(IsAbilityRandomizerEligible(ability));
+    EXPECT_EQ(ability, GetRandomizedAbilityForSpecies(SPECIES_BULBASAUR, ABILITY_OVERGROW));
+    EXPECT_EQ(ability, GetRandomizedAbilityForSpecies(SPECIES_IVYSAUR, ABILITY_OVERGROW));
+    EXPECT_EQ(ability, GetRandomizedAbilityForSpecies(SPECIES_VENUSAUR, ABILITY_OVERGROW));
+    EXPECT_EQ(GetRandomizedAbilityForSpecies(SPECIES_VAPOREON, ABILITY_WATER_ABSORB),
+              GetRandomizedAbilityForSpecies(SPECIES_JOLTEON, ABILITY_VOLT_ABSORB));
+
+    gSaveBlock3Ptr->randomizerSeed = 0x87654321;
+    differentSeedAbility = GetRandomizedAbilityForSpecies(SPECIES_BULBASAUR, ABILITY_OVERGROW);
+    EXPECT_NE(ability, differentSeedAbility);
+}
+
+TEST("Ability randomizer preserves protected families and invalid species")
+{
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+
+    EXPECT_EQ(GetRandomizedAbilityForSpecies(SPECIES_CASTFORM, ABILITY_FORECAST), ABILITY_FORECAST);
+    EXPECT_EQ(GetRandomizedAbilityForSpecies(SPECIES_CHERRIM, ABILITY_FLOWER_GIFT), ABILITY_FLOWER_GIFT);
+    EXPECT_EQ(GetRandomizedAbilityForSpecies(SPECIES_CHERUBI, ABILITY_CHLOROPHYLL), ABILITY_CHLOROPHYLL);
+    EXPECT_EQ(GetRandomizedAbilityForSpecies(SPECIES_NONE, ABILITY_NONE), ABILITY_NONE);
+    EXPECT_EQ(GetRandomizedAbilityForSpecies(SPECIES_EGG, ABILITY_NONE), ABILITY_NONE);
+    EXPECT_EQ(GetRandomizedAbilityForSpecies(NUM_SPECIES, ABILITY_OVERGROW), ABILITY_OVERGROW);
+}
+
+TEST("GetAbilityBySpecies exposes the randomized family ability")
+{
+    enum Ability ability;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    ability = GetAbilityBySpecies(SPECIES_BULBASAUR, 0);
+
+    EXPECT(IsAbilityRandomizerEligible(ability));
+    EXPECT_EQ(ability, GetAbilityBySpecies(SPECIES_BULBASAUR, 2));
+    EXPECT_EQ(ability, GetAbilityBySpecies(SPECIES_IVYSAUR, 0));
+    EXPECT_EQ(ABILITY_FORECAST, GetAbilityBySpecies(SPECIES_CASTFORM, 0));
+}
+
 TEST("Species randomizer eligibility rejects invalid and battle-only species")
 {
     EXPECT(IsSpeciesRandomizerEligible(SPECIES_BULBASAUR));

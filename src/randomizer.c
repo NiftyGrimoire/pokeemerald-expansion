@@ -9,6 +9,12 @@
 #define RANDOMIZER_STARTER_MIN_BST 300
 #define RANDOMIZER_STARTER_MAX_BST 350
 
+static EWRAM_DATA u16 sEvolutionFamilyCache[NUM_SPECIES] = {0};
+static EWRAM_DATA bool8 sEvolutionFamilyHasProtectedAbility[NUM_SPECIES] = {0};
+static EWRAM_DATA u16 sEvolutionFamilyAbilityCache[NUM_SPECIES] = {0};
+static EWRAM_DATA u32 sEvolutionFamilyAbilityCacheSeed = 0;
+static EWRAM_DATA bool8 sEvolutionFamilyCacheInitialized = FALSE;
+
 static u32 MixRandomizerValue(u32 value)
 {
     value ^= value >> 16;
@@ -50,6 +56,201 @@ u32 RandomizerHash(u32 seed, enum RandomizerCategory category, u32 key1, u32 key
     hash = MixRandomizerValue(hash ^ key2);
     hash = MixRandomizerValue(hash ^ key3);
     return hash;
+}
+
+static enum Species FindRandomizerEvolutionFamily(enum Species species)
+{
+    enum Species parent = sEvolutionFamilyCache[species];
+
+    if (parent != species)
+        sEvolutionFamilyCache[species] = FindRandomizerEvolutionFamily(parent);
+
+    return sEvolutionFamilyCache[species];
+}
+
+static bool32 IsProtectedRandomizerAbility(enum Ability ability)
+{
+    switch (ability)
+    {
+    case ABILITY_WONDER_GUARD:
+    case ABILITY_FORECAST:
+    case ABILITY_FLOWER_GIFT:
+    case ABILITY_MULTITYPE:
+    case ABILITY_ZEN_MODE:
+    case ABILITY_STANCE_CHANGE:
+    case ABILITY_BATTLE_BOND:
+    case ABILITY_POWER_CONSTRUCT:
+    case ABILITY_SCHOOLING:
+    case ABILITY_RKS_SYSTEM:
+    case ABILITY_SHIELDS_DOWN:
+    case ABILITY_DISGUISE:
+    case ABILITY_GULP_MISSILE:
+    case ABILITY_ICE_FACE:
+    case ABILITY_HUNGER_SWITCH:
+    case ABILITY_ZERO_TO_HERO:
+    case ABILITY_COMMANDER:
+    case ABILITY_EMBODY_ASPECT_TEAL_MASK:
+    case ABILITY_EMBODY_ASPECT_HEARTHFLAME_MASK:
+    case ABILITY_EMBODY_ASPECT_WELLSPRING_MASK:
+    case ABILITY_EMBODY_ASPECT_CORNERSTONE_MASK:
+    case ABILITY_TERA_SHIFT:
+    case ABILITY_TERA_SHELL:
+    case ABILITY_TERAFORM_ZERO:
+    case ABILITY_EELEVATE:
+    case ABILITY_314:
+    case ABILITY_FIRE_MANE:
+    case ABILITY_317:
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
+bool32 IsAbilityRandomizerEligible(enum Ability ability)
+{
+    return ability > ABILITY_NONE
+        && ability < ABILITIES_COUNT
+        && !IsProtectedRandomizerAbility(ability);
+}
+
+static bool32 IsRandomizerEvolutionFamilyEdge(const struct Evolution *evolution)
+{
+    enum Species target = evolution->targetSpecies;
+
+    return evolution->method != EVO_SPLIT_FROM_EVO
+        && target > SPECIES_NONE
+        && target < NUM_SPECIES
+        && IsSpeciesEnabled(target);
+}
+
+static void InitRandomizerEvolutionFamilyCache(void)
+{
+    for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+    {
+        if (IsSpeciesEnabled(species))
+            sEvolutionFamilyCache[species] = species;
+    }
+
+    for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+    {
+        const struct Evolution *evolutions;
+
+        if (!IsSpeciesEnabled(species))
+            continue;
+
+        evolutions = GetSpeciesEvolutions(species);
+        if (evolutions == NULL)
+            continue;
+
+        for (u32 i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
+        {
+            enum Species target = evolutions[i].targetSpecies;
+
+            if (IsRandomizerEvolutionFamilyEdge(&evolutions[i]))
+            {
+                enum Species sourceFamily = FindRandomizerEvolutionFamily(species);
+                enum Species targetFamily = FindRandomizerEvolutionFamily(target);
+                enum Species lowerFamily = min(sourceFamily, targetFamily);
+                enum Species higherFamily = max(sourceFamily, targetFamily);
+
+                sEvolutionFamilyCache[higherFamily] = lowerFamily;
+            }
+        }
+    }
+
+    for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+    {
+        if (IsSpeciesEnabled(species))
+            sEvolutionFamilyCache[species] = FindRandomizerEvolutionFamily(species);
+    }
+
+    for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
+    {
+        enum Species family;
+
+        if (!IsSpeciesEnabled(species))
+            continue;
+
+        family = sEvolutionFamilyCache[species];
+        for (u32 abilityNum = 0; abilityNum < NUM_ABILITY_SLOTS; abilityNum++)
+        {
+            if (IsProtectedRandomizerAbility(GetSpeciesAbility(species, abilityNum)))
+            {
+                sEvolutionFamilyHasProtectedAbility[family] = TRUE;
+                break;
+            }
+        }
+    }
+
+    sEvolutionFamilyCacheInitialized = TRUE;
+}
+
+enum Species GetRandomizerEvolutionFamily(enum Species species)
+{
+    if (species <= SPECIES_NONE || species >= NUM_SPECIES || species == SPECIES_EGG)
+        return species;
+    if (!IsSpeciesEnabled(species))
+        return species;
+
+    if (!sEvolutionFamilyCacheInitialized)
+        InitRandomizerEvolutionFamilyCache();
+
+    return sEvolutionFamilyCache[species];
+}
+
+enum Ability GetRandomizedAbilityForSpecies(enum Species species, enum Ability originalAbility)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_ABILITIES
+    enum Species family;
+    u32 seed;
+    u32 abilityCount = 0;
+    u32 selectedIndex;
+
+    if (!IsSpeciesRandomizerEligible(species))
+        return originalAbility;
+
+    family = GetRandomizerEvolutionFamily(species);
+    if (family == species && !IsSpeciesEnabled(family))
+        return originalAbility;
+    if (sEvolutionFamilyHasProtectedAbility[family])
+        return originalAbility;
+
+    seed = GetRandomizerSeed();
+    if (sEvolutionFamilyAbilityCacheSeed != seed)
+    {
+        memset(sEvolutionFamilyAbilityCache, 0, sizeof(sEvolutionFamilyAbilityCache));
+        sEvolutionFamilyAbilityCacheSeed = seed;
+    }
+    if (sEvolutionFamilyAbilityCache[family] != ABILITY_NONE)
+        return sEvolutionFamilyAbilityCache[family];
+
+    for (enum Ability ability = ABILITY_NONE + 1; ability < ABILITIES_COUNT; ability++)
+    {
+        if (IsAbilityRandomizerEligible(ability))
+            abilityCount++;
+    }
+
+    if (abilityCount == 0)
+        return originalAbility;
+
+    selectedIndex = RandomizerHash(seed,
+                                   RANDOMIZER_CATEGORY_ABILITY,
+                                   family,
+                                   RANDOMIZER_ALGORITHM_VERSION,
+                                   0)
+                  % abilityCount;
+
+    for (enum Ability ability = ABILITY_NONE + 1; ability < ABILITIES_COUNT; ability++)
+    {
+        if (IsAbilityRandomizerEligible(ability) && selectedIndex-- == 0)
+        {
+            sEvolutionFamilyAbilityCache[family] = ability;
+            return sEvolutionFamilyAbilityCache[family];
+        }
+    }
+#endif
+
+    return originalAbility;
 }
 
 bool32 IsSpeciesRandomizerEligible(enum Species species)

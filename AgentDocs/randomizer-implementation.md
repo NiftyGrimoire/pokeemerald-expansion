@@ -346,11 +346,7 @@ Manual gameplay validation still required:
 - Exercise held Mega/Z items, Dynamax, Gigantamax-configured originals, and Tera
   settings on replacement species.
 
-## Current phase: ability randomization
-
-The first ability milestone is architecture and call-path validation. Do not add
-the ability config gate or runtime hook until the form/gimmick exception list and
-candidate ability pool below are complete and tested.
+## Completed ability randomization phase
 
 Chosen representation:
 
@@ -400,31 +396,51 @@ Form and gimmick safety:
 - `GetAbilityBySpecies` is consulted by the form-change engine as well as normal
   battle setup. Species whose authored ability enables, identifies, or preserves
   a battle form must pass through unchanged.
-- Build the exception list from the configured `formChanges` data and ability
-  comparisons in `src/pokemon.c`, then audit direct ability-specific form logic
-  elsewhere. Do not rely on the general species eligibility filter alone: an
-  ordinary base species can require an authored ability to enter its special
-  form.
-- The candidate pool must exclude `ABILITY_NONE` and abilities whose mechanics
-  require a specific species/form, item, move, or battle-only state. Prefer an
-  explicit reviewed denylist for version 1; changing it later changes seeded
-  results and therefore requires an algorithm-version decision.
+- The version-1 denylist covers Wonder Guard; all ability-driven form changes;
+  Battle Bond, Zero to Hero, Commander, Embody Aspect, and Terapagos signature
+  abilities; placeholder abilities; and explicitly unimplemented abilities.
+- If any enabled evolution-family member has a denylisted authored ability, the
+  entire family preserves its authored abilities. This keeps pre-evolutions
+  consistent with form-dependent evolved species.
+- Invalid, disabled, egg, battle-only, and otherwise unusable forms pass through
+  unchanged.
 
-Required focused tests before integration:
+Implementation:
 
-- Ability-ID determinism, seed separation, category separation, and family
-  consistency across a linear evolution and a branch.
-- Distinct identities for unrelated and separately rooted regional families.
-- Candidate-pool validity and denylist coverage.
-- Passthrough for invalid species and every form/gimmick exception.
-- `GetAbilityBySpecies` integration for party, evolved, and randomized trainer
-  Pokemon, plus config-disabled vanilla behavior.
-- Confirmation that neither mutable RNG stream advances.
+- `RANDOMIZER_ABILITIES` enables the feature.
+- `GetRandomizerEvolutionFamily` builds enabled evolution-graph components with
+  minimum-species-ID union roots. Real evolution edges connect families;
+  `EVO_SPLIT_FROM_EVO` entries do not.
+- `GetRandomizedAbilityForSpecies` hashes the save seed, ability category,
+  family identity, and algorithm version, then selects uniformly from the
+  reviewed candidate pool.
+- `GetAbilityBySpecies` applies the resolver after its existing authored-slot
+  fallback. The saved `abilityNum` remains unchanged.
+- Family identities, protected-family flags, and resolved abilities are cached
+  in EWRAM. The ability cache resets if the save seed changes.
+
+Focused validation:
+
+- All 24 tests in `test/randomizer.c` pass.
+- All 26 active tests in `test/pokemon.c` pass; its one pre-existing learnset
+  size test remains known-failing.
+- All three Stance Change tests pass.
+- A normal `make -j4` ROM build succeeds.
+- The Forecast suite's eleven self-contained Castform cases pass. Six mixed
+  cases retain assumptions that unrelated weather-setting Pokemon expose their
+  authored abilities and therefore need randomizer-aware test setup.
+
+Manual gameplay validation still required:
+
+- Compare the same ordinary family across new saves and confirm its ability
+  changes while remaining stable within a save and through evolution.
+- Check summary, party, box, Pokedex, and battle displays for agreement.
+- Exercise representative overworld abilities and ordinary trainer Pokemon.
+- Exercise Castform, Cherrim, Aegislash, Wishiwashi, Minior, Mimikyu, Cramorant,
+  Eiscue, Morpeko, Zygarde, Silvally, Arceus, and Terapagos form behavior.
 
 ## Other unresolved architecture
 
-- Ability randomization: finish the form/gimmick exception audit and explicit
-  candidate-ability denylist described above.
 - Learnsets: define the move candidate pool, weighting, duplicate rules, special
   move exclusions, and evolution behavior.
 - Friendship evolution replacements: create an explicit species-level conversion
