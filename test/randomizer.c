@@ -19,6 +19,18 @@ static u16 GetTestSpeciesBaseStatTotal(enum Species species)
     return bst;
 }
 
+static bool32 HasTestEvolutionMethod(enum Species species, enum Species targetSpecies, u16 method)
+{
+    const struct Evolution *evolutions = GetSpeciesEvolutions(species);
+
+    for (u32 i = 0; evolutions != NULL && evolutions[i].method != EVOLUTIONS_END; i++)
+    {
+        if (evolutions[i].targetSpecies == targetSpecies && evolutions[i].method == method)
+            return TRUE;
+    }
+    return FALSE;
+}
+
 TEST("Randomizer hash is deterministic and keeps categories and keys separate")
 {
     u32 hash = RandomizerHash(0x12345678, RANDOMIZER_CATEGORY_ENCOUNTER, 1, 2, 3);
@@ -319,6 +331,29 @@ TEST("Selected regional stone branch evolves outside its authored region")
     CreateMon(&mon, SPECIES_PIKACHU, 30, 0, OTID_STRUCT_PLAYER_ID);
 
     EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_ITEM_CHECK, ITEM_THUNDER_STONE, NULL, NULL, CHECK_EVO), expectedTarget);
+}
+
+TEST("Former location evolutions use location-free stones only")
+{
+    static const struct
+    {
+        enum Species source;
+        enum Species target;
+    } cases[] =
+    {
+        {SPECIES_MAGNETON, SPECIES_MAGNEZONE},
+        {SPECIES_NOSEPASS, SPECIES_PROBOPASS},
+        {SPECIES_CHARJABUG, SPECIES_VIKAVOLT},
+        {SPECIES_CRABRAWLER, SPECIES_CRABOMINABLE},
+        {SPECIES_EEVEE, SPECIES_LEAFEON},
+        {SPECIES_EEVEE, SPECIES_GLACEON},
+    };
+
+    for (u32 i = 0; i < ARRAY_COUNT(cases); i++)
+    {
+        EXPECT(HasTestEvolutionMethod(cases[i].source, cases[i].target, EVO_ITEM));
+        EXPECT(!HasTestEvolutionMethod(cases[i].source, cases[i].target, EVO_LEVEL));
+    }
 }
 
 TEST("Milcery selects one stable cream flavor for every Sweet")

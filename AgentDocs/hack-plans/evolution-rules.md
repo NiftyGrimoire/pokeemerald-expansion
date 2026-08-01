@@ -15,6 +15,8 @@ Implemented on `romhack/randomizer-evolution-rules`:
 - Paired clock branches choose one result deterministically per save.
 - Milcery keeps its held Sweet as the decoration choice while the save selects
   one of nine cream flavors; any valid spin can trigger that selected result.
+- Location-based level-up routes are removed in favor of their existing
+  location-free evolution stones.
 
 No other evolution mechanic is globally broadened.
 
@@ -119,11 +121,31 @@ item, move, and other non-region requirements remain intact.
 | Dartrix | Decidueye / Hisuian Decidueye | Authored levels 34 / 36 |
 | Ursaring | Ursaluna | Peat Block; region check removed |
 
+## Location restrictions removed
+
+All six authored location-based level-up routes already had an equivalent
+evolution-stone route. The duplicate location route is removed, leaving the
+stone as the sole trigger everywhere in the game.
+
+| Source | Target | Location removed | Replacement trigger |
+| --- | --- | --- | --- |
+| Magneton | Magnezone | New Mauville | Thunder Stone |
+| Nosepass | Probopass | New Mauville | Thunder Stone |
+| Charjabug | Vikavolt | New Mauville | Thunder Stone |
+| Crabrawler | Crabominable | Shoal Cave ice room | Ice Stone |
+| Eevee | Leafeon | Petalburg Woods | Leaf Stone |
+| Eevee | Glaceon | Shoal Cave ice room | Ice Stone |
+
+Using stones for Eevee keeps Leafeon and Glaceon under player control and
+prevents an unrestricted level-up route from preempting its level-30
+Sylveon/Espeon/Umbreon logic.
+
 ## Explicitly unchanged evolution behavior
 
 - Evolution stones, held items, known-move requirements, gender checks, stat
   comparisons, weather, party composition, battle trackers, trades, and script
-  triggers remain authored unless a row above says otherwise.
+  triggers remain authored unless a row above says otherwise. The six former
+  location evolutions explicitly use their listed stones.
 - Eevee's Jolteon, Vaporeon, Flareon, Leafeon, Glaceon, and Sylveon routes remain
   available. Only Espeon versus Umbreon is a deterministic pair.
 - Own Tempo Rockruff still evolves only into Dusk Lycanroc; only its evening
@@ -146,6 +168,8 @@ Focused tests cover:
 - A Rockruff evolving into its selected form without consulting the clock.
 - Exactly one Milcery cream flavor being shared across all seven Sweets.
 - Milcery evolving to the selected held-Sweet result from an arbitrary spin.
+- All six former location targets retaining their item route and having no
+  remaining level-up route.
 
 Manual gameplay checks still required:
 
@@ -157,3 +181,5 @@ Manual gameplay checks still required:
 - Verify cancellation and retry do not change the selected target.
 - Exercise at least two different Sweets on Milcery and confirm that decoration
   follows the held item while cream flavor stays fixed within the save.
+- Use each of the Thunder, Leaf, and Ice Stone replacement routes outside the
+  former required location.

@@ -515,13 +515,17 @@ The authoritative species-by-species behavior is documented in
 - Milcery preserves its held Sweet as the decoration choice, selects one of nine
   cream flavors per save, and accepts any valid spin without a clock, direction,
   or duration restriction.
+- The six New Mauville, Petalburg Woods, and Shoal Cave evolution routes are
+  location-free: their duplicate level-up entries are removed and their existing
+  Thunder, Leaf, or Ice Stone entries are the sole triggers.
 
 Focused validation currently covers the explicit friendship tiers, an actual
 zero-friendship level evolution, allowlisted condition bypasses, deterministic
 and seed-separated branch selection, a clock-independent Rockruff evolution,
 and a region-independent Pikachu stone evolution. Milcery coverage verifies one
 stable flavor across all Sweets and an actual held-Sweet evolution from an
-arbitrary spin.
+arbitrary spin. The location-route test verifies all six targets retain their
+item evolution and no longer have a level-up route.
 
 ## Other unresolved architecture
 
