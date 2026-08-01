@@ -3340,16 +3340,21 @@ const struct LevelUpMove *GetSpeciesLevelUpLearnset(enum Species species)
     if (sanitizedSpecies != SPECIES_NONE && sanitizedSpecies != SPECIES_EGG && IsSpeciesEnabled(sanitizedSpecies))
     {
         u16 excludedMoves[MAX_LEVEL_UP_MOVES];
-        u32 i;
+        u32 authoredMoveCount = 0;
 
-        for (i = 0; i < MAX_LEVEL_UP_MOVES && learnset[i].move != LEVEL_UP_MOVE_END; i++)
+        while (authoredMoveCount < MAX_LEVEL_UP_MOVES && learnset[authoredMoveCount].move != LEVEL_UP_MOVE_END)
+            authoredMoveCount++;
+
+        for (u32 i = 0; i < RANDOMIZER_LEVEL_UP_MOVE_COUNT; i++)
         {
-            sRandomizedLevelUpLearnset[i].level = learnset[i].level;
-            sRandomizedLevelUpLearnset[i].move = GetRandomizedLevelUpMove(sanitizedSpecies, i, excludedMoves, i, learnset[i].move);
+            enum Move fallbackMove = (i < authoredMoveCount ? learnset[i].move : MOVE_POUND);
+
+            sRandomizedLevelUpLearnset[i].level = GetRandomizerLevelUpMoveLevel(i);
+            sRandomizedLevelUpLearnset[i].move = GetRandomizedLevelUpMove(sanitizedSpecies, i, excludedMoves, i, fallbackMove);
             excludedMoves[i] = sRandomizedLevelUpLearnset[i].move;
         }
-        sRandomizedLevelUpLearnset[i].move = LEVEL_UP_MOVE_END;
-        sRandomizedLevelUpLearnset[i].level = 0;
+        sRandomizedLevelUpLearnset[RANDOMIZER_LEVEL_UP_MOVE_COUNT].move = LEVEL_UP_MOVE_END;
+        sRandomizedLevelUpLearnset[RANDOMIZER_LEVEL_UP_MOVE_COUNT].level = 0;
         return sRandomizedLevelUpLearnset;
     }
 #endif

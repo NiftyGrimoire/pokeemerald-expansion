@@ -105,8 +105,10 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
 8. Learnsets (in progress; universal TM compatibility implemented):
    - Allow every enabled real Pokemon species to learn every configured TM while
      preserving authored HM and move-tutor compatibility.
-   - Preserve authored level-up slots and levels while deterministically replacing
-     each move per save, species, and slot without duplicates.
+   - Give each species four starting moves at level 1, then front-load new moves
+     across the configured cap bands while retaining the normal 20-move table
+     capacity. Deterministically replace each move per save, species, and slot
+     without duplicates.
    - Weight STAB moves 6, non-STAB damaging moves 2, and status moves 1. Exclude
      placeholders and moves whose mechanics are species-locked or unsuitable for
      general distribution; retain the authored move as an empty-pool fallback.

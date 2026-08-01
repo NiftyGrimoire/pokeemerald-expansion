@@ -46,14 +46,17 @@ not been implemented.
 - Level-up learnsets are resolved at runtime through
   `GetSpeciesLevelUpLearnset`, covering initial moves, ordinary level-up and
   evolution learning, reminders, AI legality checks, and Pokedex displays.
-- Each enabled species preserves its authored number of slots and learning
-  levels. Moves are deterministic per save, species, and slot, with no duplicate
-  moves in a learnset.
+- Each enabled species receives four starting moves at level 1. New moves are
+  front-loaded across the cap bands with counts of 3, 3, 2, 2, 1, 1, 1, 1, 1,
+  and 1 for 1-15, 15-19, 19-24, 24-29, 29-31, 31-33, 33-42, 42-46, 46-58,
+  and 58-100 respectively. This produces exactly 20 moves without increasing
+  the engine's normal level-up table capacity. Moves are deterministic per save,
+  species, and slot, with no duplicates.
 - Candidate weighting is 6 for STAB moves, 2 for non-STAB damaging moves, and 1
   for status moves. Placeholder, Transform, Sketch, Dark Void, Hyperspace Fury,
   Aura Wheel, species-power-override, and Struggle moves are excluded. The
   authored move is the fallback if no candidate exists.
-- The resolver regenerates into one 84-byte EWRAM buffer per accessor call. Add
+- The resolver regenerates into one small EWRAM buffer per accessor call. Add
   a broader cache only if profiling shows this scan is too expensive.
 - Egg-move randomization and any deliberate evolution-family inheritance policy
   remain unimplemented. Gift, wild, and trainer Pokemon already use the shared

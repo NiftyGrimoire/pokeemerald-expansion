@@ -13,6 +13,21 @@
 #define RANDOMIZER_MOVE_WEIGHT_COVERAGE 2
 #define RANDOMIZER_MOVE_WEIGHT_STATUS 1
 
+static const u8 sRandomizerLevelUpMoveLevels[RANDOMIZER_LEVEL_UP_MOVE_COUNT] =
+{
+    1, 1, 1, 1,
+    5, 10, 15,
+    16, 18, 19,
+    22, 24,
+    27, 29,
+    31,
+    33,
+    42,
+    46,
+    58,
+    80,
+};
+
 static EWRAM_DATA u16 sEvolutionFamilyCache[NUM_SPECIES] = {0};
 static EWRAM_DATA bool8 sEvolutionFamilyHasProtectedAbility[NUM_SPECIES] = {0};
 static EWRAM_DATA u16 sEvolutionFamilyAbilityCache[NUM_SPECIES] = {0};
@@ -138,6 +153,13 @@ enum Move GetRandomizedLevelUpMove(enum Species species, u8 learnsetSlot, const 
     }
 #endif
     return fallbackMove;
+}
+
+u8 GetRandomizerLevelUpMoveLevel(u8 learnsetSlot)
+{
+    if (learnsetSlot >= RANDOMIZER_LEVEL_UP_MOVE_COUNT)
+        return 0;
+    return sRandomizerLevelUpMoveLevels[learnsetSlot];
 }
 
 static enum Species FindRandomizerEvolutionFamily(enum Species species)

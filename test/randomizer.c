@@ -74,10 +74,9 @@ TEST("Learnset randomizer does not broaden HM, tutor, egg, or invalid compatibil
     EXPECT(!CanLearnTeachableMove(NUM_SPECIES, MOVE_THUNDERBOLT));
 }
 
-TEST("Level-up learnset randomization is deterministic, distinct, and preserves levels")
+TEST("Level-up learnset randomization is deterministic, distinct, and follows cap levels")
 {
     struct LevelUpMove firstLearnset[MAX_LEVEL_UP_MOVES + 1];
-    const struct LevelUpMove *originalLearnset = gSpeciesInfo[SPECIES_BULBASAUR].levelUpLearnset;
     const struct LevelUpMove *randomizedLearnset;
     u32 learnsetCount = 0;
 
@@ -85,7 +84,7 @@ TEST("Level-up learnset randomization is deterministic, distinct, and preserves 
     randomizedLearnset = GetSpeciesLevelUpLearnset(SPECIES_BULBASAUR);
     while (learnsetCount < MAX_LEVEL_UP_MOVES && randomizedLearnset[learnsetCount].move != LEVEL_UP_MOVE_END)
     {
-        EXPECT_EQ(randomizedLearnset[learnsetCount].level, originalLearnset[learnsetCount].level);
+        EXPECT_EQ(randomizedLearnset[learnsetCount].level, GetRandomizerLevelUpMoveLevel(learnsetCount));
         EXPECT(IsMoveRandomizerEligible(randomizedLearnset[learnsetCount].move));
         for (u32 prior = 0; prior < learnsetCount; prior++)
             EXPECT_NE(randomizedLearnset[learnsetCount].move, randomizedLearnset[prior].move);
@@ -93,7 +92,7 @@ TEST("Level-up learnset randomization is deterministic, distinct, and preserves 
         learnsetCount++;
     }
     EXPECT_EQ(randomizedLearnset[learnsetCount].move, LEVEL_UP_MOVE_END);
-    EXPECT_EQ(originalLearnset[learnsetCount].move, LEVEL_UP_MOVE_END);
+    EXPECT_EQ(learnsetCount, RANDOMIZER_LEVEL_UP_MOVE_COUNT);
 
     randomizedLearnset = GetSpeciesLevelUpLearnset(SPECIES_BULBASAUR);
     for (u32 i = 0; i < learnsetCount; i++)
@@ -101,6 +100,35 @@ TEST("Level-up learnset randomization is deterministic, distinct, and preserves 
         EXPECT_EQ(randomizedLearnset[i].move, firstLearnset[i].move);
         EXPECT_EQ(randomizedLearnset[i].level, firstLearnset[i].level);
     }
+}
+
+TEST("Standard learnset schedule front-loads moves within level-cap bands")
+{
+    static const u8 capBandStarts[] = {1, 15, 19, 24, 29, 31, 33, 42, 46, 58};
+    static const u8 capBandEnds[] = {15, 19, 24, 29, 31, 33, 42, 46, 58, 100};
+    static const u8 expectedMoveCounts[] = {3, 3, 2, 2, 1, 1, 1, 1, 1, 1};
+
+    EXPECT_EQ(GetRandomizerLevelUpMoveLevel(0), 1);
+    EXPECT_EQ(GetRandomizerLevelUpMoveLevel(1), 1);
+    EXPECT_EQ(GetRandomizerLevelUpMoveLevel(2), 1);
+    EXPECT_EQ(GetRandomizerLevelUpMoveLevel(3), 1);
+
+    for (u32 band = 0; band < ARRAY_COUNT(capBandEnds); band++)
+    {
+        u32 moveCount = 0;
+
+        for (u32 slot = 4; slot < RANDOMIZER_LEVEL_UP_MOVE_COUNT; slot++)
+        {
+            u8 level = GetRandomizerLevelUpMoveLevel(slot);
+
+            if (level > capBandStarts[band] && level <= capBandEnds[band])
+                moveCount++;
+            else if (band == 0 && level > 1 && level <= capBandEnds[band])
+                moveCount++;
+        }
+        EXPECT_EQ(moveCount, expectedMoveCounts[band]);
+    }
+    EXPECT_EQ(GetRandomizerLevelUpMoveLevel(RANDOMIZER_LEVEL_UP_MOVE_COUNT), 0);
 }
 
 TEST("Level-up learnsets separate seed and species identity")
