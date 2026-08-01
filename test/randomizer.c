@@ -159,6 +159,20 @@ TEST("Learnset weights shift status moves from basic to elite by level")
     EXPECT_GT(earlyQuiverDance, 0);
 }
 
+TEST("Learnset weights treat weather-setting status moves as strong tier")
+{
+    u32 earlyGrowl = GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_GROWL, 5);
+    u32 earlyRainDance = GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_RAIN_DANCE, 5);
+    u32 middleGrowl = GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_GROWL, 24);
+    u32 middleRainDance = GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_RAIN_DANCE, 24);
+    u32 lateRainDance = GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_RAIN_DANCE, 80);
+    u32 lateQuiverDance = GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_QUIVER_DANCE, 80);
+
+    EXPECT_GT(earlyGrowl, earlyRainDance);
+    EXPECT_GT(middleRainDance, middleGrowl);
+    EXPECT_GT(lateQuiverDance, lateRainDance);
+}
+
 TEST("Level-up learnsets separate seed and species identity")
 {
     enum Move bulbasaurMoves[RANDOMIZER_LEVEL_UP_MOVE_COUNT];

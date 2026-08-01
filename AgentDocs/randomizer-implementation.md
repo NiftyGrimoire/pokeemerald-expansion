@@ -58,8 +58,9 @@ not been implemented.
   or weak late move remains possible.
 - Status moves use basic, strong, and elite potency tiers. Basic effects are
   favored before level 24, strong setup/recovery/status/hazard effects from 24,
-  and elite setup or exceptional utility from 42. Off-tier status moves retain a
-  smaller nonzero weight.
+  and elite setup or exceptional utility from 42. All status moves whose effects
+  set weather, including weather-plus-switch moves, belong to the strong tier.
+  Off-tier status moves retain a smaller nonzero weight.
 - Placeholder, Transform, Sketch, Dark Void, Hyperspace Fury, Aura Wheel,
   species-power-override, and Struggle moves are excluded. The authored move is
   the fallback if no candidate exists.
