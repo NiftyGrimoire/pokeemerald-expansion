@@ -356,6 +356,24 @@ TEST("Former location evolutions use location-free stones only")
     }
 }
 
+TEST("Evolution tables contain no trade methods")
+{
+    for (enum Species species = SPECIES_NONE; species < NUM_SPECIES; species++)
+    {
+        if (species != SPECIES_NONE && !IsSpeciesEnabled(species))
+            continue;
+        const struct Evolution *evolutions = GetSpeciesEvolutions(species);
+
+        for (u32 i = 0; evolutions != NULL && evolutions[i].method != EVOLUTIONS_END; i++)
+            EXPECT_NE(evolutions[i].method, EVO_TRADE);
+    }
+
+    EXPECT(HasTestEvolutionMethod(SPECIES_KADABRA, SPECIES_ALAKAZAM, EVO_ITEM));
+    EXPECT(HasTestEvolutionMethod(SPECIES_ONIX, SPECIES_STEELIX, EVO_ITEM));
+    EXPECT(HasTestEvolutionMethod(SPECIES_KARRABLAST, SPECIES_ESCAVALIER, EVO_ITEM));
+    EXPECT(HasTestEvolutionMethod(SPECIES_SHELMET, SPECIES_ACCELGOR, EVO_ITEM));
+}
+
 TEST("Milcery selects one stable cream flavor for every Sweet")
 {
     static const enum Species strawberryTargets[] =

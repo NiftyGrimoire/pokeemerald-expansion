@@ -518,6 +518,9 @@ The authoritative species-by-species behavior is documented in
 - The six New Mauville, Petalburg Woods, and Shoal Cave evolution routes are
   location-free: their duplicate level-up entries are removed and their existing
   Thunder, Leaf, or Ice Stone entries are the sole triggers.
+- All trade methods are removed. Plain trades, Pumpkaboo forms, Karrablast, and
+  Shelmet use the Linking Cord; former held-item trades use the same evolution
+  item directly from the Bag.
 
 Focused validation currently covers the explicit friendship tiers, an actual
 zero-friendship level evolution, allowlisted condition bypasses, deterministic
@@ -525,7 +528,9 @@ and seed-separated branch selection, a clock-independent Rockruff evolution,
 and a region-independent Pikachu stone evolution. Milcery coverage verifies one
 stable flavor across all Sweets and an actual held-Sweet evolution from an
 arbitrary spin. The location-route test verifies all six targets retain their
-item evolution and no longer have a level-up route.
+item evolution and no longer have a level-up route. An exhaustive enabled-species
+scan verifies that no trade evolution methods remain and checks representative
+direct-use replacements.
 
 ## Other unresolved architecture
 

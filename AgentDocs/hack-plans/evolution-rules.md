@@ -17,6 +17,7 @@ Implemented on `romhack/randomizer-evolution-rules`:
   one of nine cream flavors; any valid spin can trigger that selected result.
 - Location-based level-up routes are removed in favor of their existing
   location-free evolution stones.
+- Trade routes are removed in favor of direct-use evolution items.
 
 No other evolution mechanic is globally broadened.
 
@@ -140,12 +141,57 @@ Using stones for Eevee keeps Leafeon and Glaceon under player control and
 prevents an unrestricted level-up route from preempting its level-30
 Sylveon/Espeon/Umbreon logic.
 
+## Trade evolutions removed
+
+No enabled species retains an `EVO_TRADE` method. Plain trades and the former
+Karrablast/Shelmet partner trade use the Linking Cord. Former held-item trades
+evolve by using that item directly from the Bag.
+
+### Linking Cord replacements
+
+| Source | Target |
+| --- | --- |
+| Kadabra | Alakazam |
+| Machoke | Machamp |
+| Graveler | Golem |
+| Alolan Graveler | Alolan Golem |
+| Haunter | Gengar |
+| Boldore | Gigalith |
+| Gurdurr | Conkeldurr |
+| Karrablast | Escavalier |
+| Shelmet | Accelgor |
+| Phantump | Trevenant |
+| Pumpkaboo, all four sizes | Matching-size Gourgeist |
+
+### Former held-item trade replacements
+
+| Source | Target | Direct-use item |
+| --- | --- | --- |
+| Poliwhirl | Politoed | King's Rock |
+| Slowpoke | Slowking | King's Rock |
+| Onix | Steelix | Metal Coat |
+| Scyther | Scizor | Metal Coat |
+| Seadra | Kingdra | Dragon Scale |
+| Rhydon | Rhyperior | Protector |
+| Electabuzz | Electivire | Electirizer |
+| Magmar | Magmortar | Magmarizer |
+| Porygon | Porygon2 | Upgrade |
+| Porygon2 | Porygon-Z | Dubious Disc |
+| Feebas | Milotic | Prism Scale |
+| Dusclops | Dusknoir | Reaper Cloth |
+| Clamperl | Huntail | Deep Sea Tooth |
+| Clamperl | Gorebyss | Deep Sea Scale |
+| Spritzee | Aromatisse | Sachet |
+| Swirlix | Slurpuff | Whipped Dream |
+
 ## Explicitly unchanged evolution behavior
 
 - Evolution stones, held items, known-move requirements, gender checks, stat
-  comparisons, weather, party composition, battle trackers, trades, and script
+  comparisons, weather, party composition, battle trackers, and script
   triggers remain authored unless a row above says otherwise. The six former
   location evolutions explicitly use their listed stones.
+- No trade trigger remains. Former trade items are used directly, and plain or
+  partner-specific trades use the Linking Cord.
 - Eevee's Jolteon, Vaporeon, Flareon, Leafeon, Glaceon, and Sylveon routes remain
   available. Only Espeon versus Umbreon is a deterministic pair.
 - Own Tempo Rockruff still evolves only into Dusk Lycanroc; only its evening
@@ -170,6 +216,8 @@ Focused tests cover:
 - Milcery evolving to the selected held-Sweet result from an arbitrary spin.
 - All six former location targets retaining their item route and having no
   remaining level-up route.
+- Every enabled evolution table containing no trade method, with representative
+  Linking Cord and direct-use item routes retained.
 
 Manual gameplay checks still required:
 
@@ -183,3 +231,5 @@ Manual gameplay checks still required:
   follows the held item while cream flavor stays fixed within the save.
 - Use each of the Thunder, Leaf, and Ice Stone replacement routes outside the
   former required location.
+- Exercise one plain trade replacement, one former held-item trade replacement,
+  both Karrablast and Shelmet, and at least two Pumpkaboo sizes.
