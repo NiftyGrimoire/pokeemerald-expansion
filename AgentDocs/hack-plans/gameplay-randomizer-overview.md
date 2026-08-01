@@ -105,12 +105,16 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
 8. Learnsets (in progress; universal TM compatibility implemented):
    - Allow every enabled real Pokemon species to learn every configured TM while
      preserving authored HM and move-tutor compatibility.
-   - Specify candidate moves, exclusions, weighting, duplicate and fallback
-     rules, evolution behavior, and stable hash identity.
-   - Inventory level-up, evolution, reminder, egg, gift, wild, and trainer move
-     access paths before selecting the shared runtime hook.
-   - Add the runtime resolver and only add a cache after measuring its access
-     pattern and EWRAM cost.
+   - Preserve authored level-up slots and levels while deterministically replacing
+     each move per save, species, and slot without duplicates.
+   - Weight STAB moves 6, non-STAB damaging moves 2, and status moves 1. Exclude
+     placeholders and moves whose mechanics are species-locked or unsuitable for
+     general distribution; retain the authored move as an empty-pool fallback.
+   - Resolve through the shared level-up accessor so initial, level-up, evolution,
+     reminder, AI, and Pokedex paths agree. Regenerate into a small shared buffer
+     and only add a broader cache after measuring access cost.
+   - Specify egg-move randomization and any evolution-family inheritance policy
+     before expanding this phase further.
 9. Evolution rules:
    - Replace friendship evolutions from an explicit species-by-species conversion
      table, preserving applicable secondary conditions.

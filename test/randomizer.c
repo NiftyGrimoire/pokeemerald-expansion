@@ -74,6 +74,62 @@ TEST("Learnset randomizer does not broaden HM, tutor, egg, or invalid compatibil
     EXPECT(!CanLearnTeachableMove(NUM_SPECIES, MOVE_THUNDERBOLT));
 }
 
+TEST("Level-up learnset randomization is deterministic, distinct, and preserves levels")
+{
+    struct LevelUpMove firstLearnset[MAX_LEVEL_UP_MOVES + 1];
+    const struct LevelUpMove *originalLearnset = gSpeciesInfo[SPECIES_BULBASAUR].levelUpLearnset;
+    const struct LevelUpMove *randomizedLearnset;
+    u32 learnsetCount = 0;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    randomizedLearnset = GetSpeciesLevelUpLearnset(SPECIES_BULBASAUR);
+    while (learnsetCount < MAX_LEVEL_UP_MOVES && randomizedLearnset[learnsetCount].move != LEVEL_UP_MOVE_END)
+    {
+        EXPECT_EQ(randomizedLearnset[learnsetCount].level, originalLearnset[learnsetCount].level);
+        EXPECT(IsMoveRandomizerEligible(randomizedLearnset[learnsetCount].move));
+        for (u32 prior = 0; prior < learnsetCount; prior++)
+            EXPECT_NE(randomizedLearnset[learnsetCount].move, randomizedLearnset[prior].move);
+        firstLearnset[learnsetCount] = randomizedLearnset[learnsetCount];
+        learnsetCount++;
+    }
+    EXPECT_EQ(randomizedLearnset[learnsetCount].move, LEVEL_UP_MOVE_END);
+    EXPECT_EQ(originalLearnset[learnsetCount].move, LEVEL_UP_MOVE_END);
+
+    randomizedLearnset = GetSpeciesLevelUpLearnset(SPECIES_BULBASAUR);
+    for (u32 i = 0; i < learnsetCount; i++)
+    {
+        EXPECT_EQ(randomizedLearnset[i].move, firstLearnset[i].move);
+        EXPECT_EQ(randomizedLearnset[i].level, firstLearnset[i].level);
+    }
+}
+
+TEST("Level-up learnsets separate seed and species identity")
+{
+    enum Move bulbasaurMove;
+    enum Move charmanderMove;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    bulbasaurMove = GetSpeciesLevelUpLearnset(SPECIES_BULBASAUR)[0].move;
+    charmanderMove = GetSpeciesLevelUpLearnset(SPECIES_CHARMANDER)[0].move;
+    EXPECT_NE(bulbasaurMove, charmanderMove);
+
+    gSaveBlock3Ptr->randomizerSeed = 0x87654321;
+    EXPECT_NE(bulbasaurMove, GetSpeciesLevelUpLearnset(SPECIES_BULBASAUR)[0].move);
+}
+
+TEST("Level-up learnsets reject special-case moves and preserve invalid species behavior")
+{
+    EXPECT(!IsMoveRandomizerEligible(MOVE_NONE));
+    EXPECT(!IsMoveRandomizerEligible(MOVE_TRANSFORM));
+    EXPECT(!IsMoveRandomizerEligible(MOVE_SKETCH));
+    EXPECT(!IsMoveRandomizerEligible(MOVE_DARK_VOID));
+    EXPECT(!IsMoveRandomizerEligible(MOVE_HYPERSPACE_FURY));
+    EXPECT(!IsMoveRandomizerEligible(MOVE_AURA_WHEEL));
+    EXPECT(!IsMoveRandomizerEligible(MOVE_STRUGGLE));
+    EXPECT_EQ(GetSpeciesLevelUpLearnset(SPECIES_NONE)[0].move, gSpeciesInfo[SPECIES_NONE].levelUpLearnset[0].move);
+    EXPECT_EQ(GetSpeciesLevelUpLearnset(SPECIES_EGG)[0].move, gSpeciesInfo[SPECIES_EGG].levelUpLearnset[0].move);
+}
+
 TEST("Randomizer evolution families include linear and branched evolutions")
 {
     EXPECT_EQ(GetRandomizerEvolutionFamily(SPECIES_BULBASAUR), SPECIES_BULBASAUR);

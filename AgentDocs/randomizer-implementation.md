@@ -43,9 +43,21 @@ not been implemented.
   shared `CanLearnTeachableMove` compatibility seam.
 - HM and move-tutor compatibility remains authored. Egg and invalid-species
   safeguards remain unchanged.
-- Level-up learnset randomization still requires the candidate-move, weighting,
-  duplicate, fallback, evolution, and stable-identity policies specified in the
-  primary plan.
+- Level-up learnsets are resolved at runtime through
+  `GetSpeciesLevelUpLearnset`, covering initial moves, ordinary level-up and
+  evolution learning, reminders, AI legality checks, and Pokedex displays.
+- Each enabled species preserves its authored number of slots and learning
+  levels. Moves are deterministic per save, species, and slot, with no duplicate
+  moves in a learnset.
+- Candidate weighting is 6 for STAB moves, 2 for non-STAB damaging moves, and 1
+  for status moves. Placeholder, Transform, Sketch, Dark Void, Hyperspace Fury,
+  Aura Wheel, species-power-override, and Struggle moves are excluded. The
+  authored move is the fallback if no candidate exists.
+- The resolver regenerates into one 84-byte EWRAM buffer per accessor call. Add
+  a broader cache only if profiling shows this scan is too expensive.
+- Egg-move randomization and any deliberate evolution-family inheritance policy
+  remain unimplemented. Gift, wild, and trainer Pokemon already use the shared
+  initial-moves path unless their data supplies explicit moves.
 
 ## Validation already performed
 

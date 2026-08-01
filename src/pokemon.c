@@ -95,6 +95,7 @@ static void Task_PlayMapChosenOrBattleBGM(u8 taskId);
 void TrySpecialOverworldEvo();
 
 EWRAM_DATA static u8 sLearningMoveTableID = 0;
+EWRAM_DATA static struct LevelUpMove sRandomizedLevelUpLearnset[MAX_LEVEL_UP_MOVES + 1] = {0};
 EWRAM_DATA u8 gPartiesCount[MAX_BATTLE_TRAINERS] = {0};
 EWRAM_DATA struct Pokemon gParties[MAX_BATTLE_TRAINERS][PARTY_SIZE] = {0};
 EWRAM_DATA struct SpriteTemplate gMultiuseSpriteTemplate = {0};
@@ -3327,9 +3328,31 @@ u32 GetSpeciesBaseStatTotal(enum Species species)
 
 const struct LevelUpMove *GetSpeciesLevelUpLearnset(enum Species species)
 {
-    const struct LevelUpMove *learnset = gSpeciesInfo[SanitizeSpeciesId(species)].levelUpLearnset;
+    if (species == SPECIES_EGG)
+        return gSpeciesInfo[SPECIES_EGG].levelUpLearnset;
+
+    enum Species sanitizedSpecies = SanitizeSpeciesId(species);
+    const struct LevelUpMove *learnset = gSpeciesInfo[sanitizedSpecies].levelUpLearnset;
+
     if (learnset == NULL)
-        return gSpeciesInfo[SPECIES_NONE].levelUpLearnset;
+        learnset = gSpeciesInfo[SPECIES_NONE].levelUpLearnset;
+#if RANDOMIZER_ENABLED && RANDOMIZER_LEARNSETS
+    if (sanitizedSpecies != SPECIES_NONE && sanitizedSpecies != SPECIES_EGG && IsSpeciesEnabled(sanitizedSpecies))
+    {
+        u16 excludedMoves[MAX_LEVEL_UP_MOVES];
+        u32 i;
+
+        for (i = 0; i < MAX_LEVEL_UP_MOVES && learnset[i].move != LEVEL_UP_MOVE_END; i++)
+        {
+            sRandomizedLevelUpLearnset[i].level = learnset[i].level;
+            sRandomizedLevelUpLearnset[i].move = GetRandomizedLevelUpMove(sanitizedSpecies, i, excludedMoves, i, learnset[i].move);
+            excludedMoves[i] = sRandomizedLevelUpLearnset[i].move;
+        }
+        sRandomizedLevelUpLearnset[i].move = LEVEL_UP_MOVE_END;
+        sRandomizedLevelUpLearnset[i].level = 0;
+        return sRandomizedLevelUpLearnset;
+    }
+#endif
     return learnset;
 }
 

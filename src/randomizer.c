@@ -1,4 +1,5 @@
 #include "global.h"
+#include "move.h"
 #include "pokemon.h"
 #include "random.h"
 #include "random_mon_generation.h"
@@ -8,6 +9,9 @@
 #define RANDOMIZER_STARTER_COUNT 3
 #define RANDOMIZER_STARTER_MIN_BST 300
 #define RANDOMIZER_STARTER_MAX_BST 350
+#define RANDOMIZER_MOVE_WEIGHT_STAB 6
+#define RANDOMIZER_MOVE_WEIGHT_COVERAGE 2
+#define RANDOMIZER_MOVE_WEIGHT_STATUS 1
 
 static EWRAM_DATA u16 sEvolutionFamilyCache[NUM_SPECIES] = {0};
 static EWRAM_DATA bool8 sEvolutionFamilyHasProtectedAbility[NUM_SPECIES] = {0};
@@ -56,6 +60,84 @@ u32 RandomizerHash(u32 seed, enum RandomizerCategory category, u32 key1, u32 key
     hash = MixRandomizerValue(hash ^ key2);
     hash = MixRandomizerValue(hash ^ key3);
     return hash;
+}
+
+bool32 IsMoveRandomizerEligible(enum Move move)
+{
+    if (move <= MOVE_NONE || move >= MOVES_COUNT)
+        return FALSE;
+
+    switch (GetMoveEffect(move))
+    {
+    case EFFECT_PLACEHOLDER:
+    case EFFECT_TRANSFORM:
+    case EFFECT_SKETCH:
+    case EFFECT_DARK_VOID:
+    case EFFECT_SPECIES_POWER_OVERRIDE:
+    case EFFECT_HYPERSPACE_FURY:
+    case EFFECT_AURA_WHEEL:
+        return FALSE;
+    default:
+        break;
+    }
+
+    return move != MOVE_STRUGGLE;
+}
+
+static bool32 IsExcludedRandomizerMove(enum Move move, const u16 *excludedMoves, u8 excludedMoveCount)
+{
+    for (u32 i = 0; i < excludedMoveCount; i++)
+    {
+        if (excludedMoves[i] == move)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+static u32 GetRandomizerMoveWeight(enum Species species, enum Move move)
+{
+    enum Type moveType = GetMoveType(move);
+
+    if (moveType == GetSpeciesType(species, 0) || moveType == GetSpeciesType(species, 1))
+        return RANDOMIZER_MOVE_WEIGHT_STAB;
+    if (GetMoveCategory(move) != DAMAGE_CATEGORY_STATUS)
+        return RANDOMIZER_MOVE_WEIGHT_COVERAGE;
+    return RANDOMIZER_MOVE_WEIGHT_STATUS;
+}
+
+enum Move GetRandomizedLevelUpMove(enum Species species, u8 learnsetSlot, const u16 *excludedMoves, u8 excludedMoveCount, enum Move fallbackMove)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_LEARNSETS
+    u32 totalWeight = 0;
+    u32 selection;
+
+    if (species <= SPECIES_NONE || species >= NUM_SPECIES || !IsSpeciesEnabled(species))
+        return fallbackMove;
+
+    for (enum Move move = MOVE_NONE + 1; move < MOVES_COUNT; move++)
+    {
+        if (IsMoveRandomizerEligible(move) && !IsExcludedRandomizerMove(move, excludedMoves, excludedMoveCount))
+            totalWeight += GetRandomizerMoveWeight(species, move);
+    }
+
+    if (totalWeight == 0)
+        return fallbackMove;
+
+    selection = RandomizerHash(GetRandomizerSeed(), RANDOMIZER_CATEGORY_LEARNSET, species, learnsetSlot, 0) % totalWeight;
+    for (enum Move move = MOVE_NONE + 1; move < MOVES_COUNT; move++)
+    {
+        u32 weight;
+
+        if (!IsMoveRandomizerEligible(move) || IsExcludedRandomizerMove(move, excludedMoves, excludedMoveCount))
+            continue;
+
+        weight = GetRandomizerMoveWeight(species, move);
+        if (selection < weight)
+            return move;
+        selection -= weight;
+    }
+#endif
+    return fallbackMove;
 }
 
 static enum Species FindRandomizerEvolutionFamily(enum Species species)
