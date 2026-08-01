@@ -4289,9 +4289,21 @@ bool32 DoesMonMeetAdditionalConditions(struct Pokemon *mon, const struct Evoluti
                 currentCondition = TRUE;
             break;
         case IF_MIN_FRIENDSHIP:
+#if RANDOMIZER_ENABLED && RANDOMIZER_EVOLUTIONS
+        {
+            u8 evolutionLevel = GetRandomizerFriendshipEvolutionLevel(GetMonData(mon, MON_DATA_SPECIES));
+
+            if (evolutionLevel != 0)
+                currentCondition = GetMonData(mon, MON_DATA_LEVEL) >= evolutionLevel;
+            else if (friendship >= params[i].arg1)
+                currentCondition = TRUE;
+            break;
+        }
+#else
             if (friendship >= params[i].arg1)
                 currentCondition = TRUE;
             break;
+#endif
         case IF_ATK_GT_DEF:
             if (attack > defense)
                 currentCondition = TRUE;

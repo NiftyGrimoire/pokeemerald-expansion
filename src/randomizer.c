@@ -78,6 +78,45 @@ u32 RandomizerHash(u32 seed, enum RandomizerCategory category, u32 key1, u32 key
     return hash;
 }
 
+u8 GetRandomizerFriendshipEvolutionLevel(enum Species species)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_EVOLUTIONS
+    switch (species)
+    {
+    // Baby Pokemon and other early first-stage evolutions.
+    case SPECIES_PICHU:
+    case SPECIES_CLEFFA:
+    case SPECIES_IGGLYBUFF:
+    case SPECIES_TOGEPI:
+    case SPECIES_AZURILL:
+    case SPECIES_BUDEW:
+    case SPECIES_CHINGLING:
+    case SPECIES_MUNCHLAX:
+        return 20;
+
+    // Ordinary midgame friendship evolutions.
+    case SPECIES_GOLBAT:
+    case SPECIES_MEOWTH_ALOLA:
+    case SPECIES_EEVEE:
+    case SPECIES_BUNEARY:
+    case SPECIES_RIOLU:
+    case SPECIES_WOOBAT:
+    case SPECIES_SWADLOON:
+    case SPECIES_SNOM:
+        return 30;
+
+    // Late or exceptional friendship evolutions.
+    case SPECIES_CHANSEY:
+    case SPECIES_TYPE_NULL:
+        return 40;
+    default:
+        break;
+    }
+#endif
+
+    return 0;
+}
+
 bool32 IsMoveRandomizerEligible(enum Move move)
 {
     if (move <= MOVE_NONE || move >= MOVES_COUNT)

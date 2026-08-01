@@ -233,6 +233,32 @@ TEST("Randomizer evolution families include linear and branched evolutions")
     EXPECT_EQ(GetRandomizerEvolutionFamily(NUM_SPECIES), NUM_SPECIES);
 }
 
+TEST("Friendship evolutions use explicit short-run level tiers")
+{
+    EXPECT_EQ(GetRandomizerFriendshipEvolutionLevel(SPECIES_PICHU), 20);
+    EXPECT_EQ(GetRandomizerFriendshipEvolutionLevel(SPECIES_TOGEPI), 20);
+    EXPECT_EQ(GetRandomizerFriendshipEvolutionLevel(SPECIES_GOLBAT), 30);
+    EXPECT_EQ(GetRandomizerFriendshipEvolutionLevel(SPECIES_EEVEE), 30);
+    EXPECT_EQ(GetRandomizerFriendshipEvolutionLevel(SPECIES_CHANSEY), 40);
+    EXPECT_EQ(GetRandomizerFriendshipEvolutionLevel(SPECIES_TYPE_NULL), 40);
+    EXPECT_EQ(GetRandomizerFriendshipEvolutionLevel(SPECIES_BULBASAUR), 0);
+    EXPECT_EQ(GetRandomizerFriendshipEvolutionLevel(SPECIES_NONE), 0);
+}
+
+TEST("Friendship evolution condition uses level instead of friendship")
+{
+    struct Pokemon mon;
+    u8 friendship = 0;
+
+    CreateMon(&mon, SPECIES_PICHU, 19, 0, OTID_STRUCT_PLAYER_ID);
+    SetMonData(&mon, MON_DATA_FRIENDSHIP, &friendship);
+    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_NORMAL, ITEM_NONE, NULL, NULL, CHECK_EVO), SPECIES_NONE);
+
+    CreateMon(&mon, SPECIES_PICHU, 20, 0, OTID_STRUCT_PLAYER_ID);
+    SetMonData(&mon, MON_DATA_FRIENDSHIP, &friendship);
+    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_NORMAL, ITEM_NONE, NULL, NULL, CHECK_EVO), SPECIES_PIKACHU);
+}
+
 TEST("Ability randomizer excludes unsafe and unimplemented abilities")
 {
     EXPECT(IsAbilityRandomizerEligible(ABILITY_OVERGROW));

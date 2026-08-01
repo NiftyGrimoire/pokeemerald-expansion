@@ -28,6 +28,7 @@ void InitRandomizerData(void);
 u32 GetRandomizerSeed(void);
 u32 RandomizerHash(u32 seed, enum RandomizerCategory category, u32 key1, u32 key2, u32 key3);
 enum Species GetRandomizerEvolutionFamily(enum Species species);
+u8 GetRandomizerFriendshipEvolutionLevel(enum Species species);
 bool32 IsAbilityRandomizerEligible(enum Ability ability);
 bool32 IsMoveRandomizerEligible(enum Move move);
 u32 GetRandomizerMoveWeightForLevel(enum Species species, enum Move move, u8 level);

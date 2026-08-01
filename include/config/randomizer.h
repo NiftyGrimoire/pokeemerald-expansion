@@ -19,6 +19,9 @@
 // Give each ordinary evolution family one deterministic randomized ability.
 #define RANDOMIZER_ABILITIES TRUE
 
+// Replace impractical evolution conditions for the short-run format.
+#define RANDOMIZER_EVOLUTIONS TRUE
+
 // Allow every enabled Pokemon species to learn every configured TM.
 #define RANDOMIZER_LEARNSETS TRUE
 
