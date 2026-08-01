@@ -134,6 +134,19 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
    - Limit replacements to items useful in a Nuzlocke, initially held items and
      evolution items; define exclusions and progression safeguards before
      implementation.
+12. Streamlined game progression:
+   - Minimize mandatory grinding so a viable party can stay near each active level
+     cap through normal trainer battles and exploration.
+   - Remove breeding as a required or supported progression system; audit the Day
+     Care, eggs, inherited moves, and breeding-only rewards or encounters so nothing
+     important depends on breeding.
+   - Complete the no-EV experience by removing or repurposing EV-focused items,
+     rewards, dialogue, and UI that no longer provide useful choices.
+   - Review Emerald's plot progression for optional streamlining, prioritizing fewer
+     forced detours, repeated conversations, and backtracking while preserving
+     progression flags, essential tutorials, major encounters, and story coherence.
+   - Playtest the full badge-to-Champion route against the level caps before choosing
+     EXP, trainer-level, encounter-level, or plot-flow adjustments.
 
 ### Phase 1 Contract
 - `RandomizerHash` is a pure function: it does not read or advance either global RNG.
