@@ -346,13 +346,101 @@ Manual gameplay validation still required:
 - Exercise held Mega/Z items, Dynamax, Gigantamax-configured originals, and Tera
   settings on replacement species.
 
+## Completed ability randomization phase
+
+Chosen representation:
+
+- Resolve an ability ID at runtime. Do not rewrite the saved `abilityNum`.
+- Key the result by the saved seed, algorithm version, and a stable evolution
+  family identity. The individual species and saved ability slot are not hash
+  inputs.
+- Every ordinary member of a family therefore resolves to the same actual
+  ability, rather than merely using the same slot number with species-specific
+  results.
+- Preserve the saved `abilityNum` for compatibility with existing Pokemon data,
+  scripts, debug tools, and any form/gimmick species that must retain its
+  authored ability.
+
+Evolution-family identity:
+
+- Treat the enabled evolution graph as a family, ignoring `EVO_SPLIT_FROM_EVO`
+  display/back-reference entries.
+- Walk real incoming evolution edges to the root. Branched evolutions share the
+  same root and randomized ability.
+- When malformed or unusual data gives a species more than one reachable root,
+  use the lowest species ID as the deterministic family identity.
+- Regional lines share an ability only when the configured evolution graph
+  actually connects them to the same root. A distinct regional base form remains
+  a distinct family. This avoids inventing relationships from National Dex
+  numbers or naming conventions.
+- Cache the computed family identity by species; repeated ability reads occur in
+  hot battle, UI, and overworld paths and must not rescan the full graph.
+
+Primary runtime seam:
+
+- `GetAbilityBySpecies` in `src/pokemon.c` is the shared conversion from a
+  species plus saved slot to an ability ID. It feeds `GetMonAbility`, battle
+  initialization, party and summary UI, box/party conversion, AI, and most
+  overworld ability checks.
+- Apply randomization after the existing species/slot fallback has produced a
+  valid authored ability. If the feature is disabled, the species is invalid, or
+  the species/form is excepted, return that authored result unchanged.
+- Pokedex code calls `GetAbilityBySpecies` for all three authored slots. Once the
+  hook is enabled those calls will intentionally show the same randomized family
+  ability; verify the layout does not print redundant entries.
+- Direct `GetSpeciesAbility` callers describe authored species data or choose a
+  saved slot. Do not globally replace that lower-level accessor.
+
+Form and gimmick safety:
+
+- `GetAbilityBySpecies` is consulted by the form-change engine as well as normal
+  battle setup. Species whose authored ability enables, identifies, or preserves
+  a battle form must pass through unchanged.
+- The version-1 denylist covers Wonder Guard; all ability-driven form changes;
+  Battle Bond, Zero to Hero, Commander, Embody Aspect, and Terapagos signature
+  abilities; placeholder abilities; and explicitly unimplemented abilities.
+- If any enabled evolution-family member has a denylisted authored ability, the
+  entire family preserves its authored abilities. This keeps pre-evolutions
+  consistent with form-dependent evolved species.
+- Invalid, disabled, egg, battle-only, and otherwise unusable forms pass through
+  unchanged.
+
+Implementation:
+
+- `RANDOMIZER_ABILITIES` enables the feature.
+- `GetRandomizerEvolutionFamily` builds enabled evolution-graph components with
+  minimum-species-ID union roots. Real evolution edges connect families;
+  `EVO_SPLIT_FROM_EVO` entries do not.
+- `GetRandomizedAbilityForSpecies` hashes the save seed, ability category,
+  family identity, and algorithm version, then selects uniformly from the
+  reviewed candidate pool.
+- `GetAbilityBySpecies` applies the resolver after its existing authored-slot
+  fallback. The saved `abilityNum` remains unchanged.
+- Family identities, protected-family flags, and resolved abilities are cached
+  in EWRAM. The ability cache resets if the save seed changes.
+
+Focused validation:
+
+- All 24 tests in `test/randomizer.c` pass.
+- All 26 active tests in `test/pokemon.c` pass; its one pre-existing learnset
+  size test remains known-failing.
+- All three Stance Change tests pass.
+- A normal `make -j4` ROM build succeeds.
+- The Forecast suite's eleven self-contained Castform cases pass. Six mixed
+  cases retain assumptions that unrelated weather-setting Pokemon expose their
+  authored abilities and therefore need randomizer-aware test setup.
+
+Manual gameplay validation still required:
+
+- Compare the same ordinary family across new saves and confirm its ability
+  changes while remaining stable within a save and through evolution.
+- Check summary, party, box, Pokedex, and battle displays for agreement.
+- Exercise representative overworld abilities and ordinary trainer Pokemon.
+- Exercise Castform, Cherrim, Aegislash, Wishiwashi, Minior, Mimikyu, Cramorant,
+  Eiscue, Morpeko, Zygarde, Silvally, Arceus, and Terapagos form behavior.
+
 ## Other unresolved architecture
 
-- Ability randomization: decide whether the stored/resolved result is an ability
-  ID or an ability slot. The same slot across an evolution family does not imply
-  the same actual ability.
-- Evolution-family identity: define the exact base-family rule, including branches
-  and regional forms.
 - Learnsets: define the move candidate pool, weighting, duplicate rules, special
   move exclusions, and evolution behavior.
 - Friendship evolution replacements: create an explicit species-level conversion

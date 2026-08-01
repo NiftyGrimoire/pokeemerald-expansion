@@ -4,6 +4,7 @@
 #include "event_data.h"
 #include "new_game.h"
 #include "pokemon.h"
+#include "randomizer.h"
 #include "test/overworld_script.h"
 #include "test/test.h"
 #include "constants/characters.h"
@@ -397,7 +398,9 @@ TEST("givemon [all]")
     EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_HELD_ITEM), ITEM_LEFTOVERS);
     EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_POKEBALL), BALL_MASTER);
     EXPECT_EQ(GetNature(&gParties[B_TRAINER_PLAYER][0]), NATURE_BOLD);
-    EXPECT_EQ(GetMonAbility(&gParties[B_TRAINER_PLAYER][0]), GetSpeciesAbility(SPECIES_WOBBUFFET, 2));
+    EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_ABILITY_NUM), 2);
+    EXPECT_EQ(GetMonAbility(&gParties[B_TRAINER_PLAYER][0]),
+              GetRandomizedAbilityForSpecies(SPECIES_WOBBUFFET, GetSpeciesAbility(SPECIES_WOBBUFFET, 2)));
     EXPECT_EQ(GetMonGender(&gParties[B_TRAINER_PLAYER][0]), MON_MALE);
     EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_HP_EV), 1);
     EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_ATK_EV), 2);
@@ -462,7 +465,9 @@ TEST("givemon [vars]")
     EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_HELD_ITEM), ITEM_LEFTOVERS);
     EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_POKEBALL), BALL_MASTER);
     EXPECT_EQ(GetNature(&gParties[B_TRAINER_PLAYER][0]), NATURE_BOLD);
-    EXPECT_EQ(GetMonAbility(&gParties[B_TRAINER_PLAYER][0]), GetSpeciesAbility(SPECIES_WOBBUFFET, 2));
+    EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_ABILITY_NUM), 2);
+    EXPECT_EQ(GetMonAbility(&gParties[B_TRAINER_PLAYER][0]),
+              GetRandomizedAbilityForSpecies(SPECIES_WOBBUFFET, GetSpeciesAbility(SPECIES_WOBBUFFET, 2)));
     EXPECT_EQ(GetMonGender(&gParties[B_TRAINER_PLAYER][0]), MON_MALE);
     EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_HP_EV), 1);
     EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_ATK_EV), 2);

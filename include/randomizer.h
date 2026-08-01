@@ -25,6 +25,9 @@ enum RandomizerEncounterType
 void InitRandomizerData(void);
 u32 GetRandomizerSeed(void);
 u32 RandomizerHash(u32 seed, enum RandomizerCategory category, u32 key1, u32 key2, u32 key3);
+enum Species GetRandomizerEvolutionFamily(enum Species species);
+bool32 IsAbilityRandomizerEligible(enum Ability ability);
+enum Ability GetRandomizedAbilityForSpecies(enum Species species, enum Ability originalAbility);
 bool32 IsSpeciesRandomizerEligible(enum Species species);
 bool32 IsSpeciesRandomizerLegendaryEncounterEligible(enum Species species);
 bool32 IsSpeciesRandomizerStarterEligible(enum Species species);
