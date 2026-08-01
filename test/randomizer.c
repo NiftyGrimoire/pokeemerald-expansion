@@ -259,6 +259,67 @@ TEST("Friendship evolution condition uses level instead of friendship")
     EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_NORMAL, ITEM_NONE, NULL, NULL, CHECK_EVO), SPECIES_PIKACHU);
 }
 
+TEST("Evolution randomizer removes declared clock and region barriers")
+{
+    EXPECT(ShouldRandomizerIgnoreEvolutionCondition(SPECIES_RIOLU, IF_NOT_TIME));
+    EXPECT(ShouldRandomizerIgnoreEvolutionCondition(SPECIES_GLIGAR, IF_TIME));
+    EXPECT(ShouldRandomizerIgnoreEvolutionCondition(SPECIES_PIKACHU, IF_REGION));
+    EXPECT(ShouldRandomizerIgnoreEvolutionCondition(SPECIES_DARTRIX, IF_NOT_REGION));
+    EXPECT(!ShouldRandomizerIgnoreEvolutionCondition(SPECIES_MILCERY, IF_TIME));
+    EXPECT(!ShouldRandomizerIgnoreEvolutionCondition(SPECIES_BULBASAUR, IF_REGION));
+}
+
+TEST("Alternate evolution target selection is deterministic and seed separated")
+{
+    bool32 firstSeedMidday;
+    bool32 foundDifferentSeed = FALSE;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    firstSeedMidday = IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDDAY);
+    EXPECT_NE(firstSeedMidday, IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDNIGHT));
+    EXPECT_EQ(firstSeedMidday, IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDDAY));
+    EXPECT(IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_DUSK));
+
+    for (u32 seed = 1; seed <= 64; seed++)
+    {
+        gSaveBlock3Ptr->randomizerSeed = seed;
+        if (firstSeedMidday != IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDDAY))
+        {
+            foundDifferentSeed = TRUE;
+            break;
+        }
+    }
+    EXPECT(foundDifferentSeed);
+}
+
+TEST("Selected time branch evolves without consulting the clock")
+{
+    struct Pokemon mon;
+    enum Species expectedTarget;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    expectedTarget = IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDDAY)
+                   ? SPECIES_LYCANROC_MIDDAY
+                   : SPECIES_LYCANROC_MIDNIGHT;
+    CreateMon(&mon, SPECIES_ROCKRUFF, 25, 0, OTID_STRUCT_PLAYER_ID);
+
+    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_NORMAL, ITEM_NONE, NULL, NULL, CHECK_EVO), expectedTarget);
+}
+
+TEST("Selected regional stone branch evolves outside its authored region")
+{
+    struct Pokemon mon;
+    enum Species expectedTarget;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x87654321;
+    expectedTarget = IsRandomizerEvolutionTargetSelected(SPECIES_PIKACHU, SPECIES_RAICHU)
+                   ? SPECIES_RAICHU
+                   : SPECIES_RAICHU_ALOLA;
+    CreateMon(&mon, SPECIES_PIKACHU, 30, 0, OTID_STRUCT_PLAYER_ID);
+
+    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_ITEM_CHECK, ITEM_THUNDER_STONE, NULL, NULL, CHECK_EVO), expectedTarget);
+}
+
 TEST("Ability randomizer excludes unsafe and unimplemented abilities")
 {
     EXPECT(IsAbilityRandomizerEligible(ABILITY_OVERGROW));

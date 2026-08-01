@@ -117,6 +117,122 @@ u8 GetRandomizerFriendshipEvolutionLevel(enum Species species)
     return 0;
 }
 
+static bool32 IsSelectedRandomizerEvolutionTarget(enum Species species, enum Species targetSpecies, enum Species firstTarget, enum Species secondTarget)
+{
+    enum Species selectedTarget;
+
+    if (targetSpecies != firstTarget && targetSpecies != secondTarget)
+        return TRUE;
+
+    selectedTarget = RandomizerHash(GetRandomizerSeed(), RANDOMIZER_CATEGORY_EVOLUTION, species, firstTarget, secondTarget) % 2 == 0
+                   ? firstTarget
+                   : secondTarget;
+    return targetSpecies == selectedTarget;
+}
+
+bool32 IsRandomizerEvolutionTargetSelected(enum Species species, enum Species targetSpecies)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_EVOLUTIONS
+    switch (species)
+    {
+    case SPECIES_EEVEE:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_ESPEON, SPECIES_UMBREON);
+    case SPECIES_ROCKRUFF:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_LYCANROC_MIDDAY, SPECIES_LYCANROC_MIDNIGHT);
+    case SPECIES_COSMOEM:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_SOLGALEO, SPECIES_LUNALA);
+    case SPECIES_PIKACHU:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_RAICHU, SPECIES_RAICHU_ALOLA);
+    case SPECIES_EXEGGCUTE:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_EXEGGUTOR, SPECIES_EXEGGUTOR_ALOLA);
+    case SPECIES_CUBONE:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_MAROWAK, SPECIES_MAROWAK_ALOLA);
+    case SPECIES_KOFFING:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_WEEZING, SPECIES_WEEZING_GALAR);
+    case SPECIES_MIME_JR:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_MR_MIME, SPECIES_MR_MIME_GALAR);
+    case SPECIES_QUILAVA:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_TYPHLOSION, SPECIES_TYPHLOSION_HISUI);
+    case SPECIES_DEWOTT:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_SAMUROTT, SPECIES_SAMUROTT_HISUI);
+    case SPECIES_PETILIL:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_LILLIGANT, SPECIES_LILLIGANT_HISUI);
+    case SPECIES_RUFFLET:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_BRAVIARY, SPECIES_BRAVIARY_HISUI);
+    case SPECIES_GOOMY:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_SLIGGOO, SPECIES_SLIGGOO_HISUI);
+    case SPECIES_BERGMITE:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_AVALUGG, SPECIES_AVALUGG_HISUI);
+    case SPECIES_DARTRIX:
+        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_DECIDUEYE, SPECIES_DECIDUEYE_HISUI);
+    default:
+        break;
+    }
+#endif
+
+    return TRUE;
+}
+
+bool32 ShouldRandomizerIgnoreEvolutionCondition(enum Species species, u16 condition)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_EVOLUTIONS
+    if (condition == IF_TIME || condition == IF_NOT_TIME)
+    {
+        switch (species)
+        {
+        case SPECIES_RATTATA_ALOLA:
+        case SPECIES_CUBONE:
+        case SPECIES_HAPPINY:
+        case SPECIES_EEVEE:
+        case SPECIES_GLIGAR:
+        case SPECIES_SNEASEL:
+        case SPECIES_SNEASEL_HISUI:
+        case SPECIES_LINOONE_GALAR:
+        case SPECIES_BUDEW:
+        case SPECIES_CHINGLING:
+        case SPECIES_RIOLU:
+        case SPECIES_TYRUNT:
+        case SPECIES_AMAURA:
+        case SPECIES_YUNGOOS:
+        case SPECIES_ROCKRUFF:
+        case SPECIES_ROCKRUFF_OWN_TEMPO:
+        case SPECIES_FOMANTIS:
+        case SPECIES_COSMOEM:
+        case SPECIES_SNOM:
+        case SPECIES_GREAVARD:
+        case SPECIES_URSARING:
+            return TRUE;
+        default:
+            break;
+        }
+    }
+    else if (condition == IF_REGION || condition == IF_NOT_REGION)
+    {
+        switch (species)
+        {
+        case SPECIES_PIKACHU:
+        case SPECIES_EXEGGCUTE:
+        case SPECIES_CUBONE:
+        case SPECIES_KOFFING:
+        case SPECIES_MIME_JR:
+        case SPECIES_QUILAVA:
+        case SPECIES_DEWOTT:
+        case SPECIES_PETILIL:
+        case SPECIES_RUFFLET:
+        case SPECIES_GOOMY:
+        case SPECIES_BERGMITE:
+        case SPECIES_DARTRIX:
+        case SPECIES_URSARING:
+            return TRUE;
+        default:
+            break;
+        }
+    }
+#endif
+
+    return FALSE;
+}
+
 bool32 IsMoveRandomizerEligible(enum Move move)
 {
     if (move <= MOVE_NONE || move >= MOVES_COUNT)

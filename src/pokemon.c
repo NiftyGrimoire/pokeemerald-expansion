@@ -4243,6 +4243,8 @@ bool32 DoesMonMeetAdditionalConditions(struct Pokemon *mon, const struct Evoluti
     u32 attack = GetMonData(mon, MON_DATA_ATK, 0);
     u32 defense = GetMonData(mon, MON_DATA_DEF, 0);
     u32 personality = GetMonData(mon, MON_DATA_PERSONALITY, 0);
+    enum Species species = GetMonData(mon, MON_DATA_SPECIES, 0);
+    u32 level = GetMonData(mon, MON_DATA_LEVEL, 0);
     u16 upperPersonality = personality >> 16;
     u32 weather = GetCurrentWeather();
     u32 nature = GetNature(mon);
@@ -4291,10 +4293,10 @@ bool32 DoesMonMeetAdditionalConditions(struct Pokemon *mon, const struct Evoluti
         case IF_MIN_FRIENDSHIP:
 #if RANDOMIZER_ENABLED && RANDOMIZER_EVOLUTIONS
         {
-            u8 evolutionLevel = GetRandomizerFriendshipEvolutionLevel(GetMonData(mon, MON_DATA_SPECIES));
+            u8 evolutionLevel = GetRandomizerFriendshipEvolutionLevel(species);
 
             if (evolutionLevel != 0)
-                currentCondition = GetMonData(mon, MON_DATA_LEVEL) >= evolutionLevel;
+                currentCondition = level >= evolutionLevel;
             else if (friendship >= params[i].arg1)
                 currentCondition = TRUE;
             break;
@@ -4317,12 +4319,12 @@ bool32 DoesMonMeetAdditionalConditions(struct Pokemon *mon, const struct Evoluti
                 currentCondition = TRUE;
             break;
         case IF_TIME:
-            if (GetTimeOfDay() == params[i].arg1)
+            if (ShouldRandomizerIgnoreEvolutionCondition(species, condition) || GetTimeOfDay() == params[i].arg1)
                 currentCondition = TRUE;
 
             break;
         case IF_NOT_TIME:
-            if (GetTimeOfDay() != params[i].arg1)
+            if (ShouldRandomizerIgnoreEvolutionCondition(species, condition) || GetTimeOfDay() != params[i].arg1)
                 currentCondition = TRUE;
             break;
         case IF_HOLD_ITEM:
@@ -4544,11 +4546,11 @@ bool32 DoesMonMeetAdditionalConditions(struct Pokemon *mon, const struct Evoluti
             }
             break;
         case IF_REGION:
-            if (GetCurrentRegion() == params[i].arg1)
+            if (ShouldRandomizerIgnoreEvolutionCondition(species, condition) || GetCurrentRegion() == params[i].arg1)
                 currentCondition = TRUE;
             break;
         case IF_NOT_REGION:
-            if (GetCurrentRegion() != params[i].arg1)
+            if (ShouldRandomizerIgnoreEvolutionCondition(species, condition) || GetCurrentRegion() != params[i].arg1)
                 currentCondition = TRUE;
             break;
         case CONDITIONS_END:
@@ -4612,6 +4614,8 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
             bool32 conditionsMet = FALSE;
             if (SanitizeSpeciesId(evolutions[i].targetSpecies) == SPECIES_NONE)
                 continue;
+            if (!IsRandomizerEvolutionTargetSelected(species, evolutions[i].targetSpecies))
+                continue;
 
             // Check main primary evolution method
             switch (evolutions[i].method)
@@ -4642,6 +4646,8 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
             bool32 conditionsMet = FALSE;
             if (SanitizeSpeciesId(evolutions[i].targetSpecies) == SPECIES_NONE)
                 continue;
+            if (!IsRandomizerEvolutionTargetSelected(species, evolutions[i].targetSpecies))
+                continue;
 
             switch (evolutions[i].method)
             {
@@ -4666,6 +4672,8 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
         {
             bool32 conditionsMet = FALSE;
             if (SanitizeSpeciesId(evolutions[i].targetSpecies) == SPECIES_NONE)
+                continue;
+            if (!IsRandomizerEvolutionTargetSelected(species, evolutions[i].targetSpecies))
                 continue;
 
             switch (evolutions[i].method)
@@ -4695,6 +4703,8 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
             bool32 conditionsMet = FALSE;
             if (SanitizeSpeciesId(evolutions[i].targetSpecies) == SPECIES_NONE)
                 continue;
+            if (!IsRandomizerEvolutionTargetSelected(species, evolutions[i].targetSpecies))
+                continue;
 
             switch (evolutions[i].method)
             {
@@ -4720,6 +4730,8 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
             bool32 conditionsMet = FALSE;
             if (SanitizeSpeciesId(evolutions[i].targetSpecies) == SPECIES_NONE)
                 continue;
+            if (!IsRandomizerEvolutionTargetSelected(species, evolutions[i].targetSpecies))
+                continue;
 
             switch (evolutions[i].method)
             {
@@ -4743,6 +4755,8 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
         for (i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
         {
             if (SanitizeSpeciesId(evolutions[i].targetSpecies) == SPECIES_NONE)
+                continue;
+            if (!IsRandomizerEvolutionTargetSelected(species, evolutions[i].targetSpecies))
                 continue;
             if (evolutions[i].method != EVO_SCRIPT_TRIGGER)
                 continue;

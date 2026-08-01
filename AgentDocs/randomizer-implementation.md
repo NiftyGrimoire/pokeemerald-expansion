@@ -3,7 +3,7 @@
 ## Current branch
 
 - Integration branch: `romhack/main`.
-- Active feature branch: `romhack/randomizer-learnsets`.
+- Active feature branch: `romhack/randomizer-evolution-rules`.
 - Base: `pokeemerald-expansion` stable `1.16.2`.
 - Push only to the NiftyGrimoire fork through `origin`.
 - Never push to `upstream`.
@@ -34,9 +34,10 @@ broad summary where they differ.
 Wild encounter randomization, BST-scaled ordinary encounter pools, scripted
 encounter randomization, level caps and EV removal, starter randomization, enemy
 trainer randomization, and evolution-family ability randomization are merged into
-`romhack/main`. Universal TM compatibility and randomized level-up learnsets are
-implemented on `romhack/randomizer-learnsets` but are not yet merged. Evolution
-changes and quality-of-life hooks have not been implemented.
+`romhack/main`, including universal TM compatibility and randomized level-up
+learnsets. Evolution rules are in progress on
+`romhack/randomizer-evolution-rules`; quality-of-life hooks have not been
+implemented.
 
 ## Learnset phase in progress
 
@@ -498,10 +499,31 @@ Before integrating `romhack/randomizer-learnsets` into `romhack/main`:
 5. Leave egg moves authored while breeding is slated for removal. Define a new
    policy only if egg moves receive a non-breeding acquisition path.
 
+## Evolution phase in progress
+
+The authoritative species-by-species behavior is documented in
+`AgentDocs/hack-plans/evolution-rules.md`.
+
+- All enabled friendship evolutions use explicit level 20, 30, or 40 tiers.
+- Audited clock-only restrictions are removed while held-item, known-move, and
+  other secondary requirements remain authored.
+- Paired clock and regional outcomes are selected deterministically from the
+  saved seed through the dedicated evolution hash category.
+- The target filter is used by normal, trade, item, battle-special, overworld,
+  and script-trigger evolution scans so a non-selected form cannot leak through
+  another access mode.
+- Milcery's 63 Sweet/spin/flavor outcomes remain authored until that larger
+  form policy is specified and tested.
+
+Focused validation currently covers the explicit friendship tiers, an actual
+zero-friendship level evolution, allowlisted condition bypasses, deterministic
+and seed-separated branch selection, a clock-independent Rockruff evolution,
+and a region-independent Pikachu stone evolution.
+
 ## Other unresolved architecture
 
-- Friendship evolution replacements: create an explicit species-level conversion
-  table.
+- Evolution rules: finish the deterministic Milcery/Alcremie policy, then run
+  the normal ROM build and manual gameplay checks from the evolution ledger.
 - Starter randomization: the player-facing three-choice policy is implemented.
   Rival parties are governed independently by the enemy-trainer policy above.
 - Time-dependent and alternate-form evolutions: define a species-level policy that

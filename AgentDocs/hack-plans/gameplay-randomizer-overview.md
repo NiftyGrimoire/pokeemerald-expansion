@@ -137,6 +137,8 @@ Current execution order:
    - Do not expand egg-move support while breeding is planned for removal. Revisit
      egg moves only if a non-breeding acquisition path is retained or added.
 9. Evolution rules — planned:
+   - The authoritative species-level conversion ledger is
+     `AgentDocs/hack-plans/evolution-rules.md`.
    - Replace friendship evolutions from an explicit species-by-species conversion
      table, preserving applicable secondary conditions.
    - Make time-dependent and alternate-form evolution lines practical in a short
