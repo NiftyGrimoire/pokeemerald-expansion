@@ -9,9 +9,10 @@
 #define RANDOMIZER_STARTER_COUNT 3
 #define RANDOMIZER_STARTER_MIN_BST 300
 #define RANDOMIZER_STARTER_MAX_BST 350
-#define RANDOMIZER_MOVE_WEIGHT_STAB 6
-#define RANDOMIZER_MOVE_WEIGHT_COVERAGE 2
-#define RANDOMIZER_MOVE_WEIGHT_STATUS 1
+#define RANDOMIZER_MOVE_TYPE_WEIGHT_STAB 3
+#define RANDOMIZER_MOVE_TYPE_WEIGHT_COVERAGE 2
+#define RANDOMIZER_MOVE_TYPE_WEIGHT_STATUS 1
+#define RANDOMIZER_MOVE_POWER_WEIGHT_MAX 12
 
 static const u8 sRandomizerLevelUpMoveLevels[RANDOMIZER_LEVEL_UP_MOVE_COUNT] =
 {
@@ -109,15 +110,100 @@ static bool32 IsExcludedRandomizerMove(enum Move move, const u16 *excludedMoves,
     return FALSE;
 }
 
-static u32 GetRandomizerMoveWeight(enum Species species, enum Move move)
+static u32 GetRandomizerStatusMoveTier(enum Move move)
 {
-    enum Type moveType = GetMoveType(move);
+    switch (move)
+    {
+    case MOVE_SPORE:
+    case MOVE_BELLY_DRUM:
+    case MOVE_SHELL_SMASH:
+    case MOVE_GEOMANCY:
+    case MOVE_QUIVER_DANCE:
+    case MOVE_TAIL_GLOW:
+    case MOVE_SHIFT_GEAR:
+    case MOVE_NO_RETREAT:
+    case MOVE_VICTORY_DANCE:
+    case MOVE_TIDY_UP:
+    case MOVE_REVIVAL_BLESSING:
+    case MOVE_SHED_TAIL:
+        return 2;
+    case MOVE_SWORDS_DANCE:
+    case MOVE_NASTY_PLOT:
+    case MOVE_DRAGON_DANCE:
+    case MOVE_CALM_MIND:
+    case MOVE_BULK_UP:
+    case MOVE_AGILITY:
+    case MOVE_RECOVER:
+    case MOVE_ROOST:
+    case MOVE_SOFT_BOILED:
+    case MOVE_SLACK_OFF:
+    case MOVE_MILK_DRINK:
+    case MOVE_MOONLIGHT:
+    case MOVE_MORNING_SUN:
+    case MOVE_SYNTHESIS:
+    case MOVE_WILL_O_WISP:
+    case MOVE_THUNDER_WAVE:
+    case MOVE_TOXIC:
+    case MOVE_SLEEP_POWDER:
+    case MOVE_HYPNOSIS:
+    case MOVE_GLARE:
+    case MOVE_STICKY_WEB:
+    case MOVE_STEALTH_ROCK:
+    case MOVE_SPIKES:
+    case MOVE_TOXIC_SPIKES:
+    case MOVE_REFLECT:
+    case MOVE_LIGHT_SCREEN:
+    case MOVE_AURORA_VEIL:
+    case MOVE_TRICK_ROOM:
+        return 1;
+    default:
+        return 0;
+    }
+}
 
-    if (moveType == GetSpeciesType(species, 0) || moveType == GetSpeciesType(species, 1))
-        return RANDOMIZER_MOVE_WEIGHT_STAB;
-    if (GetMoveCategory(move) != DAMAGE_CATEGORY_STATUS)
-        return RANDOMIZER_MOVE_WEIGHT_COVERAGE;
-    return RANDOMIZER_MOVE_WEIGHT_STATUS;
+static u32 GetRandomizerStatusMoveWeight(enum Move move, u8 level)
+{
+    u32 moveTier = GetRandomizerStatusMoveTier(move);
+    u32 targetTier = (level < 24 ? 0 : level < 42 ? 1 : 2);
+    u32 tierDistance = (moveTier > targetTier ? moveTier - targetTier : targetTier - moveTier);
+
+    if (tierDistance == 0)
+        return 10;
+    if (tierDistance == 1)
+        return 3;
+    return 1;
+}
+
+u32 GetRandomizerMoveWeightForLevel(enum Species species, enum Move move, u8 level)
+{
+    u32 typeWeight;
+
+    if (!IsMoveRandomizerEligible(move) || species <= SPECIES_NONE || species >= NUM_SPECIES)
+        return 0;
+
+    if (GetMoveCategory(move) == DAMAGE_CATEGORY_STATUS)
+        typeWeight = RANDOMIZER_MOVE_TYPE_WEIGHT_STATUS;
+    else if (GetMoveType(move) == GetSpeciesType(species, 0) || GetMoveType(move) == GetSpeciesType(species, 1))
+        typeWeight = RANDOMIZER_MOVE_TYPE_WEIGHT_STAB;
+    else
+        typeWeight = RANDOMIZER_MOVE_TYPE_WEIGHT_COVERAGE;
+
+    if (GetMoveCategory(move) == DAMAGE_CATEGORY_STATUS)
+        return typeWeight * GetRandomizerStatusMoveWeight(move, level);
+    else
+    {
+        u32 power = GetMovePower(move);
+        u32 targetPower = min(35 + level, 120);
+        u32 powerDistance;
+        u32 powerWeight;
+
+        // Fixed and level-based damage moves have no listed base power.
+        if (power == 0)
+            power = 50;
+        powerDistance = (power > targetPower ? power - targetPower : targetPower - power);
+        powerWeight = max(1, RANDOMIZER_MOVE_POWER_WEIGHT_MAX - powerDistance / 10);
+        return typeWeight * powerWeight;
+    }
 }
 
 enum Move GetRandomizedLevelUpMove(enum Species species, u8 learnsetSlot, const u16 *excludedMoves, u8 excludedMoveCount, enum Move fallbackMove)
@@ -125,6 +211,7 @@ enum Move GetRandomizedLevelUpMove(enum Species species, u8 learnsetSlot, const 
 #if RANDOMIZER_ENABLED && RANDOMIZER_LEARNSETS
     u32 totalWeight = 0;
     u32 selection;
+    u8 learnLevel = GetRandomizerLevelUpMoveLevel(learnsetSlot);
 
     if (species <= SPECIES_NONE || species >= NUM_SPECIES || !IsSpeciesEnabled(species))
         return fallbackMove;
@@ -132,7 +219,7 @@ enum Move GetRandomizedLevelUpMove(enum Species species, u8 learnsetSlot, const 
     for (enum Move move = MOVE_NONE + 1; move < MOVES_COUNT; move++)
     {
         if (IsMoveRandomizerEligible(move) && !IsExcludedRandomizerMove(move, excludedMoves, excludedMoveCount))
-            totalWeight += GetRandomizerMoveWeight(species, move);
+            totalWeight += GetRandomizerMoveWeightForLevel(species, move, learnLevel);
     }
 
     if (totalWeight == 0)
@@ -146,7 +233,7 @@ enum Move GetRandomizedLevelUpMove(enum Species species, u8 learnsetSlot, const 
         if (!IsMoveRandomizerEligible(move) || IsExcludedRandomizerMove(move, excludedMoves, excludedMoveCount))
             continue;
 
-        weight = GetRandomizerMoveWeight(species, move);
+        weight = GetRandomizerMoveWeightForLevel(species, move, learnLevel);
         if (selection < weight)
             return move;
         selection -= weight;

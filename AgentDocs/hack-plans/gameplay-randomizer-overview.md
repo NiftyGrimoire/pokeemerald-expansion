@@ -109,9 +109,11 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      across the configured cap bands while retaining the normal 20-move table
      capacity. Deterministically replace each move per save, species, and slot
      without duplicates.
-   - Weight STAB moves 6, non-STAB damaging moves 2, and status moves 1. Exclude
-     placeholders and moves whose mechanics are species-locked or unsuitable for
-     general distribution; retain the authored move as an empty-pool fallback.
+   - Weight damaging moves toward a level-scaled target power and shift status
+     weighting from basic to strong and elite effects as levels rise. Keep every
+     eligible tier possible at nonzero weight, preserve STAB and coverage bias,
+     exclude unsuitable species-locked moves, and retain the authored move as an
+     empty-pool fallback.
    - Resolve through the shared level-up accessor so initial, level-up, evolution,
      reminder, AI, and Pokedex paths agree. Regenerate into a small shared buffer
      and only add a broader cache after measuring access cost.

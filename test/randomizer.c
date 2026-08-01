@@ -131,18 +131,56 @@ TEST("Standard learnset schedule front-loads moves within level-cap bands")
     EXPECT_EQ(GetRandomizerLevelUpMoveLevel(RANDOMIZER_LEVEL_UP_MOVE_COUNT), 0);
 }
 
+TEST("Learnset weights favor appropriate damaging move power by level")
+{
+    u32 earlyEmber = GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_EMBER, 5);
+    u32 earlyFireBlast = GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_FIRE_BLAST, 5);
+    u32 lateEmber = GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_EMBER, 80);
+    u32 lateFireBlast = GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_FIRE_BLAST, 80);
+
+    EXPECT_GT(earlyEmber, earlyFireBlast);
+    EXPECT_GT(lateFireBlast, lateEmber);
+    EXPECT_GT(earlyFireBlast, 0);
+    EXPECT_GT(lateEmber, 0);
+}
+
+TEST("Learnset weights shift status moves from basic to elite by level")
+{
+    u32 earlyGrowl = GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_GROWL, 5);
+    u32 earlyQuiverDance = GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_QUIVER_DANCE, 5);
+    u32 middleCalmMind = GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_CALM_MIND, 24);
+    u32 middleGrowl = GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_GROWL, 24);
+    u32 lateGrowl = GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_GROWL, 80);
+    u32 lateQuiverDance = GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_QUIVER_DANCE, 80);
+
+    EXPECT_GT(earlyGrowl, earlyQuiverDance);
+    EXPECT_GT(middleCalmMind, middleGrowl);
+    EXPECT_GT(lateQuiverDance, lateGrowl);
+    EXPECT_GT(earlyQuiverDance, 0);
+}
+
 TEST("Level-up learnsets separate seed and species identity")
 {
-    enum Move bulbasaurMove;
-    enum Move charmanderMove;
+    enum Move bulbasaurMoves[RANDOMIZER_LEVEL_UP_MOVE_COUNT];
+    bool32 speciesDiffers = FALSE;
+    bool32 seedDiffers = FALSE;
+    const struct LevelUpMove *learnset;
 
     gSaveBlock3Ptr->randomizerSeed = 0x12345678;
-    bulbasaurMove = GetSpeciesLevelUpLearnset(SPECIES_BULBASAUR)[0].move;
-    charmanderMove = GetSpeciesLevelUpLearnset(SPECIES_CHARMANDER)[0].move;
-    EXPECT_NE(bulbasaurMove, charmanderMove);
+    learnset = GetSpeciesLevelUpLearnset(SPECIES_BULBASAUR);
+    for (u32 i = 0; i < RANDOMIZER_LEVEL_UP_MOVE_COUNT; i++)
+        bulbasaurMoves[i] = learnset[i].move;
+
+    learnset = GetSpeciesLevelUpLearnset(SPECIES_CHARMANDER);
+    for (u32 i = 0; i < RANDOMIZER_LEVEL_UP_MOVE_COUNT; i++)
+        speciesDiffers |= bulbasaurMoves[i] != learnset[i].move;
+    EXPECT(speciesDiffers);
 
     gSaveBlock3Ptr->randomizerSeed = 0x87654321;
-    EXPECT_NE(bulbasaurMove, GetSpeciesLevelUpLearnset(SPECIES_BULBASAUR)[0].move);
+    learnset = GetSpeciesLevelUpLearnset(SPECIES_BULBASAUR);
+    for (u32 i = 0; i < RANDOMIZER_LEVEL_UP_MOVE_COUNT; i++)
+        seedDiffers |= bulbasaurMoves[i] != learnset[i].move;
+    EXPECT(seedDiffers);
 }
 
 TEST("Level-up learnsets reject special-case moves and preserve invalid species behavior")

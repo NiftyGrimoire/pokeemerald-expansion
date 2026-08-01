@@ -52,10 +52,17 @@ not been implemented.
   and 58-100 respectively. This produces exactly 20 moves without increasing
   the engine's normal level-up table capacity. Moves are deterministic per save,
   species, and slot, with no duplicates.
-- Candidate weighting is 6 for STAB moves, 2 for non-STAB damaging moves, and 1
-  for status moves. Placeholder, Transform, Sketch, Dark Void, Hyperspace Fury,
-  Aura Wheel, species-power-override, and Struggle moves are excluded. The
-  authored move is the fallback if no candidate exists.
+- Damaging-move weights follow a level-based target power from roughly 40 in the
+  opening game to 115 at level 80. STAB and coverage multipliers remain, but all
+  eligible power bands retain nonzero weight, so an unusually strong early move
+  or weak late move remains possible.
+- Status moves use basic, strong, and elite potency tiers. Basic effects are
+  favored before level 24, strong setup/recovery/status/hazard effects from 24,
+  and elite setup or exceptional utility from 42. Off-tier status moves retain a
+  smaller nonzero weight.
+- Placeholder, Transform, Sketch, Dark Void, Hyperspace Fury, Aura Wheel,
+  species-power-override, and Struggle moves are excluded. The authored move is
+  the fallback if no candidate exists.
 - The resolver regenerates into one small EWRAM buffer per accessor call. Add
   a broader cache only if profiling shows this scan is too expensive.
 - Egg-move randomization and any deliberate evolution-family inheritance policy

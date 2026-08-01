@@ -30,6 +30,7 @@ u32 RandomizerHash(u32 seed, enum RandomizerCategory category, u32 key1, u32 key
 enum Species GetRandomizerEvolutionFamily(enum Species species);
 bool32 IsAbilityRandomizerEligible(enum Ability ability);
 bool32 IsMoveRandomizerEligible(enum Move move);
+u32 GetRandomizerMoveWeightForLevel(enum Species species, enum Move move, u8 level);
 enum Ability GetRandomizedAbilityForSpecies(enum Species species, enum Ability originalAbility);
 enum Move GetRandomizedLevelUpMove(enum Species species, u8 learnsetSlot, const u16 *excludedMoves, u8 excludedMoveCount, enum Move fallbackMove);
 u8 GetRandomizerLevelUpMoveLevel(u8 learnsetSlot);
