@@ -145,7 +145,8 @@ Sylveon/Espeon/Umbreon logic.
 
 No enabled species retains an `EVO_TRADE` method. Plain trades and the former
 Karrablast/Shelmet partner trade use the Linking Cord. Former held-item trades
-evolve by using that item directly from the Bag.
+evolve by using that item directly from the Bag. The Expansion config
+`I_USE_EVO_HELD_ITEMS_FROM_BAG` is enabled so these item routes are usable.
 
 ### Linking Cord replacements
 

@@ -358,6 +358,8 @@ TEST("Former location evolutions use location-free stones only")
 
 TEST("Evolution tables contain no trade methods")
 {
+    EXPECT(I_USE_EVO_HELD_ITEMS_FROM_BAG);
+
     for (enum Species species = SPECIES_NONE; species < NUM_SPECIES; species++)
     {
         if (species != SPECIES_NONE && !IsSpeciesEnabled(species))
