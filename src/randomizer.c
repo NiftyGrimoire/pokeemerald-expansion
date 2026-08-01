@@ -166,14 +166,22 @@ static u32 GetRandomizerStatusMoveTier(enum Move move)
 static u32 GetRandomizerStatusMoveWeight(enum Move move, u8 level)
 {
     u32 moveTier = GetRandomizerStatusMoveTier(move);
-    u32 targetTier = (level < 24 ? 0 : level < 42 ? 1 : 2);
-    u32 tierDistance = (moveTier > targetTier ? moveTier - targetTier : targetTier - moveTier);
 
-    if (tierDistance == 0)
-        return 10;
-    if (tierDistance == 1)
-        return 3;
-    return 1;
+    if (level < 24)
+    {
+        static const u8 sEarlyWeights[] = {10, 6, 3};
+        return sEarlyWeights[moveTier];
+    }
+    else if (level < 42)
+    {
+        static const u8 sMiddleWeights[] = {2, 24, 8};
+        return sMiddleWeights[moveTier];
+    }
+    else
+    {
+        static const u8 sLateWeights[] = {1, 10, 36};
+        return sLateWeights[moveTier];
+    }
 }
 
 u32 GetRandomizerMoveWeightForLevel(enum Species species, enum Move move, u8 level)

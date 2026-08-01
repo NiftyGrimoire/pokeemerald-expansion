@@ -60,7 +60,9 @@ not been implemented.
   favored before level 24, strong setup/recovery/status/hazard effects from 24,
   and elite setup or exceptional utility from 42. All status moves whose effects
   set weather, including weather-plus-switch moves, belong to the strong tier.
-  Off-tier status moves retain a smaller nonzero weight.
+  Per-move basic/strong/elite weights are 10/6/3 early, 2/24/8 from level 24,
+  and 1/10/36 from level 42. These elevated strong and elite weights compensate
+  for the larger basic-status candidate pool while every tier remains possible.
 - Placeholder, Transform, Sketch, Dark Void, Hyperspace Fury, Aura Wheel,
   species-power-override, and Struggle moves are excluded. The authored move is
   the fallback if no candidate exists.

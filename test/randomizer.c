@@ -156,7 +156,12 @@ TEST("Learnset weights shift status moves from basic to elite by level")
     EXPECT_GT(earlyGrowl, earlyQuiverDance);
     EXPECT_GT(middleCalmMind, middleGrowl);
     EXPECT_GT(lateQuiverDance, lateGrowl);
-    EXPECT_GT(earlyQuiverDance, 0);
+    EXPECT_EQ(earlyGrowl, 10);
+    EXPECT_EQ(earlyQuiverDance, 3);
+    EXPECT_EQ(middleGrowl, 2);
+    EXPECT_EQ(middleCalmMind, 24);
+    EXPECT_EQ(lateGrowl, 1);
+    EXPECT_EQ(lateQuiverDance, 36);
 }
 
 TEST("Learnset weights treat weather-setting status moves as strong tier")
@@ -171,6 +176,9 @@ TEST("Learnset weights treat weather-setting status moves as strong tier")
     EXPECT_GT(earlyGrowl, earlyRainDance);
     EXPECT_GT(middleRainDance, middleGrowl);
     EXPECT_GT(lateQuiverDance, lateRainDance);
+    EXPECT_EQ(earlyRainDance, 6);
+    EXPECT_EQ(middleRainDance, 24);
+    EXPECT_EQ(lateRainDance, 10);
 }
 
 TEST("Level-up learnsets separate seed and species identity")
