@@ -94,8 +94,7 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
    - Manually verify ordinary, rival, boss, override, and pooled trainers;
      save-to-save variation; repeated-encounter stability; and held-item/gimmick
      behavior.
-7. Abilities (complete on `romhack/randomizer-abilities`; manual gameplay checks
-   remain):
+7. Abilities (complete on `romhack/main`; manual gameplay checks remain):
    - Resolve one deterministic ability ID per enabled evolution-graph family.
    - Route normal party, box, battle, UI, and overworld reads through
      `GetAbilityBySpecies` while preserving the saved authored ability slot.
@@ -103,9 +102,13 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      form/signature-only, Wonder Guard, placeholder, and unimplemented abilities
      from the version-1 candidate pool.
    - Cache family identities and resolved family abilities in EWRAM.
-8. Learnsets:
-   - Specify candidate moves and weighting, then add the runtime resolver and any
-     measured cache.
+8. Learnsets (next phase):
+   - Specify candidate moves, exclusions, weighting, duplicate and fallback
+     rules, evolution behavior, and stable hash identity.
+   - Inventory level-up, evolution, reminder, egg, gift, wild, and trainer move
+     access paths before selecting the shared runtime hook.
+   - Add the runtime resolver and only add a cache after measuring its access
+     pattern and EWRAM cost.
 9. Evolution rules:
    - Replace friendship evolutions from an explicit species-by-species conversion
      table, preserving applicable secondary conditions.

@@ -7,9 +7,9 @@
 - Push only to the NiftyGrimoire fork through `origin`.
 - Never push to `upstream`.
 
-The completed BST encounter branch was merged locally into `romhack/main` by
-`aac5581c02`. Verify the current Git state and remote tracking state before
-committing or pushing; this handoff does not authorize a push.
+The ability randomizer was merged locally into `romhack/main` by `ea8674abb9`.
+Verify the current Git state and remote tracking state before committing or
+pushing; this handoff does not authorize a push.
 
 ## Primary plan
 
@@ -31,10 +31,9 @@ broad summary where they differ.
 - Intentional `SaveBlock3` size guard updated from 4 to 8 bytes.
 
 Wild encounter randomization, BST-scaled ordinary encounter pools, scripted
-encounter randomization, level caps and EV removal, and starter randomization are
-merged into `romhack/main`. Enemy trainer randomization is implemented with a
-tested pure species resolver and party-creation integration on `romhack/main`.
-Global ability and learnset randomization, evolution changes, and quality-of-life
+encounter randomization, level caps and EV removal, starter randomization, enemy
+trainer randomization, and evolution-family ability randomization are merged into
+`romhack/main`. Learnset randomization, evolution changes, and quality-of-life
 hooks have not been implemented.
 
 ## Validation already performed
@@ -212,10 +211,10 @@ Manual gameplay validation still required:
 - Confirm battles, vitamins, feathers, and EV-affecting berries cannot produce
   positive EVs from a fresh zero-EV Pokemon.
 
-## Current phase: starters
+## Completed starter phase
 
-Work is on `romhack/randomizer-starters`. Do not implement this phase directly
-on main, merge it, or push it without explicit approval.
+The starter implementation from `romhack/randomizer-starters` is merged into
+`romhack/main`. Manual gameplay checks listed below remain outstanding.
 
 Call-path review:
 
@@ -260,7 +259,7 @@ Focused validation:
   uniqueness, determinism, save separation, and invalid-slot handling.
 - A normal `make -j4` ROM build succeeds.
 
-## Next phase: enemy trainer parties
+## Completed enemy trainer party phase
 
 The chosen policy is per-encounter trainer randomization:
 
@@ -439,10 +438,35 @@ Manual gameplay validation still required:
 - Exercise Castform, Cherrim, Aegislash, Wishiwashi, Minior, Mimikyu, Cramorant,
   Eiscue, Morpeko, Zygarde, Silvally, Arceus, and Terapagos form behavior.
 
+## Next phase: learnset randomization
+
+Do not add the learnset config gate or hook until the version-1 policy resolves
+all of the following:
+
+- Candidate move pool, including explicit exclusions for unusable, scripted,
+  field-only, form-specific, and otherwise special-case moves.
+- Type weighting: exact STAB preference, coverage/status weighting, and behavior
+  for typeless or form-changing species.
+- Learnset shape: number of moves per level, duplicate policy, level-1 moves,
+  evolution moves, and handling when the filtered pool is too small.
+- Stable identity: exact hash keys for species, learn level, and move slot, plus
+  whether evolution-family identity affects results.
+- Runtime seam inventory covering level-up lookup, move learning after evolution,
+  Move Reminder/relearner behavior, eggs, gifts, wild Pokemon, and trainer-party
+  initial moves.
+- Cache design only after the access pattern and memory cost are measured; EWRAM
+  is currently 89.44% used in the normal build.
+
+First implementation milestone after the policy is documented:
+
+1. Add a pure candidate classifier and deterministic resolver API.
+2. Add focused tests for determinism, seed/species/level/slot separation,
+   weighting boundaries, exclusions, duplicates, and fallback behavior.
+3. Integrate one shared level-up access seam, then validate evolution, reminder,
+   wild, gift, and trainer creation paths independently.
+
 ## Other unresolved architecture
 
-- Learnsets: define the move candidate pool, weighting, duplicate rules, special
-  move exclusions, and evolution behavior.
 - Friendship evolution replacements: create an explicit species-level conversion
   table.
 - Starter randomization: the player-facing three-choice policy is implemented.
