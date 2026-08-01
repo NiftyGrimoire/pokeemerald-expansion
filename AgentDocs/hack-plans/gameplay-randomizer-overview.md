@@ -127,8 +127,11 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      available branch or form, including regional forms, under an explicit
      species-by-species policy.
 10. Quality of life:
-   - Implement and grant Level Capper and Portable Healer after their exact item-use
-     and level-up/evolution behavior is specified.
+   - Add a party-menu button that raises a selected Pokemon to the current level cap.
+     Process the intervening levels in order so every move-learning opportunity and
+     evolution check occurs normally rather than jumping directly to the final level.
+   - Implement and grant the Portable Healer after its exact item-use behavior is
+     specified.
 11. World items:
    - Deterministically randomize item pickups found in the overworld.
    - Limit replacements to items useful in a Nuzlocke, initially held items and
@@ -229,10 +232,13 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
   - Keep existing Emerald cap table initially: 15, 19, 24, 29, 31, 33, 42, 46, champion 58.
   - Set `B_EV_CAP_TYPE = EV_CAP_NO_GAIN`; hide/avoid EV-focused UI where practical.
 - QoL:
-  - Add two reusable Key Items:
-    - Level Capper: choose a party Pokemon and raise it to the current cap, respecting evolution/learn-move flow.
-    - Portable Healer: heal party outside battle using existing party-heal behavior.
-  - Grant both Key Items early in the game, preferably during starter/new-game setup.
+  - Add a reusable action to the party menu that raises the selected Pokemon to the
+    current cap. Award levels sequentially through the normal level-up flow so no
+    learn-move prompt or evolution opportunity is skipped; stop safely if the flow is
+    cancelled or interrupted and never exceed the active cap.
+  - Add a Portable Healer Key Item that heals the party outside battle using existing
+    party-heal behavior, and grant it early in the game, preferably during
+    starter/new-game setup.
 - Friendship evolutions:
   - Replace all `IF_MIN_FRIENDSHIP` evolution conditions with level-based equivalents:
     - Baby/early evolutions: level 20.
@@ -273,7 +279,10 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
   obtainable without waiting for a real-time window and remain stable within a save.
 - Confirm world item replacements are deterministic within a save, differ between
   saves, and never produce an item outside the approved held/evolution-item pool.
-- Confirm Level Capper and Portable Healer work outside battle and are blocked or harmless in battle.
+- Confirm the party-menu level-cap action never exceeds the active cap, processes all
+  intervening move-learning and evolution opportunities in order, and resumes safely
+  after cancellation or interruption.
+- Confirm the Portable Healer works outside battle and is blocked or harmless in battle.
 
 ## Assumptions
 - Development is based on `expansion/1.16.2` and integrated into `romhack/main`.
