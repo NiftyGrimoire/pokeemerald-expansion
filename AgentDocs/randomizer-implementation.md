@@ -3,6 +3,7 @@
 ## Current branch
 
 - Integration branch: `romhack/main`.
+- Active feature branch: `romhack/randomizer-learnsets`.
 - Base: `pokeemerald-expansion` stable `1.16.2`.
 - Push only to the NiftyGrimoire fork through `origin`.
 - Never push to `upstream`.
@@ -33,9 +34,9 @@ broad summary where they differ.
 Wild encounter randomization, BST-scaled ordinary encounter pools, scripted
 encounter randomization, level caps and EV removal, starter randomization, enemy
 trainer randomization, and evolution-family ability randomization are merged into
-`romhack/main`. Learnset randomization has begun with universal TM compatibility;
-randomized level-up learnsets, evolution changes, and quality-of-life hooks have
-not been implemented.
+`romhack/main`. Universal TM compatibility and randomized level-up learnsets are
+implemented on `romhack/randomizer-learnsets` but are not yet merged. Evolution
+changes and quality-of-life hooks have not been implemented.
 
 ## Learnset phase in progress
 
@@ -68,11 +69,19 @@ not been implemented.
   the fallback if no candidate exists.
 - The resolver regenerates into one small EWRAM buffer per accessor call. Add
   a broader cache only if profiling shows this scan is too expensive.
-- Egg-move randomization and any deliberate evolution-family inheritance policy
-  remain unimplemented. Gift, wild, and trainer Pokemon already use the shared
-  initial-moves path unless their data supplies explicit moves.
+- Egg moves intentionally remain authored while breeding is planned for removal.
+  Gift, wild, and trainer Pokemon already use the shared initial-moves path unless
+  their data supplies explicit moves.
 
-## Validation already performed
+Learnset branch validation:
+
+- Nine focused tests cover universal TM compatibility, preserved HM/tutor/egg
+  compatibility, deterministic schedules, cap-band distribution, weighted move
+  strength, exclusions, seed/species separation, and weather/status tiers.
+- A normal `make -j4` ROM build succeeds.
+- Manual gameplay checks remain in the follow-up section below.
+
+## Foundation validation already performed
 
 - Three seed/hash tests passed.
 - One species eligibility test passed.
@@ -474,32 +483,20 @@ Manual gameplay validation still required:
 - Exercise Castform, Cherrim, Aegislash, Wishiwashi, Minior, Mimikyu, Cramorant,
   Eiscue, Morpeko, Zygarde, Silvally, Arceus, and Terapagos form behavior.
 
-## Next phase: learnset randomization
+## Learnset branch follow-up
 
-Do not add the learnset config gate or hook until the version-1 policy resolves
-all of the following:
+Before integrating `romhack/randomizer-learnsets` into `romhack/main`:
 
-- Candidate move pool, including explicit exclusions for unusable, scripted,
-  field-only, form-specific, and otherwise special-case moves.
-- Type weighting: exact STAB preference, coverage/status weighting, and behavior
-  for typeless or form-changing species.
-- Learnset shape: number of moves per level, duplicate policy, level-1 moves,
-  evolution moves, and handling when the filtered pool is too small.
-- Stable identity: exact hash keys for species, learn level, and move slot, plus
-  whether evolution-family identity affects results.
-- Runtime seam inventory covering level-up lookup, move learning after evolution,
-  Move Reminder/relearner behavior, eggs, gifts, wild Pokemon, and trainer-party
-  initial moves.
-- Cache design only after the access pattern and memory cost are measured; EWRAM
-  is currently 89.44% used in the normal build.
-
-First implementation milestone after the policy is documented:
-
-1. Add a pure candidate classifier and deterministic resolver API.
-2. Add focused tests for determinism, seed/species/level/slot separation,
-   weighting boundaries, exclusions, duplicates, and fallback behavior.
-3. Integrate one shared level-up access seam, then validate evolution, reminder,
-   wild, gift, and trainer creation paths independently.
+1. Review the complete branch diff against `romhack/main` and rerun the focused
+   randomizer tests plus a normal ROM build.
+2. Manually verify initial moves, ordinary level-up learning, evolution learning,
+   Move Reminder output, Pokedex output, and trainer/wild/gift initial moves.
+3. Check representative early-, middle-, and late-game species across multiple
+   seeds for useful move variety and the intended power/status progression.
+4. Profile learnset access only if gameplay shows visible delay; retain the single
+   shared EWRAM buffer unless measurement justifies a broader cache.
+5. Leave egg moves authored while breeding is slated for removal. Define a new
+   policy only if egg moves receive a non-breeding acquisition path.
 
 ## Other unresolved architecture
 
@@ -514,4 +511,9 @@ First implementation milestone after the policy is documented:
   stable pickup identity, and build an approved Nuzlocke-useful replacement pool
   limited initially to held items and evolution items. Explicitly decide key-item,
   TM, duplicate, respawn, and progression-critical-item handling.
-- Level Capper: specify exact level-up, move-learning, and evolution behavior.
+- Level-to-cap action: expose one shared sequential leveling flow from both the
+  party menu and Pokemon Storage, preserving every move-learning and evolution
+  opportunity and writing boxed changes back without requiring a party slot.
+- Streamlined progression: audit breeding-dependent content, obsolete EV content,
+  mandatory grinding against each cap, and optional plot detours before choosing
+  concrete EXP, trainer, encounter, or script changes.

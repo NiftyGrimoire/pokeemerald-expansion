@@ -23,19 +23,34 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
 - Evolution-family identity and the exact randomized-ability representation remain
   open design questions. No ability hook should be implemented until both are
   specified together.
-- Randomized learnsets will be resolved at runtime and may use a cache if profiling
-  shows it is needed. The move pool, weighting, duplicate policy, and evolution move
-  behavior must be specified before hooking learnset access.
+- Randomized learnsets resolve at runtime on the active feature branch. The version-1
+  move pool, weighting, duplicate policy, schedule, and access seam are documented in
+  the implementation handoff. Add a broader cache only if profiling shows it is
+  needed.
 
-## Development Phases
-1. Foundation (complete on `romhack/main`):
+## Roadmap and Task List
+
+Status in this list is authoritative for phase-level planning. Detailed completed
+behavior and validation belong in `AgentDocs/randomizer-implementation.md`.
+"Implemented on feature branch" does not mean merged into `romhack/main`.
+
+Current execution order:
+
+1. Finish review, gameplay validation, and integration of Phase 8.
+2. Implement Phase 9 so evolution access matches the short-run format.
+3. Implement Phase 10's shared level-to-cap flow and Portable Healer.
+4. Specify and implement the Phase 11 world-item pool and safeguards.
+5. Audit and tune whole-game progression in Phase 12 after the preceding systems
+   can be evaluated together.
+
+1. Foundation — complete on `romhack/main`:
    - Add a master compile-time config gate, enabled for this hack.
    - Store and initialize the per-save seed and algorithm version.
    - Add a pure, deterministic, category-separated hash API.
    - Add the shared species eligibility helper.
    - Add focused unit tests for initialization, determinism, category/key separation,
      and representative eligible/ineligible species.
-2. Encounters (complete on `romhack/main`; manual gameplay/performance checks remain):
+2. Encounters — complete on `romhack/main`; manual gameplay/performance checks remain:
    - Specify which normal, fishing, rock-smash, outbreak, Feebas, scripted, and
      DexNav paths are randomized.
    - Implement a deterministic eligible-species pool and hook the agreed paths after
@@ -44,7 +59,7 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      from lower-BST species and high-level areas draw from higher-BST species.
    - Derive the difficulty band from stable encounter-table data rather than the
      mutable level roll, preserving deterministic slot mappings.
-3. Legendary encounters (complete on `romhack/main`; manual gameplay checks remain):
+3. Legendary encounters — complete on `romhack/main`; manual gameplay checks remain:
    - Route ordinary `setwildbattle` encounters through the regular BST-scaled
      encounter resolver using their fixed scripted level.
    - Randomize scripted/static encounters only when the original species is a
@@ -57,15 +72,16 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      behavior while replacing only its species.
    - Manually verify the Emerald Legendary encounters, including capture/defeat
      flags and repeat-entry behavior.
-4. Level caps and EV removal (complete on `romhack/main`; manual gameplay checks
-   remain):
+4. Level caps and EV removal — complete on `romhack/main`; manual gameplay checks
+   remain:
    - Enable the existing hard Emerald flag-based level-cap system.
    - Prevent Rare Candies and EXP Candies from exceeding the active cap.
    - Disable battle EV gain and prevent EV-boosting items from bypassing the
      zero-EV cap.
    - Manually verify battle experience, cap progression, candy behavior, and all
-     EV-changing item paths before building the Level Capper on these rules.
-5. Starters (complete on `romhack/main`; manual gameplay checks remain):
+     EV-changing item paths before building the shared level-to-cap action on these
+     rules.
+5. Starters — complete on `romhack/main`; manual gameplay checks remain:
    - Deterministically select three distinct starter choices for each save.
    - Limit choices to enabled, generally usable, non-special base-stage Pokemon
      with BST 300-350 and a complete three-stage evolution line.
@@ -75,8 +91,8 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      parties follow the enemy-trainer policy below.
    - Manually verify selection labels, sprites, cries, confirmation, the granted
      Pokemon, party checks, and save-to-save variation in gameplay.
-6. Enemy trainer parties (complete on `romhack/main`; manual gameplay checks
-   remain):
+6. Enemy trainer parties — complete on `romhack/main`; manual gameplay checks
+   remain:
    - Randomize ordinary enemy party species per configured trainer encounter.
    - Key each slot by the save seed, algorithm version, trainer ID, and party slot
      so the same encounter is stable within a save but differs across saves.
@@ -94,7 +110,7 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
    - Manually verify ordinary, rival, boss, override, and pooled trainers;
      save-to-save variation; repeated-encounter stability; and held-item/gimmick
      behavior.
-7. Abilities (complete on `romhack/main`; manual gameplay checks remain):
+7. Abilities — complete on `romhack/main`; manual gameplay checks remain:
    - Resolve one deterministic ability ID per enabled evolution-graph family.
    - Route normal party, box, battle, UI, and overworld reads through
      `GetAbilityBySpecies` while preserving the saved authored ability slot.
@@ -102,7 +118,8 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      form/signature-only, Wonder Guard, placeholder, and unimplemented abilities
      from the version-1 candidate pool.
    - Cache family identities and resolved family abilities in EWRAM.
-8. Learnsets (in progress; universal TM compatibility implemented):
+8. Learnsets — implemented on `romhack/randomizer-learnsets`; integration and
+   manual gameplay checks remain:
    - Allow every enabled real Pokemon species to learn every configured TM while
      preserving authored HM and move-tutor compatibility.
    - Give each species four starting moves at level 1, then front-load new moves
@@ -117,16 +134,16 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
    - Resolve through the shared level-up accessor so initial, level-up, evolution,
      reminder, AI, and Pokedex paths agree. Regenerate into a small shared buffer
      and only add a broader cache after measuring access cost.
-   - Specify egg-move randomization and any evolution-family inheritance policy
-     before expanding this phase further.
-9. Evolution rules:
+   - Do not expand egg-move support while breeding is planned for removal. Revisit
+     egg moves only if a non-breeding acquisition path is retained or added.
+9. Evolution rules — planned:
    - Replace friendship evolutions from an explicit species-by-species conversion
      table, preserving applicable secondary conditions.
    - Make time-dependent and alternate-form evolution lines practical in a short
      Nuzlocke: replace day/night dependencies and deterministically randomize the
      available branch or form, including regional forms, under an explicit
      species-by-species policy.
-10. Quality of life:
+10. Quality of life — planned:
    - Add a button to the party menu and Pokemon Storage that raises a selected
      Pokemon to the current level cap without requiring a boxed Pokemon to be moved
      into the party first. Process the intervening levels in order so every
@@ -134,12 +151,12 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      jumping directly to the final level.
    - Implement and grant the Portable Healer after its exact item-use behavior is
      specified.
-11. World items:
+11. World items — planned:
    - Deterministically randomize item pickups found in the overworld.
    - Limit replacements to items useful in a Nuzlocke, initially held items and
      evolution items; define exclusions and progression safeguards before
      implementation.
-12. Streamlined game progression:
+12. Streamlined game progression — planned:
    - Minimize mandatory grinding so a viable party can stay near each active level
      cap through normal trainer battles and exploration.
    - Remove breeding as a required or supported progression system; audit the Day

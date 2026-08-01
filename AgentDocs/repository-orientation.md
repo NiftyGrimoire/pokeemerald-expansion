@@ -40,8 +40,9 @@ intent. Confirm both against the source before editing.
 - Inspect the branch, worktree, and remotes before committing or pushing.
 - Preserve unrelated tracked and untracked user changes.
 - Do not commit generated ROMs, save files, credentials, or other private data.
-- A request to edit or implement does not by itself authorize committing,
-  merging, or pushing.
+- After reviewing and validating implementation work, agents may make scoped local
+  commits on the active feature branch. Merging into `romhack/main` or pushing still
+  requires the authority described in root `AGENTS.md`.
 
 ## Repository Map
 
@@ -117,12 +118,15 @@ The randomizer is runtime-resolved and deterministic per save:
 - Hash categories and behavior are save-format API; incompatible changes require
   an algorithm-version change.
 
-Foundation, ordinary wild encounter randomization, and BST-scaled encounter
-pools are implemented. The encounter system preserves vanilla encounter checks,
-method, weighted slot selection, and level, then replaces only the species.
-Ordinary pools exclude special classifications reserved for the dedicated
-Legendary scripted pool. Ordinary `setwildbattle` encounters use the regular
-BST-scaled resolver with their fixed scripted level. DexNav, visible overworld
+Foundation, ordinary and scripted encounter randomization, level caps and EV
+removal, starters, enemy trainer parties, and evolution-family abilities are
+implemented on `romhack/main`. The active learnset branch adds universal TM
+compatibility and deterministic, level-weighted level-up learnsets. Consult the
+handoff for its exact branch and validation state rather than assuming feature
+work is already integrated.
+
+The encounter system preserves vanilla encounter checks, method, weighted slot
+selection, and level, then replaces only the species. DexNav, visible overworld
 encounters, roamers, and Battle Pike/Pyramid paths remain outside the completed
 ordinary-encounter scope.
 
@@ -134,11 +138,11 @@ Before any randomizer work, read both:
 For encounter internals, also read
 `RomhackDocs/wild-encounter-randomization.md`.
 
-The documented next phase is scripted Legendary encounters. Starter
-randomization, abilities, learnsets, progression rules, evolution accessibility,
-world-item randomization, and quality-of-life items remain future work with
-unresolved policy recorded in the plan and handoff. Do not advertise a config
-gate or behavior as implemented until its code and validation exist.
+The authoritative phase status and remaining task order are in the roadmap section
+of `gameplay-randomizer-overview.md`. The implementation handoff records detailed
+completed behavior, validation, manual checks, and the safe next work on the active
+branch. Do not advertise a config gate or behavior as integrated until its code and
+validation are present on `romhack/main`.
 
 ## Delegation
 
