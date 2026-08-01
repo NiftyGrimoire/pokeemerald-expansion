@@ -19,6 +19,9 @@
 // Give each ordinary evolution family one deterministic randomized ability.
 #define RANDOMIZER_ABILITIES TRUE
 
+// Allow every enabled Pokemon species to learn every configured TM.
+#define RANDOMIZER_LEARNSETS TRUE
+
 // Changing the hash algorithm or category meanings requires a new version.
 #define RANDOMIZER_ALGORITHM_VERSION 1
 

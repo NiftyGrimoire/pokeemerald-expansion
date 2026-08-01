@@ -33,8 +33,19 @@ broad summary where they differ.
 Wild encounter randomization, BST-scaled ordinary encounter pools, scripted
 encounter randomization, level caps and EV removal, starter randomization, enemy
 trainer randomization, and evolution-family ability randomization are merged into
-`romhack/main`. Learnset randomization, evolution changes, and quality-of-life
-hooks have not been implemented.
+`romhack/main`. Learnset randomization has begun with universal TM compatibility;
+randomized level-up learnsets, evolution changes, and quality-of-life hooks have
+not been implemented.
+
+## Learnset phase in progress
+
+- Every enabled real Pokemon species can learn every configured TM through the
+  shared `CanLearnTeachableMove` compatibility seam.
+- HM and move-tutor compatibility remains authored. Egg and invalid-species
+  safeguards remain unchanged.
+- Level-up learnset randomization still requires the candidate-move, weighting,
+  duplicate, fallback, evolution, and stable-identity policies specified in the
+  primary plan.
 
 ## Validation already performed
 

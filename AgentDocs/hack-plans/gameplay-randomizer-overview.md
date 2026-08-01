@@ -102,7 +102,9 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      form/signature-only, Wonder Guard, placeholder, and unimplemented abilities
      from the version-1 candidate pool.
    - Cache family identities and resolved family abilities in EWRAM.
-8. Learnsets (next phase):
+8. Learnsets (in progress; universal TM compatibility implemented):
+   - Allow every enabled real Pokemon species to learn every configured TM while
+     preserving authored HM and move-tutor compatibility.
    - Specify candidate moves, exclusions, weighting, duplicate and fallback
      rules, evolution behavior, and stable hash identity.
    - Inventory level-up, evolution, reminder, egg, gift, wild, and trainer move

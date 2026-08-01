@@ -1,4 +1,5 @@
 #include "global.h"
+#include "item.h"
 #include "pokemon.h"
 #include "random.h"
 #include "randomizer.h"
@@ -56,6 +57,21 @@ TEST("Randomizer data initialization stores a versioned nonzero seed")
     EXPECT_NE(gSaveBlock3Ptr->randomizerSeed, 0);
     EXPECT_EQ(GetRandomizerSeed(), gSaveBlock3Ptr->randomizerSeed);
     EXPECT_EQ(gSaveBlock3Ptr->randomizerVersion, RANDOMIZER_ALGORITHM_VERSION);
+}
+
+TEST("Learnset randomizer lets every enabled Pokemon learn every TM")
+{
+    for (enum TMHMIndex tm = 1; tm <= NUM_TECHNICAL_MACHINES; tm++)
+        EXPECT(CanLearnTeachableMove(SPECIES_MAGIKARP, GetTMHMMoveId(tm)));
+}
+
+TEST("Learnset randomizer does not broaden HM, tutor, egg, or invalid compatibility")
+{
+    EXPECT(!CanLearnTeachableMove(SPECIES_MAGIKARP, MOVE_SURF));
+    EXPECT(!CanLearnTeachableMove(SPECIES_MAGIKARP, MOVE_SPLASH));
+    EXPECT(!CanLearnTeachableMove(SPECIES_EGG, MOVE_THUNDERBOLT));
+    EXPECT(!CanLearnTeachableMove(SPECIES_NONE, MOVE_THUNDERBOLT));
+    EXPECT(!CanLearnTeachableMove(NUM_SPECIES, MOVE_THUNDERBOLT));
 }
 
 TEST("Randomizer evolution families include linear and branched evolutions")

@@ -5193,8 +5193,19 @@ bool8 TryIncrementMonLevel(struct Pokemon *mon)
 u8 CanLearnTeachableMove(enum Species species, enum Move move)
 {
     const u16 *teachableLearnset = GetSpeciesTeachableLearnset(species);
+
     if (species == SPECIES_EGG)
         return FALSE;
+#if RANDOMIZER_ENABLED && RANDOMIZER_LEARNSETS
+    if (species > SPECIES_NONE && species < NUM_SPECIES && IsSpeciesEnabled(species))
+    {
+        for (enum TMHMIndex tm = 1; tm <= NUM_TECHNICAL_MACHINES; tm++)
+        {
+            if (GetTMHMMoveId(tm) == move)
+                return TRUE;
+        }
+    }
+#endif
     for (u32 i = 0; teachableLearnset[i] != MOVE_UNAVAILABLE; i++)
     {
         if (teachableLearnset[i] == move)
