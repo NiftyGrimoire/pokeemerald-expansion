@@ -127,9 +127,11 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
      available branch or form, including regional forms, under an explicit
      species-by-species policy.
 10. Quality of life:
-   - Add a party-menu button that raises a selected Pokemon to the current level cap.
-     Process the intervening levels in order so every move-learning opportunity and
-     evolution check occurs normally rather than jumping directly to the final level.
+   - Add a button to the party menu and Pokemon Storage that raises a selected
+     Pokemon to the current level cap without requiring a boxed Pokemon to be moved
+     into the party first. Process the intervening levels in order so every
+     move-learning opportunity and evolution check occurs normally rather than
+     jumping directly to the final level.
    - Implement and grant the Portable Healer after its exact item-use behavior is
      specified.
 11. World items:
@@ -232,10 +234,12 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
   - Keep existing Emerald cap table initially: 15, 19, 24, 29, 31, 33, 42, 46, champion 58.
   - Set `B_EV_CAP_TYPE = EV_CAP_NO_GAIN`; hide/avoid EV-focused UI where practical.
 - QoL:
-  - Add a reusable action to the party menu that raises the selected Pokemon to the
-    current cap. Award levels sequentially through the normal level-up flow so no
+  - Add a reusable action to both the party menu and Pokemon Storage that raises the
+    selected Pokemon to the current cap. Boxed Pokemon must not need a temporary open
+    party slot. Both entry points must use the same sequential level-up flow so no
     learn-move prompt or evolution opportunity is skipped; stop safely if the flow is
-    cancelled or interrupted and never exceed the active cap.
+    cancelled or interrupted, persist all changes to the correct party or box slot,
+    and never exceed the active cap.
   - Add a Portable Healer Key Item that heals the party outside battle using existing
     party-heal behavior, and grant it early in the game, preferably during
     starter/new-game setup.
@@ -279,9 +283,10 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
   obtainable without waiting for a real-time window and remain stable within a save.
 - Confirm world item replacements are deterministic within a save, differ between
   saves, and never produce an item outside the approved held/evolution-item pool.
-- Confirm the party-menu level-cap action never exceeds the active cap, processes all
-  intervening move-learning and evolution opportunities in order, and resumes safely
-  after cancellation or interruption.
+- Confirm the party-menu and Pokemon Storage level-cap actions never exceed the active
+  cap, process all intervening move-learning and evolution opportunities in order,
+  resume safely after cancellation or interruption, and correctly persist changes to
+  party and boxed Pokemon without requiring a free party slot.
 - Confirm the Portable Healer works outside battle and is blocked or harmless in battle.
 
 ## Assumptions
