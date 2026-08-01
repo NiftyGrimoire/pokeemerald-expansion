@@ -13,10 +13,10 @@ Implemented on `romhack/randomizer-evolution-rules`:
 - Audited day, night, and evening restrictions are removed.
 - Audited regional pairs choose one result deterministically per save.
 - Paired clock branches choose one result deterministically per save.
+- Milcery keeps its held Sweet as the decoration choice while the save selects
+  one of nine cream flavors; any valid spin can trigger that selected result.
 
-Milcery and Alcremie are intentionally still authored while their 63-result
-Sweet, spin, and flavor mapping is specified. No other evolution mechanic is
-globally broadened.
+No other evolution mechanic is globally broadened.
 
 ## Determinism contract
 
@@ -96,6 +96,7 @@ level, item, move, form, and other non-clock requirements remain intact.
 | Snom | Frosmoth | Level 30 replacement for friendship |
 | Greavard | Houndstone | Level 30 |
 | Ursaring | Ursaluna | Peat Block retained; Hisui and night checks removed |
+| Milcery | Selected Alcremie flavor | Held Sweet retained; clock and precise spin requirement removed |
 
 ## Regional restrictions removed and randomized
 
@@ -127,8 +128,11 @@ item, move, and other non-region requirements remain intact.
   available. Only Espeon versus Umbreon is a deterministic pair.
 - Own Tempo Rockruff still evolves only into Dusk Lycanroc; only its evening
   restriction is removed.
-- Milcery still uses its authored Sweet, spin, and time mapping pending a
-  dedicated deterministic 63-result policy.
+- Milcery's held Sweet still determines Strawberry, Berry, Love, Star, Clover,
+  Flower, or Ribbon decoration. The save seed selects one common cream flavor
+  from Vanilla, Ruby, Matcha, Mint, Lemon, Salted, Ruby Swirl, Caramel Swirl,
+  or Rainbow Swirl. Any valid spin action triggers the selected Sweet/flavor
+  result without checking time, direction, or spin duration.
 
 ## Validation
 
@@ -140,6 +144,8 @@ Focused tests cover:
 - Exactly one selected target in a declared pair.
 - Stability within a save and variation across seeds.
 - A Rockruff evolving into its selected form without consulting the clock.
+- Exactly one Milcery cream flavor being shared across all seven Sweets.
+- Milcery evolving to the selected held-Sweet result from an arbitrary spin.
 
 Manual gameplay checks still required:
 
@@ -149,3 +155,5 @@ Manual gameplay checks still required:
   multiple saves.
 - Verify Eevee's Fairy-move precedence and selected Espeon/Umbreon fallback.
 - Verify cancellation and retry do not change the selected target.
+- Exercise at least two different Sweets on Milcery and confirm that decoration
+  follows the held item while cream flavor stays fixed within the save.

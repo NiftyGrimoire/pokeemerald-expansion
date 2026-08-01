@@ -136,7 +136,8 @@ Current execution order:
      and only add a broader cache after measuring access cost.
    - Do not expand egg-move support while breeding is planned for removal. Revisit
      egg moves only if a non-breeding acquisition path is retained or added.
-9. Evolution rules — planned:
+9. Evolution rules — implemented on `romhack/randomizer-evolution-rules`;
+   manual gameplay checks remain:
    - The authoritative species-level conversion ledger is
      `AgentDocs/hack-plans/evolution-rules.md`.
    - Replace friendship evolutions from an explicit species-by-species conversion

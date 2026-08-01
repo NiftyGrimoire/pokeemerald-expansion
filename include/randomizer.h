@@ -32,6 +32,7 @@ enum Species GetRandomizerEvolutionFamily(enum Species species);
 u8 GetRandomizerFriendshipEvolutionLevel(enum Species species);
 bool32 IsRandomizerEvolutionTargetSelected(enum Species species, enum Species targetSpecies);
 bool32 ShouldRandomizerIgnoreEvolutionCondition(enum Species species, u16 condition);
+bool32 ShouldRandomizerIgnoreEvolutionSpin(enum Species species);
 bool32 IsAbilityRandomizerEligible(enum Ability ability);
 bool32 IsMoveRandomizerEligible(enum Move move);
 u32 GetRandomizerMoveWeightForLevel(enum Species species, enum Move move, u8 level);

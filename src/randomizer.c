@@ -130,9 +130,31 @@ static bool32 IsSelectedRandomizerEvolutionTarget(enum Species species, enum Spe
     return targetSpecies == selectedTarget;
 }
 
+static s32 GetAlcremieFlavorIndex(enum Species targetSpecies)
+{
+    if (targetSpecies == SPECIES_ALCREMIE_STRAWBERRY_VANILLA_CREAM)
+        return 0;
+    if (targetSpecies >= SPECIES_ALCREMIE_STRAWBERRY_RUBY_CREAM
+     && targetSpecies <= SPECIES_ALCREMIE_STRAWBERRY_RAINBOW_SWIRL)
+        return targetSpecies - SPECIES_ALCREMIE_STRAWBERRY_RUBY_CREAM + 1;
+    if (targetSpecies >= SPECIES_ALCREMIE_BERRY_VANILLA_CREAM
+     && targetSpecies <= SPECIES_ALCREMIE_RIBBON_RAINBOW_SWIRL)
+        return (targetSpecies - SPECIES_ALCREMIE_BERRY_VANILLA_CREAM) % 9;
+    return -1;
+}
+
 bool32 IsRandomizerEvolutionTargetSelected(enum Species species, enum Species targetSpecies)
 {
 #if RANDOMIZER_ENABLED && RANDOMIZER_EVOLUTIONS
+    if (species == SPECIES_MILCERY)
+    {
+        s32 flavorIndex = GetAlcremieFlavorIndex(targetSpecies);
+
+        if (flavorIndex < 0)
+            return TRUE;
+        return flavorIndex == RandomizerHash(GetRandomizerSeed(), RANDOMIZER_CATEGORY_EVOLUTION, species, 9, 0) % 9;
+    }
+
     switch (species)
     {
     case SPECIES_EEVEE:
@@ -180,6 +202,7 @@ bool32 ShouldRandomizerIgnoreEvolutionCondition(enum Species species, u16 condit
     {
         switch (species)
         {
+        case SPECIES_MILCERY:
         case SPECIES_RATTATA_ALOLA:
         case SPECIES_CUBONE:
         case SPECIES_HAPPINY:
@@ -231,6 +254,15 @@ bool32 ShouldRandomizerIgnoreEvolutionCondition(enum Species species, u16 condit
 #endif
 
     return FALSE;
+}
+
+bool32 ShouldRandomizerIgnoreEvolutionSpin(enum Species species)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_EVOLUTIONS
+    return species == SPECIES_MILCERY;
+#else
+    return FALSE;
+#endif
 }
 
 bool32 IsMoveRandomizerEligible(enum Move move)

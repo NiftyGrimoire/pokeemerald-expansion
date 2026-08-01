@@ -512,18 +512,21 @@ The authoritative species-by-species behavior is documented in
 - The target filter is used by normal, trade, item, battle-special, overworld,
   and script-trigger evolution scans so a non-selected form cannot leak through
   another access mode.
-- Milcery's 63 Sweet/spin/flavor outcomes remain authored until that larger
-  form policy is specified and tested.
+- Milcery preserves its held Sweet as the decoration choice, selects one of nine
+  cream flavors per save, and accepts any valid spin without a clock, direction,
+  or duration restriction.
 
 Focused validation currently covers the explicit friendship tiers, an actual
 zero-friendship level evolution, allowlisted condition bypasses, deterministic
 and seed-separated branch selection, a clock-independent Rockruff evolution,
-and a region-independent Pikachu stone evolution.
+and a region-independent Pikachu stone evolution. Milcery coverage verifies one
+stable flavor across all Sweets and an actual held-Sweet evolution from an
+arbitrary spin.
 
 ## Other unresolved architecture
 
-- Evolution rules: finish the deterministic Milcery/Alcremie policy, then run
-  the normal ROM build and manual gameplay checks from the evolution ledger.
+- Evolution rules: complete the manual gameplay checks from the evolution
+  ledger before integration.
 - Starter randomization: the player-facing three-choice policy is implemented.
   Rival parties are governed independently by the enemy-trainer policy above.
 - Time-dependent and alternate-form evolutions: define a species-level policy that
