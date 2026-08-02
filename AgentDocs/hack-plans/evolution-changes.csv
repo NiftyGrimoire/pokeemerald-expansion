@@ -101,3 +101,6 @@ Move,Steenee,Tsareena,Know Stomp,Level 28,Move requirement removed
 Move,Poipole,Naganadel,Know Dragon Pulse,Level 40,Move requirement removed
 Move,Dipplin,Hydrapple,Know Dragon Cheer,Level 40,Move requirement removed
 Move,Clobbopus,Grapploct,Know Taunt,Level 35,Move requirement removed
+Special item,Applin,Flapple,Tart Apple,Fire Stone,Player-controlled branch retained
+Special item,Applin,Appletun,Sweet Apple,Sun Stone,Player-controlled branch retained
+Special item,Applin,Dipplin,Syrupy Apple,Leaf Stone,Dipplin evolves into Hydrapple at level 40

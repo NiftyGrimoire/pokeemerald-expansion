@@ -496,6 +496,13 @@ TEST("Consolidated held-item evolutions use balanced evolution stones")
         EXPECT(HasTestItemEvolution(cases[i].source, cases[i].target, cases[i].item));
 }
 
+TEST("Applin branches use distinct evolution stones")
+{
+    EXPECT(HasTestItemEvolution(SPECIES_APPLIN, SPECIES_FLAPPLE, ITEM_FIRE_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_APPLIN, SPECIES_APPLETUN, ITEM_SUN_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_APPLIN, SPECIES_DIPPLIN, ITEM_LEAF_STONE));
+}
+
 TEST("Milcery selects one stable cream flavor for every Sweet")
 {
     static const enum Species strawberryTargets[] =

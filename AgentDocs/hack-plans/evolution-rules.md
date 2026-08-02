@@ -222,6 +222,17 @@ other direct-use evolution items, including Milcery's Sweets.
 | Sneasel | Weavile | Razor Claw | Dusk Stone |
 | Hisuian Sneasel | Sneasler | Razor Claw | Dawn Stone |
 
+### Apple evolution replacements
+
+| Source | Target | Former item | Replacement stone |
+| --- | --- | --- | --- |
+| Applin | Flapple | Tart Apple | Fire Stone |
+| Applin | Appletun | Sweet Apple | Sun Stone |
+| Applin | Dipplin | Syrupy Apple | Leaf Stone |
+
+All three Applin branches remain directly player-controlled. Dipplin then
+evolves into Hydrapple at level 40 as documented above.
+
 ## Explicitly unchanged evolution behavior
 
 - Evolution stones, held items, known-move requirements, gender checks, stat
@@ -263,6 +274,7 @@ Manual gameplay checks still required:
 
 - Exercise at least one evolution from each friendship tier.
 - Exercise the replacement stones for Happiny, Gligar, and both Sneasel forms.
+- Exercise all three stone-based Applin branches and Dipplin's level-40 follow-up.
 - Exercise a stone-based regional pair and a level-based regional pair across
   multiple saves.
 - Verify Eevee's Fairy-move precedence and selected Espeon/Umbreon fallback.

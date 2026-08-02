@@ -529,6 +529,8 @@ The authoritative species-by-species behavior is documented in
 - All move and move-type evolution checks are replaced by explicit levels so
   randomized learnsets cannot block evolution. Sylveon joins Espeon and Umbreon
   in one seeded level-30 Eevee choice; Eevee's stone routes remain available.
+- Applin uses Fire, Sun, and Leaf Stones for Flapple, Appletun, and Dipplin
+  respectively; Dipplin then evolves into Hydrapple at level 40.
 
 Focused validation currently covers the explicit friendship tiers, an actual
 zero-friendship level evolution, allowlisted condition bypasses, deterministic

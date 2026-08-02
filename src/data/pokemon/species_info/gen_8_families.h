@@ -2465,10 +2465,10 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         .levelUpLearnset = sApplinLevelUpLearnset,
         .teachableLearnset = sApplinTeachableLearnset,
         .eggMoveLearnset = sApplinEggMoveLearnset,
-        .evolutions = EVOLUTION({EVO_ITEM, ITEM_TART_APPLE, SPECIES_FLAPPLE},
-                                {EVO_ITEM, ITEM_SWEET_APPLE, SPECIES_APPLETUN}
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_FIRE_STONE, SPECIES_FLAPPLE},
+                                {EVO_ITEM, ITEM_SUN_STONE, SPECIES_APPLETUN}
                             #if P_GEN_9_CROSS_EVOS
-                                ,{EVO_ITEM, ITEM_SYRUPY_APPLE, SPECIES_DIPPLIN}
+                                ,{EVO_ITEM, ITEM_LEAF_STONE, SPECIES_DIPPLIN}
                             #endif
                             ),
     },
