@@ -570,6 +570,9 @@ replacement routes retain their intended target.
 - Summary IV view: add an option on the Pokemon summary stats page to show all six
   IV values and return cleanly to the normal stat display. This is display-only;
   it must not mutate IVs or other Pokemon data.
+- Bag Repel: add a reusable Bag-facing option for enabling and disabling repel
+  behavior without consuming standard Repel items. Specify whether this is a Key
+  Item or direct Bag toggle and define its encounter-level behavior before coding.
 - Level-to-cap action: implementation is complete on
   `romhack/qol-level-to-cap`. `TryAdvanceMonOneLevelToCap` provides the shared
   one-level stat/experience step and stops at the active cap. The field party

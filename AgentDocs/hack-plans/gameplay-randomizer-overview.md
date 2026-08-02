@@ -156,6 +156,9 @@ Current execution order:
      jumping directly to the final level.
    - Add an option on the Pokemon summary stats page to display the Pokemon's
      individual IV values, with a clear way to return to the normal stat view.
+   - Add a Bag Repel QoL option. Specify whether it is a reusable Key Item or a
+     direct Bag toggle, along with its encounter-level rule and how the player
+     disables it, before implementation.
    - Implement and grant the Portable Healer after its exact item-use behavior is
      specified.
 11. World items — planned:
@@ -282,6 +285,9 @@ Current execution order:
     starter/new-game setup.
   - Add a summary-screen stats-page option that toggles between the normal stat
     presentation and explicit IV values without changing the Pokemon.
+  - Add a Bag Repel option for enabling and disabling repel behavior without
+    consuming ordinary Repel items; finalize its exact Bag UX and encounter rule
+    before implementation.
 - Friendship evolutions:
   - Replace all `IF_MIN_FRIENDSHIP` evolution conditions with level-based equivalents:
     - Baby/early evolutions: level 20.
