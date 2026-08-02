@@ -41,13 +41,22 @@ TEST("Level-to-cap stepping advances exactly one level and stops at the cap")
 {
     struct Pokemon mon;
     u32 previousLevel;
+    u32 previousMaxHp;
+    u32 damagedHp;
+    u32 expectedExp;
 
     ClearProgressionFlags();
     CreateRandomMonWithIVs(&mon, SPECIES_PIKACHU, 5, 0);
 
     previousLevel = GetMonData(&mon, MON_DATA_LEVEL);
+    previousMaxHp = GetMonData(&mon, MON_DATA_MAX_HP);
+    damagedHp = previousMaxHp - 3;
+    SetMonData(&mon, MON_DATA_HP, &damagedHp);
+    expectedExp = gExperienceTables[gSpeciesInfo[SPECIES_PIKACHU].growthRate][previousLevel + 1];
     EXPECT(TryAdvanceMonOneLevelToCap(&mon));
     EXPECT_EQ(GetMonData(&mon, MON_DATA_LEVEL), previousLevel + 1);
+    EXPECT_EQ(GetMonData(&mon, MON_DATA_EXP), expectedExp);
+    EXPECT_EQ(GetMonData(&mon, MON_DATA_MAX_HP) - GetMonData(&mon, MON_DATA_HP), 3);
 
     while (TryAdvanceMonOneLevelToCap(&mon))
         previousLevel = GetMonData(&mon, MON_DATA_LEVEL);

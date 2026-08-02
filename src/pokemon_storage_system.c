@@ -3842,18 +3842,23 @@ static void FreePokeStorageData(void)
     FreeAllWindowBuffers();
 }
 
-static void FinishStorageLevelToCap(void)
+static void PersistStorageLevelToCap(void)
 {
     if (sStorageLevelFromParty)
         gParties[B_TRAINER_PLAYER][sStorageLevelPosition] = sStorageLevelMon;
     else
         SetBoxMonAt(sStorageLevelBoxId, sStorageLevelPosition, &sStorageLevelMon.box);
+}
 
+static void FinishStorageLevelToCap(void)
+{
+    PersistStorageLevelToCap();
     CB2_ReturnToPokeStorage();
 }
 
 static void CB2_ReturnFromStorageLevelEvolution(void)
 {
+    PersistStorageLevelToCap();
     if (GetMonData(&sStorageLevelMon, MON_DATA_SPECIES) != sStorageLevelExpectedSpecies)
     {
         sStorageLevelExpectedSpecies = SPECIES_NONE;
@@ -3879,6 +3884,7 @@ static void CB2_ContinueStorageLevelToCap(void)
             RemoveMonPPBonus(&sStorageLevelMon, moveSlot);
             SetMonMoveSlot(&sStorageLevelMon, gMoveToLearn, moveSlot);
         }
+        PersistStorageLevelToCap();
         sStorageLevelAwaitingMove = FALSE;
     }
 
@@ -3891,6 +3897,7 @@ static void CB2_ContinueStorageLevelToCap(void)
                 FinishStorageLevelToCap();
                 return;
             }
+            PersistStorageLevelToCap();
             learnResult = MonTryLearningNewMove(&sStorageLevelMon, TRUE);
             sStorageLevelLearningMoves = TRUE;
         }
@@ -3898,6 +3905,7 @@ static void CB2_ContinueStorageLevelToCap(void)
         {
             learnResult = MonTryLearningNewMove(&sStorageLevelMon, FALSE);
         }
+        PersistStorageLevelToCap();
 
         if (learnResult == MON_HAS_MAX_MOVES)
         {

@@ -567,7 +567,7 @@ replacement routes retain their intended target.
   against the Portable Healer design, and X-items against the intended battle-item
   rules, so dead or low-value rewards do not enter the pool. Explicitly decide
   key-item, TM, duplicate, respawn, and progression-critical-item handling.
-- Level-to-cap action: implementation is in progress on
+- Level-to-cap action: implementation is complete on
   `romhack/qol-level-to-cap`. `TryAdvanceMonOneLevelToCap` provides the shared
   one-level stat/experience step and stops at the active cap. The field party
   menu exposes `LEVEL TO CAP` and runs the existing stat, move-learning, and
@@ -581,6 +581,12 @@ replacement routes retain their intended target.
   original party or box position before rebuilding the Storage screen. If the
   player stops an evolution, both entry points stop the larger level-to-cap
   operation at that point and retain the levels already processed.
+  Storage checkpoints the source party or box record after each completed level,
+  move decision, and evolution rather than deferring persistence until the end.
+  The focused cap suite passes 4/4 and the ROM builds successfully. A broad test
+  run also passed the level-to-cap and party-navigation coverage but remains
+  globally red because of unrelated existing overworld-ability and battle-test
+  failures; use the focused suite as this feature's automated gate.
 - Streamlined progression: remove breeding and berry planting/growth/harvesting
   as supported mechanics. Audit the Day Care, eggs, inherited moves,
   breeding-only content, berry plots, berry tutorials and NPCs, and any dependent
