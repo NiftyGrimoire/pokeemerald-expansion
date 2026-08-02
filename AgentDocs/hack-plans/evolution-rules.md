@@ -18,6 +18,7 @@ Implemented on `romhack/randomizer-evolution-rules`:
 - Location-based level-up routes are removed in favor of their existing
   location-free evolution stones.
 - Trade routes are removed in favor of direct-use evolution items.
+- Move and move-type requirements are replaced by explicit levels.
 
 No other evolution mechanic is globally broadened.
 
@@ -31,9 +32,9 @@ source species, and the two candidate targets. The selected target is stable
 within a save and does not consume either mutable RNG stream. A different save
 can select the other target.
 
-Only the listed pair is filtered. Unrelated evolutions from the same source
-remain available. For example, Eevee's stone evolutions and its Leafeon,
-Glaceon, and Sylveon routes are not removed by the Espeon/Umbreon selection.
+Only the listed alternatives are filtered. Unrelated evolutions from the same
+source remain available. Eevee's stone evolutions remain player-controlled,
+while Sylveon, Espeon, and Umbreon form one seeded level-30 choice.
 
 ## Friendship replacements
 
@@ -59,8 +60,7 @@ friendship. Any other authored condition on that evolution remains required.
 | --- | --- | --- |
 | Golbat | Crobat | None |
 | Alolan Meowth | Alolan Persian | None |
-| Eevee | Sylveon | Must know a Fairy-type move |
-| Eevee | Espeon or Umbreon | One target selected per save; clock restriction removed |
+| Eevee | Sylveon, Espeon, or Umbreon | One target selected per save; move and clock restrictions removed |
 | Buneary | Lopunny | None |
 | Riolu | Lucario | Clock restriction removed |
 | Woobat | Swoobat | None |
@@ -115,7 +115,7 @@ item, move, and other non-region requirements remain intact.
 | Exeggcute | Exeggutor / Alolan Exeggutor | Leaf Stone |
 | Cubone | Marowak / Alolan Marowak | Level 28 |
 | Koffing | Weezing / Galarian Weezing | Level 35 |
-| Mime Jr. | Mr. Mime / Galarian Mr. Mime | Must know Mimic |
+| Mime Jr. | Mr. Mime / Galarian Mr. Mime | Level 32 |
 | Quilava | Typhlosion / Hisuian Typhlosion | Level 36 |
 | Dewott | Samurott / Hisuian Samurott | Level 36 |
 | Petilil | Lilligant / Hisuian Lilligant | Sun Stone |
@@ -124,6 +124,30 @@ item, move, and other non-region requirements remain intact.
 | Bergmite | Avalugg / Hisuian Avalugg | Level 37 |
 | Dartrix | Decidueye / Hisuian Decidueye | Level 34 for both forms |
 | Ursaring | Ursaluna | Peat Block; region check removed |
+
+## Move requirements replaced
+
+Randomized learnsets cannot guarantee access to an authored evolution move.
+Every move or move-type condition is therefore replaced by an explicit level.
+Other form-selection conditions remain as noted.
+
+| Source | Target | Former move | Replacement level | Preserved behavior |
+| --- | --- | --- | ---: | --- |
+| Lickitung | Lickilicky | Rollout | 30 | None |
+| Tangela | Tangrowth | Ancient Power | 24 | None |
+| Mime Jr. | Mr. Mime / Galarian Mr. Mime | Mimic | 32 | Seeded form selection |
+| Eevee | Sylveon / Espeon / Umbreon | Fairy-type move for Sylveon | 30 | One target selected per save |
+| Bonsly | Sudowoodo | Mimic | 16 | None |
+| Aipom | Ambipom | Double Hit | 32 | None |
+| Yanma | Yanmega | Ancient Power | 33 | None |
+| Girafarig | Farigiraf | Twin Beam | 32 | None |
+| Dunsparce | Dudunsparce | Hyper Drill | 32 | Personality-based segment form retained |
+| Hisuian Qwilfish | Overqwil | Barb Barrage | 28 | None |
+| Piloswine | Mamoswine | Ancient Power | 34 | None |
+| Steenee | Tsareena | Stomp | 28 | None |
+| Poipole | Naganadel | Dragon Pulse | 40 | None |
+| Dipplin | Hydrapple | Dragon Cheer | 40 | None |
+| Clobbopus | Grapploct | Taunt | 35 | None |
 
 ## Location restrictions removed
 
@@ -206,8 +230,9 @@ other direct-use evolution items, including Milcery's Sweets.
   location evolutions explicitly use their listed stones.
 - No trade trigger remains. Former held-item trades use the stones listed above,
   and plain or partner-specific trades use the Linking Cord.
-- Eevee's Jolteon, Vaporeon, Flareon, Leafeon, Glaceon, and Sylveon routes remain
-  available. Only Espeon versus Umbreon is a deterministic pair.
+- Eevee's Jolteon, Vaporeon, Flareon, Leafeon, and Glaceon routes remain
+  player-controlled. Sylveon, Espeon, and Umbreon form one deterministic
+  level-30 choice.
 - Own Tempo Rockruff still evolves only into Dusk Lycanroc; only its evening
   restriction is removed.
 - Using a Sweet directly from the Bag on Milcery determines its Strawberry,
@@ -232,6 +257,7 @@ Focused tests cover:
   remaining level-up route.
 - Every enabled evolution table containing no trade method, with representative
   Linking Cord and direct-use item routes retained.
+- Every enabled evolution table containing no move or move-type condition.
 
 Manual gameplay checks still required:
 

@@ -332,6 +332,58 @@ TEST("Alternate evolution target selection is deterministic and seed separated")
     EXPECT(foundDifferentSeed);
 }
 
+TEST("Eevee selects exactly one level 30 evolution without move requirements")
+{
+    static const enum Species targets[] = {SPECIES_SYLVEON, SPECIES_ESPEON, SPECIES_UMBREON};
+    u32 selectedCount = 0;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    for (u32 i = 0; i < ARRAY_COUNT(targets); i++)
+    {
+        EXPECT(HasTestLevelEvolution(SPECIES_EEVEE, targets[i], 30));
+        if (IsRandomizerEvolutionTargetSelected(SPECIES_EEVEE, targets[i]))
+            selectedCount++;
+    }
+    EXPECT_EQ(selectedCount, 1);
+    EXPECT(IsRandomizerEvolutionTargetSelected(SPECIES_EEVEE, SPECIES_JOLTEON));
+}
+
+TEST("Evolution tables contain no move requirements")
+{
+    for (enum Species species = SPECIES_NONE; species < NUM_SPECIES; species++)
+    {
+        if (species != SPECIES_NONE && !IsSpeciesEnabled(species))
+            continue;
+        const struct Evolution *evolutions = GetSpeciesEvolutions(species);
+
+        for (u32 i = 0; evolutions != NULL && evolutions[i].method != EVOLUTIONS_END; i++)
+        {
+            const struct EvolutionParam *params = evolutions[i].params;
+
+            for (u32 j = 0; params != NULL && params[j].condition != CONDITIONS_END; j++)
+            {
+                EXPECT_NE(params[j].condition, IF_KNOWS_MOVE);
+                EXPECT_NE(params[j].condition, IF_KNOWS_MOVE_TYPE);
+            }
+        }
+    }
+
+    EXPECT(HasTestLevelEvolution(SPECIES_LICKITUNG, SPECIES_LICKILICKY, 30));
+    EXPECT(HasTestLevelEvolution(SPECIES_TANGELA, SPECIES_TANGROWTH, 24));
+    EXPECT(HasTestLevelEvolution(SPECIES_MIME_JR, SPECIES_MR_MIME, 32));
+    EXPECT(HasTestLevelEvolution(SPECIES_BONSLY, SPECIES_SUDOWOODO, 16));
+    EXPECT(HasTestLevelEvolution(SPECIES_AIPOM, SPECIES_AMBIPOM, 32));
+    EXPECT(HasTestLevelEvolution(SPECIES_YANMA, SPECIES_YANMEGA, 33));
+    EXPECT(HasTestLevelEvolution(SPECIES_GIRAFARIG, SPECIES_FARIGIRAF, 32));
+    EXPECT(HasTestLevelEvolution(SPECIES_DUNSPARCE, SPECIES_DUDUNSPARCE_TWO_SEGMENT, 32));
+    EXPECT(HasTestLevelEvolution(SPECIES_QWILFISH_HISUI, SPECIES_OVERQWIL, 28));
+    EXPECT(HasTestLevelEvolution(SPECIES_PILOSWINE, SPECIES_MAMOSWINE, 34));
+    EXPECT(HasTestLevelEvolution(SPECIES_STEENEE, SPECIES_TSAREENA, 28));
+    EXPECT(HasTestLevelEvolution(SPECIES_POIPOLE, SPECIES_NAGANADEL, 40));
+    EXPECT(HasTestLevelEvolution(SPECIES_DIPPLIN, SPECIES_HYDRAPPLE, 40));
+    EXPECT(HasTestLevelEvolution(SPECIES_CLOBBOPUS, SPECIES_GRAPPLOCT, 35));
+}
+
 TEST("Both Dartrix branches evolve at level 34")
 {
     EXPECT(HasTestLevelEvolution(SPECIES_DARTRIX, SPECIES_DECIDUEYE, 34));

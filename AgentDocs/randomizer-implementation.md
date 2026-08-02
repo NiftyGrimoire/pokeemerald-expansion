@@ -526,6 +526,9 @@ The authoritative species-by-species behavior is documented in
   routes are likewise consolidated into Shiny, Moon, Dusk, and Dawn Stones.
 - Dartrix evolves into either selected Decidueye form at level 34; the Hisuian
   route no longer waits until level 36.
+- All move and move-type evolution checks are replaced by explicit levels so
+  randomized learnsets cannot block evolution. Sylveon joins Espeon and Umbreon
+  in one seeded level-30 Eevee choice; Eevee's stone routes remain available.
 
 Focused validation currently covers the explicit friendship tiers, an actual
 zero-friendship level evolution, allowlisted condition bypasses, deterministic

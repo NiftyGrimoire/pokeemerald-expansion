@@ -130,6 +130,23 @@ static bool32 IsSelectedRandomizerEvolutionTarget(enum Species species, enum Spe
     return targetSpecies == selectedTarget;
 }
 
+static bool32 IsSelectedEeveeLevelEvolutionTarget(enum Species targetSpecies)
+{
+    static const enum Species targets[] =
+    {
+        SPECIES_SYLVEON,
+        SPECIES_ESPEON,
+        SPECIES_UMBREON,
+    };
+
+    for (u32 i = 0; i < ARRAY_COUNT(targets); i++)
+    {
+        if (targetSpecies == targets[i])
+            return i == RandomizerHash(GetRandomizerSeed(), RANDOMIZER_CATEGORY_EVOLUTION, SPECIES_EEVEE, ARRAY_COUNT(targets), 0) % ARRAY_COUNT(targets);
+    }
+    return TRUE;
+}
+
 static s32 GetAlcremieFlavorIndex(enum Species targetSpecies)
 {
     if (targetSpecies == SPECIES_ALCREMIE_STRAWBERRY_VANILLA_CREAM)
@@ -158,7 +175,7 @@ bool32 IsRandomizerEvolutionTargetSelected(enum Species species, enum Species ta
     switch (species)
     {
     case SPECIES_EEVEE:
-        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_ESPEON, SPECIES_UMBREON);
+        return IsSelectedEeveeLevelEvolutionTarget(targetSpecies);
     case SPECIES_ROCKRUFF:
         return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_LYCANROC_MIDDAY, SPECIES_LYCANROC_MIDNIGHT);
     case SPECIES_COSMOEM:

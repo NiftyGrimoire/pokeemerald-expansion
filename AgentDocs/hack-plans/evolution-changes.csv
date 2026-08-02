@@ -9,8 +9,8 @@ Friendship,Chingling,Chimecho,High friendship at night,Level 20,Clock restrictio
 Friendship,Munchlax,Snorlax,High friendship,Level 20,None
 Friendship,Golbat,Crobat,High friendship,Level 30,None
 Friendship,Alolan Meowth,Alolan Persian,High friendship,Level 30,None
-Friendship,Eevee,Sylveon,High friendship while knowing a Fairy-type move,Level 30 while knowing a Fairy-type move,Fairy-type move remains required
-Friendship and seeded branch,Eevee,Espeon or Umbreon,High friendship during the corresponding time,Level 30,One target is selected per save; clock restriction removed
+Friendship and move,Eevee,Sylveon,High friendship while knowing a Fairy-type move,Level 30,One of Sylveon Espeon or Umbreon is selected per save
+Friendship and seeded branch,Eevee,Espeon or Umbreon,High friendship during the corresponding time,Level 30,One of Sylveon Espeon or Umbreon is selected per save; clock restriction removed
 Friendship,Buneary,Lopunny,High friendship,Level 30,None
 Friendship,Riolu,Lucario,High friendship during the day,Level 30,Clock restriction removed
 Friendship,Woobat,Swoobat,High friendship,Level 30,None
@@ -37,7 +37,7 @@ Clock and region,Ursaring,Ursaluna,Peat Block at night in Hisui,Use Peat Block f
 Seeded regional branch,Pikachu,Raichu or Alolan Raichu,Thunder Stone with region deciding form,Thunder Stone,One target is selected per save
 Seeded regional branch,Exeggcute,Exeggutor or Alolan Exeggutor,Leaf Stone with region deciding form,Leaf Stone,One target is selected per save
 Seeded regional branch,Koffing,Weezing or Galarian Weezing,Level 35 with region deciding form,Level 35,One target is selected per save
-Seeded regional branch,Mime Jr.,Mr. Mime or Galarian Mr. Mime,Know Mimic with region deciding form,Know Mimic,One target is selected per save
+Move and seeded regional branch,Mime Jr.,Mr. Mime or Galarian Mr. Mime,Know Mimic with region deciding form,Level 32,One target is selected per save
 Seeded regional branch,Quilava,Typhlosion or Hisuian Typhlosion,Level 36 with region deciding form,Level 36,One target is selected per save
 Seeded regional branch,Dewott,Samurott or Hisuian Samurott,Level 36 with region deciding form,Level 36,One target is selected per save
 Seeded regional branch,Petilil,Lilligant or Hisuian Lilligant,Sun Stone with region deciding form,Sun Stone,One target is selected per save
@@ -88,3 +88,16 @@ Special item,Milcery,Star Alcremie,Hold Star Sweet and perform a matching spin a
 Special item,Milcery,Clover Alcremie,Hold Clover Sweet and perform a matching spin at the correct time,Use Clover Sweet from the Bag,Cream flavor is selected per save
 Special item,Milcery,Flower Alcremie,Hold Flower Sweet and perform a matching spin at the correct time,Use Flower Sweet from the Bag,Cream flavor is selected per save
 Special item,Milcery,Ribbon Alcremie,Hold Ribbon Sweet and perform a matching spin at the correct time,Use Ribbon Sweet from the Bag,Cream flavor is selected per save
+Move,Lickitung,Lickilicky,Know Rollout,Level 30,Move requirement removed
+Move,Tangela,Tangrowth,Know Ancient Power,Level 24,Move requirement removed
+Move,Bonsly,Sudowoodo,Know Mimic,Level 16,Move requirement removed
+Move,Aipom,Ambipom,Know Double Hit,Level 32,Move requirement removed
+Move,Yanma,Yanmega,Know Ancient Power,Level 33,Move requirement removed
+Move,Girafarig,Farigiraf,Know Twin Beam,Level 32,Move requirement removed
+Move,Dunsparce,Dudunsparce,Know Hyper Drill,Level 32,Personality-based two-segment or three-segment result retained
+Move,Hisuian Qwilfish,Overqwil,Know Barb Barrage,Level 28,Move requirement removed
+Move,Piloswine,Mamoswine,Know Ancient Power,Level 34,Move requirement removed
+Move,Steenee,Tsareena,Know Stomp,Level 28,Move requirement removed
+Move,Poipole,Naganadel,Know Dragon Pulse,Level 40,Move requirement removed
+Move,Dipplin,Hydrapple,Know Dragon Cheer,Level 40,Move requirement removed
+Move,Clobbopus,Grapploct,Know Taunt,Level 35,Move requirement removed
