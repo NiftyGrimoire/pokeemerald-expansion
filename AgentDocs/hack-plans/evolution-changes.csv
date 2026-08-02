@@ -33,7 +33,7 @@ Clock,Own Tempo Rockruff,Dusk Lycanroc,Level 25 during evening,Level 25,Clock re
 Clock,Fomantis,Lurantis,Level 34 during the day,Level 34,Clock restriction removed
 Clock and seeded branch,Cosmoem,Solgaleo or Lunala,Level 53 during the corresponding time,Level 53,One target is selected per save; clock restriction removed
 Clock,Greavard,Houndstone,Level 30 at night,Level 30,Clock restriction removed
-Clock and region,Ursaring,Ursaluna,Peat Block at night in Hisui,Use Peat Block from the Bag,Clock and region restrictions removed
+Special item clock and region,Ursaring,Ursaluna,Peat Block at night in Hisui,Moon Stone,Special item clock and region restrictions removed
 Seeded regional branch,Pikachu,Raichu or Alolan Raichu,Thunder Stone with region deciding form,Thunder Stone,One target is selected per save
 Seeded regional branch,Exeggcute,Exeggutor or Alolan Exeggutor,Leaf Stone with region deciding form,Leaf Stone,One target is selected per save
 Seeded regional branch,Koffing,Weezing or Galarian Weezing,Level 35 with region deciding form,Level 35,One target is selected per save
@@ -68,7 +68,7 @@ Plain trade,Pumpkaboo (Super),Gourgeist (Super),Trade,Linking Cord,None
 Held-item trade,Poliwhirl,Politoed,Trade while holding King's Rock,Dawn Stone,None
 Held-item trade,Slowpoke,Slowking,Trade while holding King's Rock,Dawn Stone,None
 Held-item trade,Onix,Steelix,Trade while holding Metal Coat,Dawn Stone,None
-Held-item trade,Scyther,Scizor,Trade while holding Metal Coat,Dusk Stone,Kleavor still uses Black Augurite
+Held-item trade,Scyther,Scizor,Trade while holding Metal Coat,Dusk Stone,Kleavor uses Leaf Stone
 Held-item trade,Seadra,Kingdra,Trade while holding Dragon Scale,Water Stone,None
 Held-item trade,Rhydon,Rhyperior,Trade while holding Protector,Moon Stone,None
 Held-item trade,Electabuzz,Electivire,Trade while holding Electirizer,Thunder Stone,None
@@ -81,13 +81,13 @@ Held-item trade,Clamperl,Huntail,Trade while holding Deep Sea Tooth,Water Stone,
 Held-item trade,Clamperl,Gorebyss,Trade while holding Deep Sea Scale,Shiny Stone,None
 Held-item trade,Spritzee,Aromatisse,Trade while holding Sachet,Shiny Stone,None
 Held-item trade,Swirlix,Slurpuff,Trade while holding Whipped Dream,Sun Stone,None
-Special item,Milcery,Strawberry Alcremie,Hold Strawberry Sweet and perform a matching spin at the correct time,Use Strawberry Sweet from the Bag,Cream flavor is selected per save
-Special item,Milcery,Berry Alcremie,Hold Berry Sweet and perform a matching spin at the correct time,Use Berry Sweet from the Bag,Cream flavor is selected per save
-Special item,Milcery,Love Alcremie,Hold Love Sweet and perform a matching spin at the correct time,Use Love Sweet from the Bag,Cream flavor is selected per save
-Special item,Milcery,Star Alcremie,Hold Star Sweet and perform a matching spin at the correct time,Use Star Sweet from the Bag,Cream flavor is selected per save
-Special item,Milcery,Clover Alcremie,Hold Clover Sweet and perform a matching spin at the correct time,Use Clover Sweet from the Bag,Cream flavor is selected per save
-Special item,Milcery,Flower Alcremie,Hold Flower Sweet and perform a matching spin at the correct time,Use Flower Sweet from the Bag,Cream flavor is selected per save
-Special item,Milcery,Ribbon Alcremie,Hold Ribbon Sweet and perform a matching spin at the correct time,Use Ribbon Sweet from the Bag,Cream flavor is selected per save
+Special item,Milcery,Strawberry Alcremie,Hold Strawberry Sweet and perform a matching spin at the correct time,Fire Stone,Cream flavor is selected per save
+Special item,Milcery,Berry Alcremie,Hold Berry Sweet and perform a matching spin at the correct time,Water Stone,Cream flavor is selected per save
+Special item,Milcery,Love Alcremie,Hold Love Sweet and perform a matching spin at the correct time,Shiny Stone,Cream flavor is selected per save
+Special item,Milcery,Star Alcremie,Hold Star Sweet and perform a matching spin at the correct time,Thunder Stone,Cream flavor is selected per save
+Special item,Milcery,Clover Alcremie,Hold Clover Sweet and perform a matching spin at the correct time,Leaf Stone,Cream flavor is selected per save
+Special item,Milcery,Flower Alcremie,Hold Flower Sweet and perform a matching spin at the correct time,Sun Stone,Cream flavor is selected per save
+Special item,Milcery,Ribbon Alcremie,Hold Ribbon Sweet and perform a matching spin at the correct time,Dawn Stone,Cream flavor is selected per save
 Move,Lickitung,Lickilicky,Know Rollout,Level 30,Move requirement removed
 Move,Tangela,Tangrowth,Know Ancient Power,Level 24,Move requirement removed
 Move,Bonsly,Sudowoodo,Know Mimic,Level 16,Move requirement removed
@@ -104,3 +104,15 @@ Move,Clobbopus,Grapploct,Know Taunt,Level 35,Move requirement removed
 Special item,Applin,Flapple,Tart Apple,Fire Stone,Player-controlled branch retained
 Special item,Applin,Appletun,Sweet Apple,Sun Stone,Player-controlled branch retained
 Special item,Applin,Dipplin,Syrupy Apple,Leaf Stone,Dipplin evolves into Hydrapple at level 40
+Special item,Scyther,Kleavor,Black Augurite,Leaf Stone,Player-controlled branch retained
+Special item,Galarian Slowpoke,Galarian Slowbro,Galarica Cuff,Ice Stone,Player-controlled branch retained
+Special item,Galarian Slowpoke,Galarian Slowking,Galarica Wreath,Shiny Stone,Player-controlled branch retained
+Special item,Phony Sinistea,Phony Polteageist,Cracked Pot,Dawn Stone,Source form preserves outcome
+Special item,Antique Sinistea,Antique Polteageist,Chipped Pot,Dawn Stone,Source form preserves outcome
+Special item,Kubfu,Single Strike Urshifu,Scroll of Darkness,Dusk Stone,Player-controlled branch retained
+Special item,Kubfu,Rapid Strike Urshifu,Scroll of Waters,Water Stone,Player-controlled branch retained
+Special item,Charcadet,Armarouge,Auspicious Armor,Sun Stone,Player-controlled branch retained
+Special item,Charcadet,Ceruledge,Malicious Armor,Dusk Stone,Player-controlled branch retained
+Special item,Duraludon,Archaludon,Metal Alloy,Thunder Stone,None
+Special item,Counterfeit Poltchageist,Unremarkable Sinistcha,Unremarkable Teacup,Ice Stone,Source form preserves outcome
+Special item,Artisan Poltchageist,Masterpiece Sinistcha,Masterpiece Teacup,Ice Stone,Source form preserves outcome

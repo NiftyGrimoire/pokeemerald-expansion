@@ -443,8 +443,6 @@ TEST("Former location evolutions use location-free stones only")
 
 TEST("Evolution tables contain no trade methods")
 {
-    EXPECT(I_USE_EVO_HELD_ITEMS_FROM_BAG);
-
     for (enum Species species = SPECIES_NONE; species < NUM_SPECIES; species++)
     {
         if (species != SPECIES_NONE && !IsSpeciesEnabled(species))
@@ -503,6 +501,62 @@ TEST("Applin branches use distinct evolution stones")
     EXPECT(HasTestItemEvolution(SPECIES_APPLIN, SPECIES_DIPPLIN, ITEM_LEAF_STONE));
 }
 
+TEST("Remaining species-specific item evolutions use ordinary stones")
+{
+    for (enum Species species = SPECIES_NONE; species < NUM_SPECIES; species++)
+    {
+        if (species != SPECIES_NONE && !IsSpeciesEnabled(species))
+            continue;
+        const struct Evolution *evolutions = GetSpeciesEvolutions(species);
+
+        for (u32 i = 0; evolutions != NULL && evolutions[i].method != EVOLUTIONS_END; i++)
+        {
+            if (evolutions[i].method != EVO_ITEM)
+                continue;
+
+            switch (evolutions[i].param)
+            {
+            case ITEM_FIRE_STONE:
+            case ITEM_WATER_STONE:
+            case ITEM_THUNDER_STONE:
+            case ITEM_LEAF_STONE:
+            case ITEM_ICE_STONE:
+            case ITEM_MOON_STONE:
+            case ITEM_SUN_STONE:
+            case ITEM_SHINY_STONE:
+            case ITEM_DUSK_STONE:
+            case ITEM_DAWN_STONE:
+            case ITEM_LINKING_CORD:
+                break;
+            default:
+                EXPECT(FALSE);
+                break;
+            }
+        }
+    }
+
+    EXPECT(HasTestItemEvolution(SPECIES_SCYTHER, SPECIES_KLEAVOR, ITEM_LEAF_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_SLOWPOKE_GALAR, SPECIES_SLOWBRO_GALAR, ITEM_ICE_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_SLOWPOKE_GALAR, SPECIES_SLOWKING_GALAR, ITEM_SHINY_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_SINISTEA_PHONY, SPECIES_POLTEAGEIST_PHONY, ITEM_DAWN_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_SINISTEA_ANTIQUE, SPECIES_POLTEAGEIST_ANTIQUE, ITEM_DAWN_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_URSARING, SPECIES_URSALUNA, ITEM_MOON_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_KUBFU, SPECIES_URSHIFU_SINGLE_STRIKE, ITEM_DUSK_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_KUBFU, SPECIES_URSHIFU_RAPID_STRIKE, ITEM_WATER_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_CHARCADET, SPECIES_ARMAROUGE, ITEM_SUN_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_CHARCADET, SPECIES_CERULEDGE, ITEM_DUSK_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_DURALUDON, SPECIES_ARCHALUDON, ITEM_THUNDER_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_POLTCHAGEIST_COUNTERFEIT, SPECIES_SINISTCHA_UNREMARKABLE, ITEM_ICE_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_POLTCHAGEIST_ARTISAN, SPECIES_SINISTCHA_MASTERPIECE, ITEM_ICE_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_MILCERY, SPECIES_ALCREMIE_STRAWBERRY_VANILLA_CREAM, ITEM_FIRE_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_MILCERY, SPECIES_ALCREMIE_BERRY_VANILLA_CREAM, ITEM_WATER_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_MILCERY, SPECIES_ALCREMIE_LOVE_VANILLA_CREAM, ITEM_SHINY_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_MILCERY, SPECIES_ALCREMIE_STAR_VANILLA_CREAM, ITEM_THUNDER_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_MILCERY, SPECIES_ALCREMIE_CLOVER_VANILLA_CREAM, ITEM_LEAF_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_MILCERY, SPECIES_ALCREMIE_FLOWER_VANILLA_CREAM, ITEM_SUN_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_MILCERY, SPECIES_ALCREMIE_RIBBON_VANILLA_CREAM, ITEM_DAWN_STONE));
+}
+
 TEST("Milcery selects one stable cream flavor for every Sweet")
 {
     static const enum Species strawberryTargets[] =
@@ -547,7 +601,7 @@ TEST("Milcery selects one stable cream flavor for every Sweet")
     EXPECT(IsRandomizerEvolutionTargetSelected(SPECIES_MILCERY, berryTargets[selectedFlavor]));
 }
 
-TEST("Milcery evolves to its selected flavor by using a Sweet from the Bag")
+TEST("Milcery evolves to its selected Strawberry form with a Fire Stone")
 {
     static const enum Species strawberryTargets[] =
     {
@@ -572,9 +626,8 @@ TEST("Milcery evolves to its selected flavor by using a Sweet from the Bag")
     }
     CreateMon(&mon, SPECIES_MILCERY, 20, 0, OTID_STRUCT_PLAYER_ID);
 
-    EXPECT(I_USE_EVO_HELD_ITEMS_FROM_BAG);
     EXPECT_NE(expectedTarget, SPECIES_NONE);
-    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_ITEM_CHECK, ITEM_STRAWBERRY_SWEET, NULL, NULL, CHECK_EVO), expectedTarget);
+    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_ITEM_CHECK, ITEM_FIRE_STONE, NULL, NULL, CHECK_EVO), expectedTarget);
 }
 
 TEST("Ability randomizer excludes unsafe and unimplemented abilities")

@@ -13,7 +13,7 @@ Implemented on `romhack/randomizer-evolution-rules`:
 - Audited day, night, and evening restrictions are removed.
 - Audited regional pairs choose one result deterministically per save.
 - Paired clock branches choose one result deterministically per save.
-- Milcery evolves by using a Sweet directly from the Bag; the Sweet chooses its
+- Milcery evolves with one of seven ordinary stones; the stone chooses its
   decoration while the save selects one of nine cream flavors.
 - Location-based level-up routes are removed in favor of their existing
   location-free evolution stones.
@@ -101,8 +101,8 @@ level, item, move, form, and other non-clock requirements remain intact.
 | Cosmoem | Solgaleo or Lunala | Level 53; deterministic pair |
 | Snom | Frosmoth | Level 30 replacement for friendship |
 | Greavard | Houndstone | Level 30 |
-| Ursaring | Ursaluna | Peat Block retained; Hisui and night checks removed |
-| Milcery | Selected Alcremie flavor | Use a Sweet directly from the Bag; held item, clock, and spin requirements removed |
+| Ursaring | Ursaluna | Moon Stone; Peat Block, Hisui, and night checks removed |
+| Milcery | Selected Alcremie flavor | Use a decoration-specific stone; Sweet, clock, and spin requirements removed |
 
 ## Regional restrictions removed and randomized
 
@@ -123,7 +123,7 @@ item, move, and other non-region requirements remain intact.
 | Goomy | Sliggoo / Hisuian Sliggoo | Level 40 |
 | Bergmite | Avalugg / Hisuian Avalugg | Level 37 |
 | Dartrix | Decidueye / Hisuian Decidueye | Level 34 for both forms |
-| Ursaring | Ursaluna | Peat Block; region check removed |
+| Ursaring | Ursaluna | Moon Stone; region check removed |
 
 ## Move requirements replaced
 
@@ -173,8 +173,8 @@ Sylveon/Espeon/Umbreon logic.
 No enabled species retains an `EVO_TRADE` method. Plain trades and the former
 Karrablast/Shelmet partner trade use the Linking Cord. Former held-item trades
 are distributed across ordinary evolution stones to keep those items similarly
-useful. The Expansion config `I_USE_EVO_HELD_ITEMS_FROM_BAG` remains enabled for
-other direct-use evolution items, including Milcery's Sweets.
+useful. `I_USE_EVO_HELD_ITEMS_FROM_BAG` is disabled because no evolution route
+uses those former held items directly from the Bag.
 
 ### Linking Cord replacements
 
@@ -233,6 +233,39 @@ other direct-use evolution items, including Milcery's Sweets.
 All three Applin branches remain directly player-controlled. Dipplin then
 evolves into Hydrapple at level 40 as documented above.
 
+### Remaining special-item replacements
+
+| Source | Target | Former item | Replacement stone |
+| --- | --- | --- | --- |
+| Scyther | Kleavor | Black Augurite | Leaf Stone |
+| Galarian Slowpoke | Galarian Slowbro | Galarica Cuff | Ice Stone |
+| Galarian Slowpoke | Galarian Slowking | Galarica Wreath | Shiny Stone |
+| Phony Sinistea | Phony Polteageist | Cracked Pot | Dawn Stone |
+| Antique Sinistea | Antique Polteageist | Chipped Pot | Dawn Stone |
+| Ursaring | Ursaluna | Peat Block | Moon Stone |
+| Kubfu | Single Strike Urshifu | Scroll of Darkness | Dusk Stone |
+| Kubfu | Rapid Strike Urshifu | Scroll of Waters | Water Stone |
+| Charcadet | Armarouge | Auspicious Armor | Sun Stone |
+| Charcadet | Ceruledge | Malicious Armor | Dusk Stone |
+| Duraludon | Archaludon | Metal Alloy | Thunder Stone |
+| Counterfeit Poltchageist | Unremarkable Sinistcha | Unremarkable Teacup | Ice Stone |
+| Artisan Poltchageist | Masterpiece Sinistcha | Masterpiece Teacup | Ice Stone |
+
+### Alcremie decoration stones
+
+| Decoration | Replacement stone |
+| --- | --- |
+| Strawberry | Fire Stone |
+| Berry | Water Stone |
+| Love | Shiny Stone |
+| Star | Thunder Stone |
+| Clover | Leaf Stone |
+| Flower | Sun Stone |
+| Ribbon | Dawn Stone |
+
+The selected stone controls Alcremie's decoration. The save seed still selects
+one common cream flavor across all seven decorations.
+
 ## Explicitly unchanged evolution behavior
 
 - Evolution stones, held items, known-move requirements, gender checks, stat
@@ -246,11 +279,10 @@ evolves into Hydrapple at level 40 as documented above.
   level-30 choice.
 - Own Tempo Rockruff still evolves only into Dusk Lycanroc; only its evening
   restriction is removed.
-- Using a Sweet directly from the Bag on Milcery determines its Strawberry,
-  Berry, Love, Star, Clover, Flower, or Ribbon decoration. The save seed selects
-  one common cream flavor from Vanilla, Ruby, Matcha, Mint, Lemon, Salted, Ruby
-  Swirl, Caramel Swirl, or Rainbow Swirl. No held item, spin, or clock condition
-  remains. Sweet usability follows `I_USE_EVO_HELD_ITEMS_FROM_BAG`.
+- Using the listed stone on Milcery determines its Strawberry, Berry, Love,
+  Star, Clover, Flower, or Ribbon decoration. The save seed selects one common
+  cream flavor from Vanilla, Ruby, Matcha, Mint, Lemon, Salted, Ruby Swirl,
+  Caramel Swirl, or Rainbow Swirl. No Sweet, spin, or clock condition remains.
 
 ## Validation
 
@@ -263,7 +295,7 @@ Focused tests cover:
 - Stability within a save and variation across seeds.
 - A Rockruff evolving into its selected form without consulting the clock.
 - Exactly one Milcery cream flavor being shared across all seven Sweets.
-- Milcery evolving to the selected result by using a Sweet directly from the Bag.
+- Milcery evolving to the selected result with each decoration stone.
 - All six former location targets retaining their item route and having no
   remaining level-up route.
 - Every enabled evolution table containing no trade method, with representative
@@ -279,8 +311,8 @@ Manual gameplay checks still required:
   multiple saves.
 - Verify Eevee's Fairy-move precedence and selected Espeon/Umbreon fallback.
 - Verify cancellation and retry do not change the selected target.
-- Exercise at least two different Sweets on Milcery and confirm that decoration
-  follows the used item while cream flavor stays fixed within the save.
+- Exercise at least two different stones on Milcery and confirm that decoration
+  follows the used stone while cream flavor stays fixed within the save.
 - Use each of the Thunder, Leaf, and Ice Stone replacement routes outside the
   former required location.
 - Exercise one plain trade replacement, one former held-item trade replacement,

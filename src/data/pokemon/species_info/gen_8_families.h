@@ -4047,7 +4047,7 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         .levelUpLearnset = sSinisteaLevelUpLearnset,
         .teachableLearnset = sSinisteaTeachableLearnset,
         .formSpeciesIdTable = sSinisteaFormSpeciesIdTable,
-        .evolutions = EVOLUTION({EVO_ITEM, ITEM_CRACKED_POT, SPECIES_POLTEAGEIST_PHONY}),
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_DAWN_STONE, SPECIES_POLTEAGEIST_PHONY}),
     },
 
     [SPECIES_SINISTEA_ANTIQUE] =
@@ -4113,7 +4113,7 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         .levelUpLearnset = sSinisteaLevelUpLearnset,
         .teachableLearnset = sSinisteaTeachableLearnset,
         .formSpeciesIdTable = sSinisteaFormSpeciesIdTable,
-        .evolutions = EVOLUTION({EVO_ITEM, ITEM_CHIPPED_POT, SPECIES_POLTEAGEIST_ANTIQUE}),
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_DAWN_STONE, SPECIES_POLTEAGEIST_ANTIQUE}),
     },
 
     [SPECIES_POLTEAGEIST_PHONY] =
@@ -4829,13 +4829,13 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         .eggMoveLearnset = sMilceryEggMoveLearnset,
 #if RANDOMIZER_ENABLED && RANDOMIZER_EVOLUTIONS
         .evolutions = EVOLUTION(
-                                ALCREMIE_ITEM_EVOLUTIONS(STRAWBERRY, ITEM_STRAWBERRY_SWEET),
-                                ALCREMIE_ITEM_EVOLUTIONS(BERRY, ITEM_BERRY_SWEET),
-                                ALCREMIE_ITEM_EVOLUTIONS(LOVE, ITEM_LOVE_SWEET),
-                                ALCREMIE_ITEM_EVOLUTIONS(STAR, ITEM_STAR_SWEET),
-                                ALCREMIE_ITEM_EVOLUTIONS(CLOVER, ITEM_CLOVER_SWEET),
-                                ALCREMIE_ITEM_EVOLUTIONS(FLOWER, ITEM_FLOWER_SWEET),
-                                ALCREMIE_ITEM_EVOLUTIONS(RIBBON, ITEM_RIBBON_SWEET)
+                                ALCREMIE_ITEM_EVOLUTIONS(STRAWBERRY, ITEM_FIRE_STONE),
+                                ALCREMIE_ITEM_EVOLUTIONS(BERRY, ITEM_WATER_STONE),
+                                ALCREMIE_ITEM_EVOLUTIONS(LOVE, ITEM_SHINY_STONE),
+                                ALCREMIE_ITEM_EVOLUTIONS(STAR, ITEM_THUNDER_STONE),
+                                ALCREMIE_ITEM_EVOLUTIONS(CLOVER, ITEM_LEAF_STONE),
+                                ALCREMIE_ITEM_EVOLUTIONS(FLOWER, ITEM_SUN_STONE),
+                                ALCREMIE_ITEM_EVOLUTIONS(RIBBON, ITEM_DAWN_STONE)
                         )
 #else
         .evolutions = EVOLUTION(
@@ -6496,7 +6496,7 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         .formSpeciesIdTable = sDuraludonFormSpeciesIdTable,
         .formChangeTable = sDuraludonFormChangeTable,
     #if P_GEN_9_CROSS_EVOS
-        .evolutions = EVOLUTION({EVO_ITEM, ITEM_METAL_ALLOY, SPECIES_ARCHALUDON}),
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_THUNDER_STONE, SPECIES_ARCHALUDON}),
     #endif
     },
 
@@ -7291,8 +7291,8 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         .teachableLearnset = sKubfuTeachableLearnset,
         .evolutions = EVOLUTION({EVO_SCRIPT_TRIGGER, EVO_TRIGGER_DARK_SCROLL, SPECIES_URSHIFU_SINGLE_STRIKE},
                                 {EVO_SCRIPT_TRIGGER, EVO_TRIGGER_WATER_SCROLL, SPECIES_URSHIFU_RAPID_STRIKE},
-                                {EVO_ITEM, ITEM_SCROLL_OF_DARKNESS, SPECIES_URSHIFU_SINGLE_STRIKE},
-                                {EVO_ITEM, ITEM_SCROLL_OF_WATERS,   SPECIES_URSHIFU_RAPID_STRIKE}),
+                                {EVO_ITEM, ITEM_DUSK_STONE, SPECIES_URSHIFU_SINGLE_STRIKE},
+                                {EVO_ITEM, ITEM_WATER_STONE, SPECIES_URSHIFU_RAPID_STRIKE}),
     },
 
     [SPECIES_URSHIFU_SINGLE_STRIKE] =
