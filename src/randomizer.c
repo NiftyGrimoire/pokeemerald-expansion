@@ -13,6 +13,17 @@
 #define RANDOMIZER_MOVE_TYPE_WEIGHT_COVERAGE 2
 #define RANDOMIZER_MOVE_TYPE_WEIGHT_STATUS 1
 #define RANDOMIZER_MOVE_POWER_WEIGHT_MAX 12
+#define RANDOMIZER_MOVE_BUCKET_COUNT_MAX 512
+#define RANDOMIZER_MOVE_BUCKET_NONE 0xFFFF
+#define RANDOMIZER_MOVE_BUCKET_STATUS_TYPE NUMBER_OF_MON_TYPES
+
+struct RandomizerMoveBucket
+{
+    u16 firstMove;
+    u16 moveCount;
+    u16 powerOrStatusTier;
+    u8 type;
+};
 
 static const u8 sRandomizerLevelUpMoveLevels[RANDOMIZER_LEVEL_UP_MOVE_COUNT] =
 {
@@ -34,6 +45,14 @@ static EWRAM_DATA bool8 sEvolutionFamilyHasProtectedAbility[NUM_SPECIES] = {0};
 static EWRAM_DATA u16 sEvolutionFamilyAbilityCache[NUM_SPECIES] = {0};
 static EWRAM_DATA u32 sEvolutionFamilyAbilityCacheSeed = 0;
 static EWRAM_DATA bool8 sEvolutionFamilyCacheInitialized = FALSE;
+static EWRAM_DATA struct RandomizerMoveBucket sRandomizerMoveBuckets[RANDOMIZER_MOVE_BUCKET_COUNT_MAX] = {0};
+static EWRAM_DATA u16 sRandomizerBucketMoves[MOVES_COUNT] = {0};
+static EWRAM_DATA u16 sRandomizerMoveBucketByMove[MOVES_COUNT] = {0};
+static EWRAM_DATA u16 sRandomizerMoveBucketCount = 0;
+static EWRAM_DATA bool8 sRandomizerMoveBucketsInitialized = FALSE;
+static EWRAM_DATA bool8 sRandomizerMoveBucketsUsable = FALSE;
+
+static void InitRandomizerMoveBuckets(void);
 
 static u32 MixRandomizerValue(u32 value)
 {
@@ -55,6 +74,7 @@ void InitRandomizerData(void)
 
     gSaveBlock3Ptr->randomizerSeed = seed;
     gSaveBlock3Ptr->randomizerVersion = RANDOMIZER_ALGORITHM_VERSION;
+    InitRandomizerMoveBuckets();
 #endif
 }
 
@@ -359,10 +379,8 @@ static u32 GetRandomizerStatusMoveTier(enum Move move)
     }
 }
 
-static u32 GetRandomizerStatusMoveWeight(enum Move move, u8 level)
+static u32 GetRandomizerStatusTierWeight(u32 moveTier, u8 level)
 {
-    u32 moveTier = GetRandomizerStatusMoveTier(move);
-
     if (level < 24)
     {
         static const u8 sEarlyWeights[] = {13, 8, 4};
@@ -378,6 +396,29 @@ static u32 GetRandomizerStatusMoveWeight(enum Move move, u8 level)
         static const u8 sLateWeights[] = {1, 13, 48};
         return sLateWeights[moveTier];
     }
+}
+
+static u32 GetRandomizerStatusMoveWeight(enum Move move, u8 level)
+{
+    return GetRandomizerStatusTierWeight(GetRandomizerStatusMoveTier(move), level);
+}
+
+static u32 GetRandomizerDamagingMovePowerWeight(u32 power, u8 level)
+{
+    u32 targetPower = min(35 + level, 120);
+    u32 powerDistance;
+    u32 powerPenaltyBand;
+    u32 powerPenalty;
+
+    // Fixed and level-based damage moves have no listed base power.
+    if (power == 0)
+        power = 50;
+    powerDistance = (power > targetPower ? power - targetPower : targetPower - power);
+    powerPenaltyBand = (level < 24) ? 7 : 10;
+    powerPenalty = powerDistance / powerPenaltyBand;
+    if (powerPenalty >= RANDOMIZER_MOVE_POWER_WEIGHT_MAX - 1)
+        return 1;
+    return RANDOMIZER_MOVE_POWER_WEIGHT_MAX - powerPenalty;
 }
 
 u32 GetRandomizerMoveWeightForLevel(enum Species species, enum Move move, u8 level)
@@ -398,25 +439,127 @@ u32 GetRandomizerMoveWeightForLevel(enum Species species, enum Move move, u8 lev
         return typeWeight * GetRandomizerStatusMoveWeight(move, level);
     else
     {
-        u32 power = GetMovePower(move);
-        u32 targetPower = min(35 + level, 120);
-        u32 powerDistance;
-        u32 powerPenaltyBand;
-        u32 powerPenalty;
-        u32 powerWeight;
-
-        // Fixed and level-based damage moves have no listed base power.
-        if (power == 0)
-            power = 50;
-        powerDistance = (power > targetPower ? power - targetPower : targetPower - power);
-        powerPenaltyBand = (level < 24) ? 7 : 10;
-        powerPenalty = powerDistance / powerPenaltyBand;
-        if (powerPenalty >= RANDOMIZER_MOVE_POWER_WEIGHT_MAX - 1)
-            powerWeight = 1;
-        else
-            powerWeight = RANDOMIZER_MOVE_POWER_WEIGHT_MAX - powerPenalty;
-        return typeWeight * powerWeight;
+        return typeWeight * GetRandomizerDamagingMovePowerWeight(GetMovePower(move), level);
     }
+}
+
+static u16 FindRandomizerMoveBucket(u8 type, u16 powerOrStatusTier)
+{
+    for (u32 i = 0; i < sRandomizerMoveBucketCount; i++)
+    {
+        if (sRandomizerMoveBuckets[i].type == type
+         && sRandomizerMoveBuckets[i].powerOrStatusTier == powerOrStatusTier)
+            return i;
+    }
+    return RANDOMIZER_MOVE_BUCKET_NONE;
+}
+
+static void InitRandomizerMoveBuckets(void)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_LEARNSETS
+    u16 nextMove = 0;
+
+    if (sRandomizerMoveBucketsInitialized)
+        return;
+    sRandomizerMoveBucketsInitialized = TRUE;
+    sRandomizerMoveBucketsUsable = FALSE;
+    sRandomizerMoveBucketCount = 0;
+
+    for (enum Move move = MOVE_NONE; move < MOVES_COUNT; move++)
+        sRandomizerMoveBucketByMove[move] = RANDOMIZER_MOVE_BUCKET_NONE;
+
+    for (enum Move move = MOVE_NONE + 1; move < MOVES_COUNT; move++)
+    {
+        u8 type;
+        u16 powerOrStatusTier;
+        u16 bucket;
+
+        if (!IsMoveRandomizerEligible(move))
+            continue;
+        if (GetMoveCategory(move) == DAMAGE_CATEGORY_STATUS)
+        {
+            type = RANDOMIZER_MOVE_BUCKET_STATUS_TYPE;
+            powerOrStatusTier = GetRandomizerStatusMoveTier(move);
+        }
+        else
+        {
+            type = GetMoveType(move);
+            powerOrStatusTier = GetMovePower(move);
+            if (powerOrStatusTier == 0)
+                powerOrStatusTier = 50;
+        }
+
+        bucket = FindRandomizerMoveBucket(type, powerOrStatusTier);
+        if (bucket == RANDOMIZER_MOVE_BUCKET_NONE)
+        {
+            if (sRandomizerMoveBucketCount >= RANDOMIZER_MOVE_BUCKET_COUNT_MAX)
+                return;
+            bucket = sRandomizerMoveBucketCount++;
+            sRandomizerMoveBuckets[bucket].type = type;
+            sRandomizerMoveBuckets[bucket].powerOrStatusTier = powerOrStatusTier;
+        }
+        sRandomizerMoveBuckets[bucket].moveCount++;
+        sRandomizerMoveBucketByMove[move] = bucket;
+    }
+
+    for (u32 bucket = 0; bucket < sRandomizerMoveBucketCount; bucket++)
+    {
+        u16 moveCount = sRandomizerMoveBuckets[bucket].moveCount;
+
+        sRandomizerMoveBuckets[bucket].firstMove = nextMove;
+        sRandomizerMoveBuckets[bucket].moveCount = 0;
+        nextMove += moveCount;
+    }
+    for (enum Move move = MOVE_NONE + 1; move < MOVES_COUNT; move++)
+    {
+        u16 bucket = sRandomizerMoveBucketByMove[move];
+
+        if (bucket != RANDOMIZER_MOVE_BUCKET_NONE)
+        {
+            u16 index = sRandomizerMoveBuckets[bucket].firstMove + sRandomizerMoveBuckets[bucket].moveCount++;
+            sRandomizerBucketMoves[index] = move;
+        }
+    }
+    sRandomizerMoveBucketsUsable = TRUE;
+#endif
+}
+
+static u32 GetRandomizerMoveBucketWeight(enum Species species, const struct RandomizerMoveBucket *bucket, u8 level)
+{
+    if (bucket->type == RANDOMIZER_MOVE_BUCKET_STATUS_TYPE)
+        return RANDOMIZER_MOVE_TYPE_WEIGHT_STATUS * GetRandomizerStatusTierWeight(bucket->powerOrStatusTier, level);
+    else if (bucket->type == GetSpeciesType(species, 0) || bucket->type == GetSpeciesType(species, 1))
+        return RANDOMIZER_MOVE_TYPE_WEIGHT_STAB * GetRandomizerDamagingMovePowerWeight(bucket->powerOrStatusTier, level);
+    else
+        return RANDOMIZER_MOVE_TYPE_WEIGHT_COVERAGE * GetRandomizerDamagingMovePowerWeight(bucket->powerOrStatusTier, level);
+}
+
+static u16 GetRandomizerMoveBucketAvailableCount(u16 bucket, const u16 *excludedMoves, u8 excludedMoveCount)
+{
+    u16 availableCount = sRandomizerMoveBuckets[bucket].moveCount;
+
+    for (u32 i = 0; i < excludedMoveCount; i++)
+    {
+        enum Move move = excludedMoves[i];
+        bool32 alreadyExcluded = FALSE;
+
+        for (u32 j = 0; j < i; j++)
+        {
+            if (excludedMoves[j] == move)
+            {
+                alreadyExcluded = TRUE;
+                break;
+            }
+        }
+
+        if (!alreadyExcluded
+         && availableCount != 0
+         && move > MOVE_NONE
+         && move < MOVES_COUNT
+         && sRandomizerMoveBucketByMove[move] == bucket)
+            availableCount--;
+    }
+    return availableCount;
 }
 
 enum Move GetRandomizedLevelUpMove(enum Species species, u8 learnsetSlot, const u16 *excludedMoves, u8 excludedMoveCount, enum Move fallbackMove)
@@ -429,27 +572,45 @@ enum Move GetRandomizedLevelUpMove(enum Species species, u8 learnsetSlot, const 
     if (species <= SPECIES_NONE || species >= NUM_SPECIES || !IsSpeciesEnabled(species))
         return fallbackMove;
 
-    for (enum Move move = MOVE_NONE + 1; move < MOVES_COUNT; move++)
+    InitRandomizerMoveBuckets();
+    if (!sRandomizerMoveBucketsUsable)
+        return fallbackMove;
+
+    for (u32 bucket = 0; bucket < sRandomizerMoveBucketCount; bucket++)
     {
-        if (IsMoveRandomizerEligible(move) && !IsExcludedRandomizerMove(move, excludedMoves, excludedMoveCount))
-            totalWeight += GetRandomizerMoveWeightForLevel(species, move, learnLevel);
+        u32 availableCount = GetRandomizerMoveBucketAvailableCount(bucket, excludedMoves, excludedMoveCount);
+        totalWeight += availableCount * GetRandomizerMoveBucketWeight(species, &sRandomizerMoveBuckets[bucket], learnLevel);
     }
 
     if (totalWeight == 0)
         return fallbackMove;
 
     selection = RandomizerHash(GetRandomizerSeed(), RANDOMIZER_CATEGORY_LEARNSET, species, learnsetSlot, 0) % totalWeight;
-    for (enum Move move = MOVE_NONE + 1; move < MOVES_COUNT; move++)
+    for (u32 bucket = 0; bucket < sRandomizerMoveBucketCount; bucket++)
     {
-        u32 weight;
+        const struct RandomizerMoveBucket *moveBucket = &sRandomizerMoveBuckets[bucket];
+        u32 availableCount = GetRandomizerMoveBucketAvailableCount(bucket, excludedMoves, excludedMoveCount);
+        u32 weight = GetRandomizerMoveBucketWeight(species, moveBucket, learnLevel);
+        u32 bucketWeight = availableCount * weight;
 
-        if (!IsMoveRandomizerEligible(move) || IsExcludedRandomizerMove(move, excludedMoves, excludedMoveCount))
-            continue;
+        if (selection < bucketWeight)
+        {
+            u32 selectedMove = selection / weight;
 
-        weight = GetRandomizerMoveWeightForLevel(species, move, learnLevel);
-        if (selection < weight)
-            return move;
-        selection -= weight;
+            for (u32 i = 0; i < moveBucket->moveCount; i++)
+            {
+                enum Move move = sRandomizerBucketMoves[moveBucket->firstMove + i];
+
+                if (!IsExcludedRandomizerMove(move, excludedMoves, excludedMoveCount))
+                {
+                    if (selectedMove == 0)
+                        return move;
+                    selectedMove--;
+                }
+            }
+            return fallbackMove;
+        }
+        selection -= bucketWeight;
     }
 #endif
     return fallbackMove;

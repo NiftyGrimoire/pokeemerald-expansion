@@ -11,8 +11,10 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
   up one result must not affect any other result.
 - Category identifiers and hash behavior are save-format API. Once released, changing
   either requires incrementing the randomizer algorithm version.
-- Version 1 saves store a nonzero `u32 randomizerSeed` and a randomizer algorithm
-  version in `SaveBlock3`. New-game initialization creates both values. Save
+- Version 2 saves store a nonzero `u32 randomizerSeed` and a randomizer algorithm
+  version in `SaveBlock3`. New-game initialization creates both values. Version 2
+  intentionally replaces the unreleased version-1 learnset mapping with bucketed
+  move selection; pre-version-2 development saves are not supported. Save
   compatibility with unmodified Expansion saves is not required for the initial
   romhack release.
 - A single eligibility helper will define the general species pool. It must require an
@@ -135,7 +137,12 @@ Current execution order:
      shared full-table accessor. Initial move assignment generates the same
      deterministic sequence only through the Pokemon's current level and keeps a
      rolling window of the last four moves, avoiding work on future-level slots.
-     Only add a broader cache after measuring the remaining access cost.
+     Build a compact move-bucket index once from Expansion's authoritative
+     `gMovesInfo` metadata, grouping damaging moves by exact type and normalized
+     power and status moves by potency tier. Runtime selection weighs these
+     buckets and subtracts prior selections instead of repeatedly scanning and
+     reclassifying the complete move table. Only add a broader cache after
+     measuring the remaining access cost.
    - Do not expand egg-move support while breeding is planned for removal. Revisit
      egg moves only if a non-breeding acquisition path is retained or added.
 9. Evolution rules — complete on `romhack/main`; manual gameplay checks remain:

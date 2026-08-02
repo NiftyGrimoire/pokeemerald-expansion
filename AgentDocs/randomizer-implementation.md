@@ -22,7 +22,9 @@ broad summary where they differ.
 ## Completed foundation
 
 - Master randomizer config gate in `include/config/randomizer.h`.
-- Version 1 algorithm identifier.
+- Version 2 algorithm identifier. Version 2 deliberately replaces the unreleased
+  version-1 learnset mapping with bucketed selection; development saves created
+  before this change are not supported.
 - Per-save nonzero `u32 randomizerSeed` and algorithm version in `SaveBlock3`.
 - Seed initialization during `NewGameInitData`.
 - Stateless `RandomizerHash` with separate encounter, ability, and learnset
@@ -85,6 +87,16 @@ been implemented.
   This keeps wild, gift, and trainer initial moves identical to the full table
   while reducing encounter-time move-pool scans, especially at low levels. Add a
   broader cache only if profiling shows the remaining scans are too expensive.
+- Expansion already exposes the authoritative configured move metadata through
+  `gMovesInfo`, but does not provide a prebuilt randomizer bucket index. Version 2
+  builds that compact index once from `gMovesInfo` during New Game initialization,
+  with lazy initialization covering a loaded save after boot. Damaging moves share
+  buckets by exact type and normalized power; status moves share the existing
+  basic, strong, and elite buckets. Encounter-time selection weighs buckets rather
+  than rescanning and reclassifying every move. Previously selected moves are
+  subtracted from their buckets, retaining the no-duplicates policy. The compact
+  index costs about 7.5 KiB of EWRAM; the production build uses 242,192 of 262,144
+  EWRAM bytes after this change.
 - Egg moves intentionally remain authored while breeding is planned for removal.
   Gift, wild, and trainer Pokemon already use the shared initial-moves path unless
   their data supplies explicit moves.
