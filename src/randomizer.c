@@ -351,7 +351,9 @@ static u32 GetRandomizerStatusMoveTier(enum Move move)
     case MOVE_TRICK_ROOM:
         return 1;
     default:
-        if (GetMoveEffect(move) == EFFECT_WEATHER || GetMoveEffect(move) == EFFECT_WEATHER_AND_SWITCH)
+        if (GetMoveEffect(move) == EFFECT_PROTECT
+         || GetMoveEffect(move) == EFFECT_WEATHER
+         || GetMoveEffect(move) == EFFECT_WEATHER_AND_SWITCH)
             return 1;
         return 0;
     }

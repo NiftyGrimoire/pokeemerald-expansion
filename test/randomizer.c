@@ -233,6 +233,14 @@ TEST("Learnset weights treat weather-setting status moves as strong tier")
     EXPECT_EQ(lateRainDance, 13);
 }
 
+TEST("Learnset weights treat Protect-like moves as strong tier")
+{
+    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_PROTECT, 5), 8);
+    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_DETECT, 24), 32);
+    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_KINGS_SHIELD, 80), 13);
+    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_SPIKY_SHIELD, 80), 13);
+}
+
 TEST("Level-up learnsets separate seed and species identity")
 {
     enum Move bulbasaurMoves[RANDOMIZER_LEVEL_UP_MOVE_COUNT];

@@ -68,6 +68,8 @@ been implemented.
   favored before level 24, strong setup/recovery/status/hazard effects from 24,
   and elite setup or exceptional utility from 42. All status moves whose effects
   set weather, including weather-plus-switch moves, belong to the strong tier.
+  Protect-like effects, including Protect, Detect, guard moves, and damaging or
+  stat-lowering shield variants, also belong to the strong tier.
   Per-move basic/strong/elite weights are 13/8/4 early, 3/32/11 from level 24,
   and 1/13/48 from level 42. These are approximately 4/3 of the prior values so
   status moves retain their relationship to the increased STAB multiplier.
