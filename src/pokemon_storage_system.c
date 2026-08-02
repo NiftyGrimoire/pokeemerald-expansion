@@ -986,9 +986,9 @@ static const struct WindowTemplate sWindowTemplates[] =
     [WIN_MESSAGE] = {
         .bg = 0,
         .tilemapLeft = 11,
-        .tilemapTop = 17,
+        .tilemapTop = 15,
         .width = 18,
-        .height = 2,
+        .height = 4,
         .paletteNum = 15,
         .baseBlock = 0x14,
     },
