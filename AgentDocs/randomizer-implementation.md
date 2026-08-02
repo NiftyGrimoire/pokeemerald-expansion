@@ -57,12 +57,9 @@ been implemented.
 - Damaging-move weights follow a level-based target power from roughly 40 in the
   opening game to 115 at level 80. STAB and coverage multipliers remain, but all
   eligible power bands retain nonzero weight, so an unusually strong early move
-  or weak late move remains possible after the four starting slots. Level-1
-  damaging moves must have listed power below 80; attacks with 61-79 power remain
-  possible at one-quarter of their normal power weight, while the intended
-  opening band is 20-60 power. Zero- or sentinel-power attacks, including
-  dynamically calculated, fixed-damage, level-based, and OHKO effects, are
-  deferred until later slots.
+  or weak late move remains possible. Power-distance penalties saturate at a
+  base weight of one; this explicit saturation avoids unsigned underflow making
+  extreme-power moves such as Self-Destruct, Explosion, and V-create dominant.
 - Status moves use basic, strong, and elite potency tiers. Basic effects are
   favored before level 24, strong setup/recovery/status/hazard effects from 24,
   and elite setup or exceptional utility from 42. All status moves whose effects
@@ -81,10 +78,10 @@ been implemented.
 
 Learnset branch validation:
 
-- Ten focused tests cover universal TM compatibility, preserved HM/tutor/egg
+- Nine focused tests cover universal TM compatibility, preserved HM/tutor/egg
   compatibility, deterministic schedules, cap-band distribution, weighted move
-  strength, level-1 power safeguards and sampled distribution, exclusions,
-  seed/species separation, and weather/status tiers.
+  strength and extreme-power saturation, exclusions, seed/species separation,
+  and weather/status tiers.
 - A normal `make -j4` ROM build succeeds.
 - Manual gameplay checks remain in the follow-up section below.
 

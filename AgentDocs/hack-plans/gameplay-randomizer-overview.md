@@ -125,12 +125,11 @@ Current execution order:
      without duplicates.
    - Weight damaging moves toward a level-scaled target power and shift status
      weighting from basic to strong and elite effects as levels rise. Keep every
-     eligible tier possible at nonzero weight after the starting slots, preserve
-     STAB and coverage bias, exclude unsuitable species-locked moves, and retain
-     the authored move as an empty-pool fallback. For the four level-1 moves,
-     exclude damaging moves with zero/sentinel power or at least 80 power and
-     sharply reduce the weight of 61-79 power attacks so ordinary 20-60 power
-     moves dominate the opening distribution.
+     eligible tier possible at nonzero weight, preserve STAB and coverage bias,
+     exclude unsuitable species-locked moves, and retain the authored move as an
+     empty-pool fallback. Saturate power-distance penalties at the minimum weight
+     without unsigned subtraction so extreme-power moves remain rare instead of
+     overflowing the weighted pool.
    - Resolve through the shared level-up accessor so initial, level-up, evolution,
      reminder, AI, and Pokedex paths agree. Regenerate into a small shared buffer
      and only add a broader cache after measuring access cost.

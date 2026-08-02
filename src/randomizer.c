@@ -13,9 +13,6 @@
 #define RANDOMIZER_MOVE_TYPE_WEIGHT_COVERAGE 2
 #define RANDOMIZER_MOVE_TYPE_WEIGHT_STATUS 1
 #define RANDOMIZER_MOVE_POWER_WEIGHT_MAX 12
-#define RANDOMIZER_STARTING_MOVE_PREFERRED_MAX_POWER 60
-#define RANDOMIZER_STARTING_MOVE_MAX_POWER 79
-#define RANDOMIZER_STARTING_MOVE_HIGH_POWER_DIVISOR 4
 
 static const u8 sRandomizerLevelUpMoveLevels[RANDOMIZER_LEVEL_UP_MOVE_COUNT] =
 {
@@ -402,25 +399,18 @@ u32 GetRandomizerMoveWeightForLevel(enum Species species, enum Move move, u8 lev
         u32 power = GetMovePower(move);
         u32 targetPower = min(35 + level, 120);
         u32 powerDistance;
+        u32 powerPenalty;
         u32 powerWeight;
-
-        // Starting moves should be immediately usable without trivializing the
-        // opening game. Zero and sentinel power values are used by fixed,
-        // level-based, OHKO, and other dynamically calculated attacks, so defer
-        // all of them until after the four level-1 slots.
-        if (level == 1 && (power <= 1 || power > RANDOMIZER_STARTING_MOVE_MAX_POWER))
-            return 0;
 
         // Fixed and level-based damage moves have no listed base power.
         if (power == 0)
             power = 50;
         powerDistance = (power > targetPower ? power - targetPower : targetPower - power);
-        powerWeight = max(1, RANDOMIZER_MOVE_POWER_WEIGHT_MAX - powerDistance / 10);
-
-        // Keep 61-79 power attacks possible at level 1, but make the ordinary
-        // 20-60 power opening band substantially more likely.
-        if (level == 1 && power > RANDOMIZER_STARTING_MOVE_PREFERRED_MAX_POWER)
-            powerWeight = max(1, powerWeight / RANDOMIZER_STARTING_MOVE_HIGH_POWER_DIVISOR);
+        powerPenalty = powerDistance / 10;
+        if (powerPenalty >= RANDOMIZER_MOVE_POWER_WEIGHT_MAX - 1)
+            powerWeight = 1;
+        else
+            powerWeight = RANDOMIZER_MOVE_POWER_WEIGHT_MAX - powerPenalty;
         return typeWeight * powerWeight;
     }
 }
