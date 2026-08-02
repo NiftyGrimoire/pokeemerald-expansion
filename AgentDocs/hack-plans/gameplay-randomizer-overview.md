@@ -154,6 +154,8 @@ Current execution order:
      into the party first. Process the intervening levels in order so every
      move-learning opportunity and evolution check occurs normally rather than
      jumping directly to the final level.
+   - Add an option on the Pokemon summary stats page to display the Pokemon's
+     individual IV values, with a clear way to return to the normal stat view.
    - Implement and grant the Portable Healer after its exact item-use behavior is
      specified.
 11. World items — planned:
@@ -278,6 +280,8 @@ Current execution order:
   - Add a Portable Healer Key Item that heals the party outside battle using existing
     party-heal behavior, and grant it early in the game, preferably during
     starter/new-game setup.
+  - Add a summary-screen stats-page option that toggles between the normal stat
+    presentation and explicit IV values without changing the Pokemon.
 - Friendship evolutions:
   - Replace all `IF_MIN_FRIENDSHIP` evolution conditions with level-based equivalents:
     - Baby/early evolutions: level 20.

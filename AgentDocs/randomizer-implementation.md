@@ -567,6 +567,9 @@ replacement routes retain their intended target.
   against the Portable Healer design, and X-items against the intended battle-item
   rules, so dead or low-value rewards do not enter the pool. Explicitly decide
   key-item, TM, duplicate, respawn, and progression-critical-item handling.
+- Summary IV view: add an option on the Pokemon summary stats page to show all six
+  IV values and return cleanly to the normal stat display. This is display-only;
+  it must not mutate IVs or other Pokemon data.
 - Level-to-cap action: implementation is complete on
   `romhack/qol-level-to-cap`. `TryAdvanceMonOneLevelToCap` provides the shared
   one-level stat/experience step and stops at the active cap. The field party
