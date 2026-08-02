@@ -399,6 +399,7 @@ u32 GetRandomizerMoveWeightForLevel(enum Species species, enum Move move, u8 lev
         u32 power = GetMovePower(move);
         u32 targetPower = min(35 + level, 120);
         u32 powerDistance;
+        u32 powerPenaltyBand;
         u32 powerPenalty;
         u32 powerWeight;
 
@@ -406,7 +407,8 @@ u32 GetRandomizerMoveWeightForLevel(enum Species species, enum Move move, u8 lev
         if (power == 0)
             power = 50;
         powerDistance = (power > targetPower ? power - targetPower : targetPower - power);
-        powerPenalty = powerDistance / 10;
+        powerPenaltyBand = (level < 24) ? 7 : 10;
+        powerPenalty = powerDistance / powerPenaltyBand;
         if (powerPenalty >= RANDOMIZER_MOVE_POWER_WEIGHT_MAX - 1)
             powerWeight = 1;
         else

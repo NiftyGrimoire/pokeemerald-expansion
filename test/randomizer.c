@@ -183,6 +183,8 @@ TEST("Learnset weights favor appropriate damaging move power by level")
     u32 lateFireBlast = GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_FIRE_BLAST, 80);
 
     EXPECT_GT(earlyEmber, earlyFireBlast);
+    EXPECT_EQ(earlyEmber, 48);
+    EXPECT_EQ(earlyFireBlast, 8);
     EXPECT_GT(lateFireBlast, lateEmber);
     EXPECT_GT(earlyFireBlast, 0);
     EXPECT_GT(lateEmber, 0);

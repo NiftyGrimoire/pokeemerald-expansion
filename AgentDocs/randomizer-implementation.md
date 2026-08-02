@@ -56,11 +56,14 @@ been implemented.
   species, and slot, with no duplicates.
 - Damaging-move weights follow a level-based target power from roughly 40 in the
   opening game to 115 at level 80. STAB moves use a 4x multiplier and coverage
-  moves use 2x, strengthening the preference for same-type attacks. All eligible
-  power bands retain nonzero weight, so an unusually strong early move or weak
-  late move remains possible. Power-distance penalties saturate at a base weight
-  of one; this explicit saturation avoids unsigned underflow making extreme-power
-  moves such as Self-Destruct, Explosion, and V-create dominant.
+  moves use 2x, strengthening the preference for same-type attacks. Before level
+  24, each seven points away from the target removes one base-weight point;
+  afterward the band widens to ten points. This makes the early curve reject
+  overpowered attacks more aggressively without imposing a hard power clamp. All
+  eligible power bands retain nonzero weight, so an unusually strong early move
+  or weak late move remains possible. Power-distance penalties saturate at a base
+  weight of one; this explicit saturation avoids unsigned underflow making
+  extreme-power moves such as Self-Destruct, Explosion, and V-create dominant.
 - Status moves use basic, strong, and elite potency tiers. Basic effects are
   favored before level 24, strong setup/recovery/status/hazard effects from 24,
   and elite setup or exceptional utility from 42. All status moves whose effects
