@@ -143,6 +143,49 @@ TEST("Level-up learnset randomization is deterministic, distinct, and follows ca
     }
 }
 
+TEST("Randomized initial moves match the rolling window of the full learnset")
+{
+    static const struct
+    {
+        enum Species species;
+        u8 level;
+        u32 seed;
+    } cases[] =
+    {
+        {SPECIES_BULBASAUR, 1, 0x12345678},
+        {SPECIES_CHARMANDER, 12, 0x87654321},
+        {SPECIES_PIKACHU, 30, 0x13572468},
+        {SPECIES_DRAGONITE, 100, 0x24681357},
+    };
+
+    for (u32 caseId = 0; caseId < ARRAY_COUNT(cases); caseId++)
+    {
+        struct Pokemon mon;
+        enum Move expectedMoves[MAX_MON_MOVES] = {MOVE_NONE};
+        u8 expectedMoveCount = 0;
+        const struct LevelUpMove *learnset;
+
+        gSaveBlock3Ptr->randomizerSeed = cases[caseId].seed;
+        learnset = GetSpeciesLevelUpLearnset(cases[caseId].species);
+        for (u32 i = 0; learnset[i].move != LEVEL_UP_MOVE_END && learnset[i].level <= cases[caseId].level; i++)
+        {
+            if (expectedMoveCount < MAX_MON_MOVES)
+                expectedMoves[expectedMoveCount++] = learnset[i].move;
+            else
+            {
+                for (u32 j = 0; j < MAX_MON_MOVES - 1; j++)
+                    expectedMoves[j] = expectedMoves[j + 1];
+                expectedMoves[MAX_MON_MOVES - 1] = learnset[i].move;
+            }
+        }
+
+        CreateMon(&mon, cases[caseId].species, cases[caseId].level, 0, OTID_STRUCT_PLAYER_ID);
+        GiveMonInitialMoveset(&mon);
+        for (u32 i = 0; i < MAX_MON_MOVES; i++)
+            EXPECT_EQ(GetMonData(&mon, MON_DATA_MOVE1 + i), expectedMoves[i]);
+    }
+}
+
 TEST("Standard learnset schedule front-loads moves within level-cap bands")
 {
     static const u8 capBandStarts[] = {1, 15, 19, 24, 29, 31, 33, 42, 46, 58};

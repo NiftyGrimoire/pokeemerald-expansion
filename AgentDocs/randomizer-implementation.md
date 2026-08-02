@@ -78,8 +78,13 @@ been implemented.
 - Placeholder, Transform, Sketch, Dark Void, Hyperspace Fury, Aura Wheel,
   species-power-override, and Struggle moves are excluded. The authored move is
   the fallback if no candidate exists.
-- The resolver regenerates into one small EWRAM buffer per accessor call. Add
-  a broader cache only if profiling shows this scan is too expensive.
+- The full learnset resolver regenerates into one small EWRAM buffer per accessor
+  call. Initial move assignment uses a behavior-preserving rolling window: it
+  generates randomized slots sequentially only through the Pokemon's current
+  level, retains the last four eligible moves, and skips every future-level slot.
+  This keeps wild, gift, and trainer initial moves identical to the full table
+  while reducing encounter-time move-pool scans, especially at low levels. Add a
+  broader cache only if profiling shows the remaining scans are too expensive.
 - Egg moves intentionally remain authored while breeding is planned for removal.
   Gift, wild, and trainer Pokemon already use the shared initial-moves path unless
   their data supplies explicit moves.

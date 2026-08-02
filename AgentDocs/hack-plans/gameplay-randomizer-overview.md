@@ -131,9 +131,11 @@ Current execution order:
      and retain the authored move as an empty-pool fallback. Saturate
      power-distance penalties at the minimum weight without unsigned subtraction
      so extreme-power moves remain rare instead of overflowing the weighted pool.
-   - Resolve through the shared level-up accessor so initial, level-up, evolution,
-     reminder, AI, and Pokedex paths agree. Regenerate into a small shared buffer
-     and only add a broader cache after measuring access cost.
+   - Resolve level-up, evolution, reminder, AI, and Pokedex paths through the
+     shared full-table accessor. Initial move assignment generates the same
+     deterministic sequence only through the Pokemon's current level and keeps a
+     rolling window of the last four moves, avoiding work on future-level slots.
+     Only add a broader cache after measuring the remaining access cost.
    - Do not expand egg-move support while breeding is planned for removal. Revisit
      egg moves only if a non-breeding acquisition path is retained or added.
 9. Evolution rules — complete on `romhack/main`; manual gameplay checks remain:

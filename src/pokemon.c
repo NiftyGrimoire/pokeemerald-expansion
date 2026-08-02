@@ -1564,6 +1564,50 @@ void GiveMonInitialMoveset(struct Pokemon *mon)
     GiveBoxMonInitialMoveset(&mon->box);
 }
 
+static bool32 GetRandomizedInitialMoveset(enum Species species, u8 level, enum Move *moves, u8 *addedMoves)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_LEARNSETS
+    enum Species sanitizedSpecies = SanitizeSpeciesId(species);
+    const struct LevelUpMove *authoredLearnset;
+    u16 excludedMoves[RANDOMIZER_LEVEL_UP_MOVE_COUNT];
+    u32 authoredMoveCount = 0;
+
+    if (sanitizedSpecies == SPECIES_NONE || sanitizedSpecies == SPECIES_EGG || !IsSpeciesEnabled(sanitizedSpecies))
+        return FALSE;
+
+    authoredLearnset = gSpeciesInfo[sanitizedSpecies].levelUpLearnset;
+    if (authoredLearnset == NULL)
+        authoredLearnset = gSpeciesInfo[SPECIES_NONE].levelUpLearnset;
+    while (authoredMoveCount < MAX_LEVEL_UP_MOVES && authoredLearnset[authoredMoveCount].move != LEVEL_UP_MOVE_END)
+        authoredMoveCount++;
+
+    for (u32 i = 0; i < RANDOMIZER_LEVEL_UP_MOVE_COUNT; i++)
+    {
+        enum Move fallbackMove;
+        enum Move move;
+
+        if (GetRandomizerLevelUpMoveLevel(i) > level)
+            break;
+
+        fallbackMove = (i < authoredMoveCount ? authoredLearnset[i].move : MOVE_POUND);
+        move = GetRandomizedLevelUpMove(sanitizedSpecies, i, excludedMoves, i, fallbackMove);
+        excludedMoves[i] = move;
+
+        if (*addedMoves < MAX_MON_MOVES)
+            moves[(*addedMoves)++] = move;
+        else
+        {
+            for (u32 j = 0; j < MAX_MON_MOVES - 1; j++)
+                moves[j] = moves[j + 1];
+            moves[MAX_MON_MOVES - 1] = move;
+        }
+    }
+    return TRUE;
+#else
+    return FALSE;
+#endif
+}
+
 void GiveBoxMonInitialMoveset(struct BoxPokemon *boxMon) //Credit: AsparagusEduardo
 {
     enum Species species = GetBoxMonData(boxMon, MON_DATA_SPECIES);
@@ -1571,39 +1615,43 @@ void GiveBoxMonInitialMoveset(struct BoxPokemon *boxMon) //Credit: AsparagusEdua
     s32 i;
     enum Move moves[MAX_MON_MOVES] = {MOVE_NONE};
     u8 addedMoves = 0;
-    const struct LevelUpMove *learnset = GetSpeciesLevelUpLearnset(species);
+    const struct LevelUpMove *learnset;
 
-    for (i = 0; learnset[i].move != LEVEL_UP_MOVE_END; i++)
+    if (!GetRandomizedInitialMoveset(species, level, moves, &addedMoves))
     {
-        s32 j;
-        bool32 alreadyKnown = FALSE;
-
-        if (learnset[i].level > level)
-            break;
-        if (learnset[i].level == 0)
-            continue;
-
-        for (j = 0; j < addedMoves; j++)
+        learnset = GetSpeciesLevelUpLearnset(species);
+        for (i = 0; learnset[i].move != LEVEL_UP_MOVE_END; i++)
         {
-            if (moves[j] == learnset[i].move)
-            {
-                alreadyKnown = TRUE;
+            s32 j;
+            bool32 alreadyKnown = FALSE;
+
+            if (learnset[i].level > level)
                 break;
-            }
-        }
+            if (learnset[i].level == 0)
+                continue;
 
-        if (!alreadyKnown)
-        {
-            if (addedMoves < MAX_MON_MOVES)
+            for (j = 0; j < addedMoves; j++)
             {
-                moves[addedMoves] = learnset[i].move;
-                addedMoves++;
+                if (moves[j] == learnset[i].move)
+                {
+                    alreadyKnown = TRUE;
+                    break;
+                }
             }
-            else
+
+            if (!alreadyKnown)
             {
-                for (j = 0; j < MAX_MON_MOVES - 1; j++)
-                    moves[j] = moves[j + 1];
-                moves[MAX_MON_MOVES - 1] = learnset[i].move;
+                if (addedMoves < MAX_MON_MOVES)
+                {
+                    moves[addedMoves] = learnset[i].move;
+                    addedMoves++;
+                }
+                else
+                {
+                    for (j = 0; j < MAX_MON_MOVES - 1; j++)
+                        moves[j] = moves[j + 1];
+                    moves[MAX_MON_MOVES - 1] = learnset[i].move;
+                }
             }
         }
     }
