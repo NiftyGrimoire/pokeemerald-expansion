@@ -582,9 +582,10 @@ replacement routes retain their intended target.
   it up again by party index, including their move-replacement summary screen;
   this permits the Storage `LEVEL TO CAP` action to operate on a persistent
   temporary Pokemon without occupying a party slot. Storage advances one level
-  at a time, checks every level-up move (opening move replacement when needed),
-  runs each evolution scene, then writes the completed record back to its
-  original party or box position before rebuilding the Storage screen. If the
+  at a time, displays a level-up message for each level, prompts before opening
+  move replacement, returns to the visible Storage UI between ordinary levels,
+  and runs each evolution scene. It writes the completed record back to its
+  original party or box position. If the
   player stops an evolution, both entry points stop the larger level-to-cap
   operation at that point and retain the levels already processed.
   Storage checkpoints the source party or box record after each completed level,
