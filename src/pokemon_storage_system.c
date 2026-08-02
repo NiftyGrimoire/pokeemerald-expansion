@@ -22,6 +22,7 @@
 #include "mail.h"
 #include "main.h"
 #include "menu.h"
+#include "menu_specialized.h"
 #include "mon_markings.h"
 #include "naming_screen.h"
 #include "overworld.h"
@@ -570,6 +571,9 @@ EWRAM_DATA static u8 sStorageLevelPosition = 0;
 EWRAM_DATA static enum Species sStorageLevelExpectedSpecies = SPECIES_NONE;
 EWRAM_DATA static bool8 sStorageLevelResumeOnReopen = FALSE;
 EWRAM_DATA static u8 sStorageLevelResumeState = 0;
+EWRAM_DATA static u16 sStorageLevelStatsBefore[NUM_STATS] = {0};
+EWRAM_DATA static u16 sStorageLevelStatsAfter[NUM_STATS] = {0};
+EWRAM_DATA static u8 sStorageLevelStatsWindowId = 0;
 
 // Main tasks
 static void Task_InitPokeStorage(u8);
@@ -3865,6 +3869,17 @@ static void PersistStorageLevelToCap(void)
         SetBoxMonAt(sStorageLevelBoxId, sStorageLevelPosition, &sStorageLevelMon.box);
 }
 
+enum {
+    STORAGE_LEVEL_ADVANCE,
+    STORAGE_LEVEL_WAIT_LEVEL_TEXT,
+    STORAGE_LEVEL_WAIT_STATS_PAGE_1,
+    STORAGE_LEVEL_WAIT_STATS_PAGE_2,
+    STORAGE_LEVEL_TRY_MOVES,
+    STORAGE_LEVEL_WAIT_LEARNED_TEXT,
+    STORAGE_LEVEL_WAIT_MOVE_PROMPT,
+    STORAGE_LEVEL_HANDLE_MOVE_PROMPT,
+};
+
 static void CB2_ReturnFromStorageLevelEvolution(void)
 {
     PersistStorageLevelToCap();
@@ -3894,20 +3909,33 @@ static void CB2_ReturnFromStorageLevelMoveSelect(void)
     }
     PersistStorageLevelToCap();
     sStorageLevelResumeOnReopen = TRUE;
-    sStorageLevelResumeState = 2;
+    sStorageLevelResumeState = STORAGE_LEVEL_TRY_MOVES;
     CB2_ReturnToPokeStorage();
 }
 
-enum {
-    STORAGE_LEVEL_ADVANCE,
-    STORAGE_LEVEL_WAIT_LEVEL_TEXT,
-    STORAGE_LEVEL_TRY_MOVES,
-    STORAGE_LEVEL_WAIT_LEARNED_TEXT,
-    STORAGE_LEVEL_WAIT_MOVE_PROMPT,
-    STORAGE_LEVEL_HANDLE_MOVE_PROMPT,
+static const u8 sText_StorageWantsToLearnMove[] = _("{STR_VAR_1} wants to learn\n{STR_VAR_2}. Replace a move?");
+
+static const struct WindowTemplate sStorageLevelStatsWindowTemplate =
+{
+    .bg = 0,
+    .tilemapLeft = 19,
+    .tilemapTop = 1,
+    .width = 10,
+    .height = 11,
+    .paletteNum = 15,
+    .baseBlock = 0x250,
 };
 
-static const u8 sText_StorageWantsToLearnMove[] = _("{STR_VAR_1} wants to learn\n{STR_VAR_2}. Replace a move?");
+static void RemoveStorageLevelStatsWindow(void)
+{
+    if (sStorageLevelStatsWindowId != WINDOW_NONE)
+    {
+        ClearStdWindowAndFrameToTransparent(sStorageLevelStatsWindowId, FALSE);
+        RemoveWindow(sStorageLevelStatsWindowId);
+        sStorageLevelStatsWindowId = WINDOW_NONE;
+        ScheduleBgCopyTilemapToVram(0);
+    }
+}
 
 static void Task_StorageLevelToCap(u8 taskId)
 {
@@ -3916,6 +3944,7 @@ static void Task_StorageLevelToCap(u8 taskId)
     switch (sStorage->state)
     {
     case STORAGE_LEVEL_ADVANCE:
+        GetMonLevelUpWindowStats(&sStorageLevelMon, sStorageLevelStatsBefore);
         if (!TryAdvanceMonOneLevelToCap(&sStorageLevelMon))
         {
             PersistStorageLevelToCap();
@@ -3925,6 +3954,7 @@ static void Task_StorageLevelToCap(u8 taskId)
             SetPokeStorageTask(Task_PokeStorageMain);
             return;
         }
+        GetMonLevelUpWindowStats(&sStorageLevelMon, sStorageLevelStatsAfter);
         PersistStorageLevelToCap();
         SetDisplayMonData(&sStorageLevelMon, MODE_PARTY);
         RefreshDisplayMon();
@@ -3940,6 +3970,31 @@ static void Task_StorageLevelToCap(u8 taskId)
         if (!IsDma3ManagerBusyWithBgCopy() && WaitFanfare(FALSE) && JOY_NEW(A_BUTTON | B_BUTTON))
         {
             ClearBottomWindow();
+            sStorageLevelStatsWindowId = AddWindow(&sStorageLevelStatsWindowTemplate);
+            DrawStdFrameWithCustomTileAndPalette(sStorageLevelStatsWindowId, FALSE, 2, 14);
+            DrawLevelUpWindowPg1(sStorageLevelStatsWindowId, sStorageLevelStatsBefore, sStorageLevelStatsAfter,
+                                 TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_LIGHT_GRAY);
+            CopyWindowToVram(sStorageLevelStatsWindowId, COPYWIN_GFX);
+            ScheduleBgCopyTilemapToVram(0);
+            sStorage->state = STORAGE_LEVEL_WAIT_STATS_PAGE_1;
+        }
+        break;
+    case STORAGE_LEVEL_WAIT_STATS_PAGE_1:
+        if (JOY_NEW(A_BUTTON | B_BUTTON))
+        {
+            PlaySE(SE_SELECT);
+            DrawLevelUpWindowPg2(sStorageLevelStatsWindowId, sStorageLevelStatsAfter,
+                                 TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_LIGHT_GRAY);
+            CopyWindowToVram(sStorageLevelStatsWindowId, COPYWIN_GFX);
+            ScheduleBgCopyTilemapToVram(0);
+            sStorage->state = STORAGE_LEVEL_WAIT_STATS_PAGE_2;
+        }
+        break;
+    case STORAGE_LEVEL_WAIT_STATS_PAGE_2:
+        if (JOY_NEW(A_BUTTON | B_BUTTON))
+        {
+            PlaySE(SE_SELECT);
+            RemoveStorageLevelStatsWindow();
             sStorage->state = STORAGE_LEVEL_TRY_MOVES;
         }
         break;
@@ -4029,6 +4084,7 @@ static void StartStorageLevelToCap(u8 taskId)
     sStorageLevelPosition = sCursorPosition;
     sStorageLevelLearningMoves = FALSE;
     sStorageLevelExpectedSpecies = SPECIES_NONE;
+    sStorageLevelStatsWindowId = WINDOW_NONE;
 
     if (sStorageLevelFromParty)
         sStorageLevelMon = gParties[B_TRAINER_PLAYER][sStorageLevelPosition];
