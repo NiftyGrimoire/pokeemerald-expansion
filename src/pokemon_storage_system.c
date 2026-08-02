@@ -567,6 +567,7 @@ EWRAM_DATA static bool8 sStorageLevelLearningMoves = FALSE;
 EWRAM_DATA static bool8 sStorageLevelAwaitingMove = FALSE;
 EWRAM_DATA static u8 sStorageLevelBoxId = 0;
 EWRAM_DATA static u8 sStorageLevelPosition = 0;
+EWRAM_DATA static enum Species sStorageLevelExpectedSpecies = SPECIES_NONE;
 
 // Main tasks
 static void Task_InitPokeStorage(u8);
@@ -578,6 +579,7 @@ static void Task_HandleBoxOptions(u8);
 static void Task_OnSelectedMon(u8);
 static void StartStorageLevelToCap(u8);
 static void CB2_ContinueStorageLevelToCap(void);
+static void CB2_ReturnFromStorageLevelEvolution(void);
 static void Task_OnCloseBoxPressed(u8);
 static void Task_HidePartyPokemon(u8);
 static void Task_DepositMenu(u8);
@@ -3850,6 +3852,20 @@ static void FinishStorageLevelToCap(void)
     CB2_ReturnToPokeStorage();
 }
 
+static void CB2_ReturnFromStorageLevelEvolution(void)
+{
+    if (GetMonData(&sStorageLevelMon, MON_DATA_SPECIES) != sStorageLevelExpectedSpecies)
+    {
+        sStorageLevelExpectedSpecies = SPECIES_NONE;
+        FinishStorageLevelToCap();
+    }
+    else
+    {
+        sStorageLevelExpectedSpecies = SPECIES_NONE;
+        CB2_ContinueStorageLevelToCap();
+    }
+}
+
 static void CB2_ContinueStorageLevelToCap(void)
 {
     enum Move learnResult;
@@ -3898,7 +3914,8 @@ static void CB2_ContinueStorageLevelToCap(void)
         if (targetSpecies != SPECIES_NONE)
         {
             GetEvolutionTargetSpecies(&sStorageLevelMon, EVO_MODE_NORMAL, ITEM_NONE, NULL, &canStopEvo, DO_EVO);
-            gCB2_AfterEvolution = CB2_ContinueStorageLevelToCap;
+            sStorageLevelExpectedSpecies = targetSpecies;
+            gCB2_AfterEvolution = CB2_ReturnFromStorageLevelEvolution;
             BeginEvolutionScene(&sStorageLevelMon, targetSpecies, canStopEvo, 0);
             return;
         }
@@ -3912,6 +3929,7 @@ static void StartStorageLevelToCap(u8 taskId)
     sStorageLevelPosition = sCursorPosition;
     sStorageLevelLearningMoves = FALSE;
     sStorageLevelAwaitingMove = FALSE;
+    sStorageLevelExpectedSpecies = SPECIES_NONE;
 
     if (sStorageLevelFromParty)
         sStorageLevelMon = gParties[B_TRAINER_PLAYER][sStorageLevelPosition];

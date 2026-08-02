@@ -578,7 +578,9 @@ replacement routes retain their intended target.
   temporary Pokemon without occupying a party slot. Storage advances one level
   at a time, checks every level-up move (opening move replacement when needed),
   runs each evolution scene, then writes the completed record back to its
-  original party or box position before rebuilding the Storage screen.
+  original party or box position before rebuilding the Storage screen. If the
+  player stops an evolution, both entry points stop the larger level-to-cap
+  operation at that point and retain the levels already processed.
 - Streamlined progression: remove breeding and berry planting/growth/harvesting
   as supported mechanics. Audit the Day Care, eggs, inherited moves,
   breeding-only content, berry plots, berry tutorials and NPCs, and any dependent

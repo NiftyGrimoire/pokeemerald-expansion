@@ -224,6 +224,7 @@ EWRAM_DATA u8 gBattlePartyCurrentOrder[PARTY_SIZE / 2] = {0}; // bits 0-3 are th
 static EWRAM_DATA u8 sInitialLevel = 0;
 static EWRAM_DATA u8 sFinalLevel = 0;
 static EWRAM_DATA bool8 sLevelToCapActive = FALSE;
+static EWRAM_DATA enum Species sLevelToCapExpectedSpecies = SPECIES_NONE;
 
 // IWRAM common
 COMMON_DATA void (*gItemUseCB)(u8, TaskFunc) = NULL;
@@ -6077,7 +6078,15 @@ static void CB2_ReturnToPartyMenuUsingRareCandy(void)
 
 static void CB2_ReturnToPartyMenuLevelToCap(void)
 {
-    InitPartyMenu(PARTY_MENU_TYPE_FIELD, PARTY_LAYOUT_SINGLE, PARTY_ACTION_CHOOSE_MON, TRUE, PARTY_MSG_NONE, Task_AdvanceLevelToCap, gPartyMenu.exitCallback);
+    TaskFunc task = Task_AdvanceLevelToCap;
+
+    if (GetMonData(&gParties[B_TRAINER_PLAYER][gPartyMenu.slotId], MON_DATA_SPECIES) != sLevelToCapExpectedSpecies)
+    {
+        sLevelToCapActive = FALSE;
+        task = Task_HandleChooseMonInput;
+    }
+    sLevelToCapExpectedSpecies = SPECIES_NONE;
+    InitPartyMenu(PARTY_MENU_TYPE_FIELD, PARTY_LAYOUT_SINGLE, PARTY_ACTION_CHOOSE_MON, TRUE, PARTY_MSG_NONE, task, gPartyMenu.exitCallback);
 }
 
 static void PartyMenuTryEvolution(u8 taskId)
@@ -6097,7 +6106,10 @@ static void PartyMenuTryEvolution(u8 taskId)
         GetEvolutionTargetSpecies(mon, EVO_MODE_NORMAL, ITEM_NONE, NULL, &canStopEvo, DO_EVO);
         FreePartyPointers();
         if (sLevelToCapActive)
+        {
+            sLevelToCapExpectedSpecies = targetSpecies;
             gCB2_AfterEvolution = CB2_ReturnToPartyMenuLevelToCap;
+        }
         else if (GetItemFieldFunc(gSpecialVar_ItemId) == ItemUseOutOfBattle_RareCandy && gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD && CheckBagHasItem(gSpecialVar_ItemId, 1))
             gCB2_AfterEvolution = CB2_ReturnToPartyMenuUsingRareCandy;
         else
