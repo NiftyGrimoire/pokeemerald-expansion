@@ -574,9 +574,11 @@ replacement routes retain their intended target.
   evolution presentation after every individual level before continuing.
   Evolution scenes now retain the supplied Pokemon pointer instead of looking
   it up again by party index, including their move-replacement summary screen;
-  this permits the forthcoming Storage flow to operate on a temporary boxed
-  Pokemon without occupying a party slot. Pokemon Storage still needs the
-  equivalent stateful flow and must write boxed changes back afterward.
+  this permits the Storage `LEVEL TO CAP` action to operate on a persistent
+  temporary Pokemon without occupying a party slot. Storage advances one level
+  at a time, checks every level-up move (opening move replacement when needed),
+  runs each evolution scene, then writes the completed record back to its
+  original party or box position before rebuilding the Storage screen.
 - Streamlined progression: remove breeding and berry planting/growth/harvesting
   as supported mechanics. Audit the Day Care, eggs, inherited moves,
   breeding-only content, berry plots, berry tutorials and NPCs, and any dependent

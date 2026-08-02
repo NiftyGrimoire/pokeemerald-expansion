@@ -1,12 +1,15 @@
 #include "global.h"
 #include "malloc.h"
+#include "battle.h"
 #include "bg.h"
+#include "caps.h"
 #include "data.h"
 #include "decompress.h"
 #include "dma3.h"
 #include "dynamic_placeholder_text_util.h"
 #include "event_data.h"
 #include "event_object_movement.h"
+#include "evolution_scene.h"
 #include "field_screen_effect.h"
 #include "field_weather.h"
 #include "fldeff_misc.h"
@@ -132,6 +135,7 @@ enum {
     MENU_SHIFT,
     MENU_PLACE,
     MENU_SUMMARY,
+    MENU_LEVEL_TO_CAP,
     MENU_RELEASE,
     MENU_MARK,
     MENU_JUMP,
@@ -557,6 +561,12 @@ EWRAM_DATA static u8 sMovingMonOrigBoxPos = 0;
 EWRAM_DATA static bool8 sAutoActionOn = 0;
 EWRAM_DATA static bool8 sJustOpenedBag = 0;
 EWRAM_DATA static bool8 sRefreshDisplayMonGfx = FALSE;
+EWRAM_DATA static struct Pokemon sStorageLevelMon = {0};
+EWRAM_DATA static bool8 sStorageLevelFromParty = FALSE;
+EWRAM_DATA static bool8 sStorageLevelLearningMoves = FALSE;
+EWRAM_DATA static bool8 sStorageLevelAwaitingMove = FALSE;
+EWRAM_DATA static u8 sStorageLevelBoxId = 0;
+EWRAM_DATA static u8 sStorageLevelPosition = 0;
 
 // Main tasks
 static void Task_InitPokeStorage(u8);
@@ -566,6 +576,8 @@ static void Task_ShowPokeStorage(u8);
 static void Task_OnBPressed(u8);
 static void Task_HandleBoxOptions(u8);
 static void Task_OnSelectedMon(u8);
+static void StartStorageLevelToCap(u8);
+static void CB2_ContinueStorageLevelToCap(void);
 static void Task_OnCloseBoxPressed(u8);
 static void Task_HidePartyPokemon(u8);
 static void Task_DepositMenu(u8);
@@ -2660,6 +2672,10 @@ static void Task_OnSelectedMon(u8 taskId)
             PlaySE(SE_SELECT);
             SetPokeStorageTask(Task_ShowMonSummary);
             break;
+        case MENU_LEVEL_TO_CAP:
+            PlaySE(SE_SELECT);
+            StartStorageLevelToCap(taskId);
+            break;
         case MENU_MARK:
             PlaySE(SE_SELECT);
             SetPokeStorageTask(Task_ShowMarkMenu);
@@ -3822,6 +3838,89 @@ static void FreePokeStorageData(void)
     MultiMove_Free();
     FREE_AND_SET_NULL(sStorage);
     FreeAllWindowBuffers();
+}
+
+static void FinishStorageLevelToCap(void)
+{
+    if (sStorageLevelFromParty)
+        gParties[B_TRAINER_PLAYER][sStorageLevelPosition] = sStorageLevelMon;
+    else
+        SetBoxMonAt(sStorageLevelBoxId, sStorageLevelPosition, &sStorageLevelMon.box);
+
+    CB2_ReturnToPokeStorage();
+}
+
+static void CB2_ContinueStorageLevelToCap(void)
+{
+    enum Move learnResult;
+
+    if (sStorageLevelAwaitingMove)
+    {
+        u8 moveSlot = GetMoveSlotToReplace();
+
+        if (moveSlot < MAX_MON_MOVES)
+        {
+            RemoveMonPPBonus(&sStorageLevelMon, moveSlot);
+            SetMonMoveSlot(&sStorageLevelMon, gMoveToLearn, moveSlot);
+        }
+        sStorageLevelAwaitingMove = FALSE;
+    }
+
+    for (;;)
+    {
+        if (!sStorageLevelLearningMoves)
+        {
+            if (!TryAdvanceMonOneLevelToCap(&sStorageLevelMon))
+            {
+                FinishStorageLevelToCap();
+                return;
+            }
+            learnResult = MonTryLearningNewMove(&sStorageLevelMon, TRUE);
+            sStorageLevelLearningMoves = TRUE;
+        }
+        else
+        {
+            learnResult = MonTryLearningNewMove(&sStorageLevelMon, FALSE);
+        }
+
+        if (learnResult == MON_HAS_MAX_MOVES)
+        {
+            sStorageLevelAwaitingMove = TRUE;
+            ShowSelectMovePokemonSummaryScreen(&sStorageLevelMon, 0, CB2_ContinueStorageLevelToCap, gMoveToLearn);
+            return;
+        }
+        if (learnResult != MOVE_NONE)
+            continue;
+
+        sStorageLevelLearningMoves = FALSE;
+        bool32 canStopEvo = TRUE;
+        enum Species targetSpecies = GetEvolutionTargetSpecies(&sStorageLevelMon, EVO_MODE_NORMAL, ITEM_NONE, NULL, &canStopEvo, CHECK_EVO);
+        if (targetSpecies != SPECIES_NONE)
+        {
+            GetEvolutionTargetSpecies(&sStorageLevelMon, EVO_MODE_NORMAL, ITEM_NONE, NULL, &canStopEvo, DO_EVO);
+            gCB2_AfterEvolution = CB2_ContinueStorageLevelToCap;
+            BeginEvolutionScene(&sStorageLevelMon, targetSpecies, canStopEvo, 0);
+            return;
+        }
+    }
+}
+
+static void StartStorageLevelToCap(u8 taskId)
+{
+    sStorageLevelFromParty = (sCursorArea == CURSOR_AREA_IN_PARTY);
+    sStorageLevelBoxId = StorageGetCurrentBox();
+    sStorageLevelPosition = sCursorPosition;
+    sStorageLevelLearningMoves = FALSE;
+    sStorageLevelAwaitingMove = FALSE;
+
+    if (sStorageLevelFromParty)
+        sStorageLevelMon = gParties[B_TRAINER_PLAYER][sStorageLevelPosition];
+    else
+        BoxMonAtToMon(sStorageLevelBoxId, sStorageLevelPosition, &sStorageLevelMon);
+
+    FreePokeStorageData();
+    DestroyTask(taskId);
+    SetMainCallback2(CB2_ContinueStorageLevelToCap);
 }
 
 
@@ -7804,6 +7903,12 @@ static bool8 SetMenuTexts_Mon(void)
     }
 
     SetMenuText(MENU_SUMMARY);
+    if (!sStorage->displayMonIsEgg
+     && ((sCursorArea == CURSOR_AREA_IN_PARTY
+         && GetMonData(&gParties[B_TRAINER_PLAYER][sCursorPosition], MON_DATA_LEVEL) < GetCurrentLevelCap())
+     || (sCursorArea == CURSOR_AREA_IN_BOX
+         && GetBoxMonData(GetCursorBoxMon(), MON_DATA_LEVEL) < GetCurrentLevelCap())))
+        SetMenuText(MENU_LEVEL_TO_CAP);
     if (sStorage->boxOption == OPTION_MOVE_MONS)
     {
         if (sCursorArea == CURSOR_AREA_IN_BOX)
@@ -8082,6 +8187,7 @@ static const u8 *const sMenuTexts[] =
     [MENU_SHIFT]      = COMPOUND_STRING("SHIFT"),
     [MENU_PLACE]      = COMPOUND_STRING("PLACE"),
     [MENU_SUMMARY]    = COMPOUND_STRING("SUMMARY"),
+    [MENU_LEVEL_TO_CAP] = COMPOUND_STRING("LEVEL TO CAP"),
     [MENU_RELEASE]    = COMPOUND_STRING("RELEASE"),
     [MENU_MARK]       = COMPOUND_STRING("MARK"),
     [MENU_JUMP]       = COMPOUND_STRING("JUMP"),
