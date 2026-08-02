@@ -45,6 +45,20 @@ static bool32 HasTestItemEvolution(enum Species species, enum Species targetSpec
     return FALSE;
 }
 
+static bool32 HasTestLevelEvolution(enum Species species, enum Species targetSpecies, u16 level)
+{
+    const struct Evolution *evolutions = GetSpeciesEvolutions(species);
+
+    for (u32 i = 0; evolutions != NULL && evolutions[i].method != EVOLUTIONS_END; i++)
+    {
+        if (evolutions[i].targetSpecies == targetSpecies
+         && evolutions[i].method == EVO_LEVEL
+         && evolutions[i].param == level)
+            return TRUE;
+    }
+    return FALSE;
+}
+
 TEST("Randomizer hash is deterministic and keeps categories and keys separate")
 {
     u32 hash = RandomizerHash(0x12345678, RANDOMIZER_CATEGORY_ENCOUNTER, 1, 2, 3);
@@ -316,6 +330,12 @@ TEST("Alternate evolution target selection is deterministic and seed separated")
         }
     }
     EXPECT(foundDifferentSeed);
+}
+
+TEST("Both Dartrix branches evolve at level 34")
+{
+    EXPECT(HasTestLevelEvolution(SPECIES_DARTRIX, SPECIES_DECIDUEYE, 34));
+    EXPECT(HasTestLevelEvolution(SPECIES_DARTRIX, SPECIES_DECIDUEYE_HISUI, 34));
 }
 
 TEST("Selected time branch evolves without consulting the clock")

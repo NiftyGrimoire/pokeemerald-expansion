@@ -122,7 +122,7 @@ item, move, and other non-region requirements remain intact.
 | Rufflet | Braviary / Hisuian Braviary | Level 54 |
 | Goomy | Sliggoo / Hisuian Sliggoo | Level 40 |
 | Bergmite | Avalugg / Hisuian Avalugg | Level 37 |
-| Dartrix | Decidueye / Hisuian Decidueye | Authored levels 34 / 36 |
+| Dartrix | Decidueye / Hisuian Decidueye | Level 34 for both forms |
 | Ursaring | Ursaluna | Peat Block; region check removed |
 
 ## Location restrictions removed
