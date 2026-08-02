@@ -202,7 +202,6 @@ bool32 ShouldRandomizerIgnoreEvolutionCondition(enum Species species, u16 condit
     {
         switch (species)
         {
-        case SPECIES_MILCERY:
         case SPECIES_RATTATA_ALOLA:
         case SPECIES_CUBONE:
         case SPECIES_HAPPINY:
@@ -254,15 +253,6 @@ bool32 ShouldRandomizerIgnoreEvolutionCondition(enum Species species, u16 condit
 #endif
 
     return FALSE;
-}
-
-bool32 ShouldRandomizerIgnoreEvolutionSpin(enum Species species)
-{
-#if RANDOMIZER_ENABLED && RANDOMIZER_EVOLUTIONS
-    return species == SPECIES_MILCERY;
-#else
-    return FALSE;
-#endif
 }
 
 bool32 IsMoveRandomizerEligible(enum Move move)

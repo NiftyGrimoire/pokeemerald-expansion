@@ -4736,7 +4736,7 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
             switch (evolutions[i].method)
             {
             case EVO_SPIN:
-                if (ShouldRandomizerIgnoreEvolutionSpin(species) || gSpecialVar_0x8000 == evolutions[i].param)
+                if (gSpecialVar_0x8000 == evolutions[i].param)
                     conditionsMet = TRUE;
                 break;
             }

@@ -278,7 +278,6 @@ TEST("Evolution randomizer removes declared clock and region barriers")
     EXPECT(ShouldRandomizerIgnoreEvolutionCondition(SPECIES_GLIGAR, IF_TIME));
     EXPECT(ShouldRandomizerIgnoreEvolutionCondition(SPECIES_PIKACHU, IF_REGION));
     EXPECT(ShouldRandomizerIgnoreEvolutionCondition(SPECIES_DARTRIX, IF_NOT_REGION));
-    EXPECT(ShouldRandomizerIgnoreEvolutionCondition(SPECIES_MILCERY, IF_TIME));
     EXPECT(!ShouldRandomizerIgnoreEvolutionCondition(SPECIES_BULBASAUR, IF_REGION));
 }
 
@@ -418,12 +417,9 @@ TEST("Milcery selects one stable cream flavor for every Sweet")
     EXPECT_EQ(selectedCount, 1);
     EXPECT_LT(selectedFlavor, ARRAY_COUNT(berryTargets));
     EXPECT(IsRandomizerEvolutionTargetSelected(SPECIES_MILCERY, berryTargets[selectedFlavor]));
-    EXPECT(ShouldRandomizerIgnoreEvolutionCondition(SPECIES_MILCERY, IF_TIME));
-    EXPECT(ShouldRandomizerIgnoreEvolutionSpin(SPECIES_MILCERY));
-    EXPECT(!ShouldRandomizerIgnoreEvolutionSpin(SPECIES_BULBASAUR));
 }
 
-TEST("Milcery evolves to its selected flavor with any spin and the held Sweet")
+TEST("Milcery evolves to its selected flavor by using a Sweet from the Bag")
 {
     static const enum Species strawberryTargets[] =
     {
@@ -438,7 +434,6 @@ TEST("Milcery evolves to its selected flavor with any spin and the held Sweet")
         SPECIES_ALCREMIE_STRAWBERRY_RAINBOW_SWIRL,
     };
     struct Pokemon mon;
-    enum Item heldItem = ITEM_STRAWBERRY_SWEET;
     enum Species expectedTarget = SPECIES_NONE;
 
     gSaveBlock3Ptr->randomizerSeed = 0x87654321;
@@ -448,11 +443,10 @@ TEST("Milcery evolves to its selected flavor with any spin and the held Sweet")
             expectedTarget = strawberryTargets[flavor];
     }
     CreateMon(&mon, SPECIES_MILCERY, 20, 0, OTID_STRUCT_PLAYER_ID);
-    SetMonData(&mon, MON_DATA_HELD_ITEM, &heldItem);
-    gSpecialVar_0x8000 = 0;
 
+    EXPECT(I_USE_EVO_HELD_ITEMS_FROM_BAG);
     EXPECT_NE(expectedTarget, SPECIES_NONE);
-    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_OVERWORLD_SPECIAL, ITEM_NONE, NULL, NULL, CHECK_EVO), expectedTarget);
+    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_ITEM_CHECK, ITEM_STRAWBERRY_SWEET, NULL, NULL, CHECK_EVO), expectedTarget);
 }
 
 TEST("Ability randomizer excludes unsafe and unimplemented abilities")

@@ -197,11 +197,11 @@ evolve by using that item directly from the Bag. The Expansion config
   available. Only Espeon versus Umbreon is a deterministic pair.
 - Own Tempo Rockruff still evolves only into Dusk Lycanroc; only its evening
   restriction is removed.
-- Milcery's held Sweet still determines Strawberry, Berry, Love, Star, Clover,
-  Flower, or Ribbon decoration. The save seed selects one common cream flavor
-  from Vanilla, Ruby, Matcha, Mint, Lemon, Salted, Ruby Swirl, Caramel Swirl,
-  or Rainbow Swirl. Any valid spin action triggers the selected Sweet/flavor
-  result without checking time, direction, or spin duration.
+- Using a Sweet directly from the Bag on Milcery determines its Strawberry,
+  Berry, Love, Star, Clover, Flower, or Ribbon decoration. The save seed selects
+  one common cream flavor from Vanilla, Ruby, Matcha, Mint, Lemon, Salted, Ruby
+  Swirl, Caramel Swirl, or Rainbow Swirl. No held item, spin, or clock condition
+  remains. Sweet usability follows `I_USE_EVO_HELD_ITEMS_FROM_BAG`.
 
 ## Validation
 
@@ -214,7 +214,7 @@ Focused tests cover:
 - Stability within a save and variation across seeds.
 - A Rockruff evolving into its selected form without consulting the clock.
 - Exactly one Milcery cream flavor being shared across all seven Sweets.
-- Milcery evolving to the selected held-Sweet result from an arbitrary spin.
+- Milcery evolving to the selected result by using a Sweet directly from the Bag.
 - All six former location targets retaining their item route and having no
   remaining level-up route.
 - Every enabled evolution table containing no trade method, with representative

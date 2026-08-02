@@ -4754,6 +4754,17 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
 #endif //P_FAMILY_IMPIDIMP
 
 #if P_FAMILY_MILCERY
+#define ALCREMIE_ITEM_EVOLUTIONS(sweet, item)                                  \
+    {EVO_ITEM, item, SPECIES_ALCREMIE_ ##sweet##_VANILLA_CREAM},               \
+    {EVO_ITEM, item, SPECIES_ALCREMIE_ ##sweet##_RUBY_CREAM},                  \
+    {EVO_ITEM, item, SPECIES_ALCREMIE_ ##sweet##_MATCHA_CREAM},                \
+    {EVO_ITEM, item, SPECIES_ALCREMIE_ ##sweet##_MINT_CREAM},                  \
+    {EVO_ITEM, item, SPECIES_ALCREMIE_ ##sweet##_LEMON_CREAM},                 \
+    {EVO_ITEM, item, SPECIES_ALCREMIE_ ##sweet##_SALTED_CREAM},                \
+    {EVO_ITEM, item, SPECIES_ALCREMIE_ ##sweet##_RUBY_SWIRL},                  \
+    {EVO_ITEM, item, SPECIES_ALCREMIE_ ##sweet##_CARAMEL_SWIRL},               \
+    {EVO_ITEM, item, SPECIES_ALCREMIE_ ##sweet##_RAINBOW_SWIRL}
+
     [SPECIES_MILCERY] =
     {
         .baseHP        = 45,
@@ -4816,6 +4827,17 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         .levelUpLearnset = sMilceryLevelUpLearnset,
         .teachableLearnset = sMilceryTeachableLearnset,
         .eggMoveLearnset = sMilceryEggMoveLearnset,
+#if RANDOMIZER_ENABLED && RANDOMIZER_EVOLUTIONS
+        .evolutions = EVOLUTION(
+                                ALCREMIE_ITEM_EVOLUTIONS(STRAWBERRY, ITEM_STRAWBERRY_SWEET),
+                                ALCREMIE_ITEM_EVOLUTIONS(BERRY, ITEM_BERRY_SWEET),
+                                ALCREMIE_ITEM_EVOLUTIONS(LOVE, ITEM_LOVE_SWEET),
+                                ALCREMIE_ITEM_EVOLUTIONS(STAR, ITEM_STAR_SWEET),
+                                ALCREMIE_ITEM_EVOLUTIONS(CLOVER, ITEM_CLOVER_SWEET),
+                                ALCREMIE_ITEM_EVOLUTIONS(FLOWER, ITEM_FLOWER_SWEET),
+                                ALCREMIE_ITEM_EVOLUTIONS(RIBBON, ITEM_RIBBON_SWEET)
+                        )
+#else
         .evolutions = EVOLUTION(
                                 {EVO_SPIN, SPIN_CW_SHORT, SPECIES_ALCREMIE_STRAWBERRY_VANILLA_CREAM,
                                 CONDITIONS({IF_HOLD_ITEM, ITEM_STRAWBERRY_SWEET},
@@ -5007,7 +5029,10 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
                                 CONDITIONS({IF_HOLD_ITEM, ITEM_RIBBON_SWEET},
                                            {IF_TIME, TIME_EVENING})}
                         )
+#endif
     },
+
+#undef ALCREMIE_ITEM_EVOLUTIONS
 
 #define ALCREMIE_MISC_INFO(color)                                               \
         .baseHP        = 65,                                                    \

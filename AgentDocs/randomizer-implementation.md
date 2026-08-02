@@ -512,9 +512,10 @@ The authoritative species-by-species behavior is documented in
 - The target filter is used by normal, trade, item, battle-special, overworld,
   and script-trigger evolution scans so a non-selected form cannot leak through
   another access mode.
-- Milcery preserves its held Sweet as the decoration choice, selects one of nine
-  cream flavors per save, and accepts any valid spin without a clock, direction,
-  or duration restriction.
+- Milcery evolves by using a Sweet directly from the Bag. The Sweet chooses its
+  decoration and the save seed selects one of nine cream flavors, with no held
+  item, spin, or clock requirement. Sweet usability is gated through the enabled
+  `I_USE_EVO_HELD_ITEMS_FROM_BAG` config.
 - The six New Mauville, Petalburg Woods, and Shoal Cave evolution routes are
   location-free: their duplicate level-up entries are removed and their existing
   Thunder, Leaf, or Ice Stone entries are the sole triggers.
@@ -526,8 +527,8 @@ Focused validation currently covers the explicit friendship tiers, an actual
 zero-friendship level evolution, allowlisted condition bypasses, deterministic
 and seed-separated branch selection, a clock-independent Rockruff evolution,
 and a region-independent Pikachu stone evolution. Milcery coverage verifies one
-stable flavor across all Sweets and an actual held-Sweet evolution from an
-arbitrary spin. The location-route test verifies all six targets retain their
+stable flavor across all Sweets and an actual direct-use Sweet evolution. The
+location-route test verifies all six targets retain their
 item evolution and no longer have a level-up route. An exhaustive enabled-species
 scan verifies that no trade evolution methods remain and checks representative
 direct-use replacements.
