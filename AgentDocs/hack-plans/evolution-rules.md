@@ -266,6 +266,20 @@ evolves into Hydrapple at level 40 as documented above.
 The selected stone controls Alcremie's decoration. The save seed still selects
 one common cream flavor across all seven decorations.
 
+## World-item randomizer handoff
+
+The future world-item replacement pool must follow the active evolution table,
+not the items' legacy `ITEM_TYPE_EVOLUTION_ITEM` classification. Species-specific
+items replaced in this ledger must be excluded when they no longer provide any
+independent battle or field utility. Former evolution items that still have a
+useful held effect, such as King's Rock, Metal Coat, Razor Claw, Razor Fang, Deep
+Sea Tooth, or Deep Sea Scale, require an explicit held-item usefulness decision.
+
+The pool also needs a Nuzlocke-value audit beyond evolution items. X-items should
+not enter the pool if battle stat consumables are outside the ruleset. Potions and
+other medicine should be included only if their healing tier remains meaningful
+after the Portable Healer design is finalized.
+
 ## Explicitly unchanged evolution behavior
 
 - Evolution stones, held items, known-move requirements, gender checks, stat

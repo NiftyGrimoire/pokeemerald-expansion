@@ -555,8 +555,12 @@ direct-use replacements.
   alternate or regional-form outcomes for a save.
 - World item randomization: identify all visible and hidden pickup paths, define a
   stable pickup identity, and build an approved Nuzlocke-useful replacement pool
-  limited initially to held items and evolution items. Explicitly decide key-item,
-  TM, duplicate, respawn, and progression-critical-item handling.
+  limited initially to genuinely useful held items and the standard stones or
+  Linking Cord. Exclude retired species-specific evolution items unless they
+  retain a worthwhile independent battle effect. Audit Potions and other medicine
+  against the Portable Healer design, and X-items against the intended battle-item
+  rules, so dead or low-value rewards do not enter the pool. Explicitly decide
+  key-item, TM, duplicate, respawn, and progression-critical-item handling.
 - Level-to-cap action: expose one shared sequential leveling flow from both the
   party menu and Pokemon Storage, preserving every move-learning and evolution
   opportunity and writing boxed changes back without requiring a party slot.

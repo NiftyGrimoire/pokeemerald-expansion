@@ -159,6 +159,12 @@ Current execution order:
    - Limit replacements to items useful in a Nuzlocke, initially held items and
      evolution items; define exclusions and progression safeguards before
      implementation.
+   - Build the pool from actual current utility, not an item's legacy category.
+     Exclude obsolete species-specific evolution items whose routes now use
+     stones, unless an item retains a separately useful battle effect.
+   - Audit low-value consumables before admitting them. In particular, exclude
+     X-items if in-battle stat items are outside the ruleset, and exclude basic
+     Potions or similar healing items if the Portable Healer makes them redundant.
 12. Streamlined game progression — planned:
    - Minimize mandatory grinding so a viable party can stay near each active level
      cap through normal trainer battles and exploration.
@@ -281,6 +287,17 @@ Current execution order:
     from the save seed and a stable pickup identity.
   - Restrict the initial replacement pool to held items and evolution items that are
     usable during a Nuzlocke.
+  - Do not infer usefulness from `ITEM_TYPE_EVOLUTION_ITEM`: all species-specific
+    evolution routes have been consolidated into stones or the Linking Cord.
+    Remove retired evolution items from the pool when they have no other useful
+    battle or field effect. Items such as King's Rock, Metal Coat, Razor Claw,
+    Razor Fang, Deep Sea Tooth, and Deep Sea Scale require an explicit held-effect
+    decision instead of automatic exclusion.
+  - Review consumables against the intended Nuzlocke rules. X-items should be
+    excluded if battle stat consumables are not part of the format. Potions and
+    other basic healing should be excluded if free Portable Healer access makes
+    them dead or disappointing rewards; otherwise define which healing tiers are
+    worthwhile rather than admitting the entire medicine pocket.
   - Specify key-item/TM handling, duplicate policy, pickup respawn behavior, and any
     progression-critical exclusions before hooking item scripts.
 
