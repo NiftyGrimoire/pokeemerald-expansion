@@ -569,9 +569,10 @@ replacement routes retain their intended target.
   key-item, TM, duplicate, respawn, and progression-critical-item handling.
 - Level-to-cap action: implementation is in progress on
   `romhack/qol-level-to-cap`. `TryAdvanceMonOneLevelToCap` provides the shared
-  one-level stat/experience step and stops at the active cap. Expose a stateful
-  sequential flow from both the party menu and Pokemon Storage around that step,
-  preserving every move-learning and evolution opportunity and writing boxed
+  one-level stat/experience step and stops at the active cap. The field party
+  menu exposes `LEVEL TO CAP` and runs the existing stat, move-learning, and
+  evolution presentation after every individual level before continuing.
+  Pokemon Storage still needs the equivalent stateful flow and must write boxed
   changes back without requiring a party slot.
 - Streamlined progression: remove breeding and berry planting/growth/harvesting
   as supported mechanics. Audit the Day Care, eggs, inherited moves,
