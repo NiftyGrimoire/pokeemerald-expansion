@@ -642,11 +642,14 @@ enum Ability GetRandomizedAbilityForSpecies(enum Species species, enum Ability o
 
     for (enum Ability ability = ABILITY_NONE + 1; ability < ABILITIES_COUNT; ability++)
     {
-        if (IsAbilityRandomizerEligible(ability) && selectedIndex-- == 0)
+        if (!IsAbilityRandomizerEligible(ability))
+            continue;
+        if (selectedIndex == 0)
         {
             sEvolutionFamilyAbilityCache[family] = ability;
             return sEvolutionFamilyAbilityCache[family];
         }
+        selectedIndex--;
     }
 #endif
 
@@ -773,8 +776,12 @@ enum Species GetRandomizedSpeciesForEncounter(enum Species originalSpecies, u16 
 
     for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
     {
-        if (IsOrdinaryEncounterCandidate(species, minBST, maxBST) && selectedIndex-- == 0)
-            return species;
+        if (IsOrdinaryEncounterCandidate(species, minBST, maxBST))
+        {
+            if (selectedIndex == 0)
+                return species;
+            selectedIndex--;
+        }
     }
 #endif
 
@@ -829,8 +836,12 @@ enum Species GetRandomizedSpeciesForLegendaryEncounter(enum Species originalSpec
 
     for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
     {
-        if (IsSpeciesRandomizerLegendaryEncounterEligible(species) && selectedIndex-- == 0)
-            return species;
+        if (IsSpeciesRandomizerLegendaryEncounterEligible(species))
+        {
+            if (selectedIndex == 0)
+                return species;
+            selectedIndex--;
+        }
     }
 #endif
 
@@ -893,8 +904,12 @@ enum Species GetRandomizedSpeciesForTrainer(enum Species originalSpecies, u16 tr
 
     for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
     {
-        if (IsOrdinaryEncounterCandidate(species, minBST, maxBST) && selectedIndex-- == 0)
-            return species;
+        if (IsOrdinaryEncounterCandidate(species, minBST, maxBST))
+        {
+            if (selectedIndex == 0)
+                return species;
+            selectedIndex--;
+        }
     }
 #endif
 
@@ -1050,11 +1065,13 @@ enum Species GetRandomizedStarterSpecies(enum Species originalSpecies, u8 slot)
                 }
             }
 
-            if (!alreadySelected && selectedIndex-- == 0)
+            if (!alreadySelected && selectedIndex == 0)
             {
                 selected[choice] = species;
                 break;
             }
+            if (!alreadySelected)
+                selectedIndex--;
         }
     }
 
