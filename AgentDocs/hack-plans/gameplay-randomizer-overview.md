@@ -172,6 +172,10 @@ Current execution order:
    - Remove breeding as a required or supported progression system; audit the Day
      Care, eggs, inherited moves, and breeding-only rewards or encounters so nothing
      important depends on breeding.
+   - Remove berry planting, watering, growth, and harvesting as a supported
+     progression mechanic. Audit berry plots, related NPCs and tutorials, and
+     berry-dependent rewards or encounters; provide direct, finite acquisition
+     paths for any berries that remain important to Nuzlocke gameplay.
    - Complete the no-EV experience by removing or repurposing EV-focused items,
      rewards, dialogue, and UI that no longer provide useful choices.
    - Review Emerald's plot progression for optional streamlining, prioritizing fewer

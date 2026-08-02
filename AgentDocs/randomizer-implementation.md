@@ -567,6 +567,10 @@ replacement routes retain their intended target.
 - Level-to-cap action: expose one shared sequential leveling flow from both the
   party menu and Pokemon Storage, preserving every move-learning and evolution
   opportunity and writing boxed changes back without requiring a party slot.
-- Streamlined progression: audit breeding-dependent content, obsolete EV content,
-  mandatory grinding against each cap, and optional plot detours before choosing
-  concrete EXP, trainer, encounter, or script changes.
+- Streamlined progression: remove breeding and berry planting/growth/harvesting
+  as supported mechanics. Audit the Day Care, eggs, inherited moves,
+  breeding-only content, berry plots, berry tutorials and NPCs, and any dependent
+  rewards or encounters so important content receives a direct replacement path.
+  Also audit obsolete EV content, mandatory grinding against each cap, and
+  optional plot detours before choosing concrete EXP, trainer, encounter, or
+  script changes.
