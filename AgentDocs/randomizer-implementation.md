@@ -567,9 +567,12 @@ replacement routes retain their intended target.
   against the Portable Healer design, and X-items against the intended battle-item
   rules, so dead or low-value rewards do not enter the pool. Explicitly decide
   key-item, TM, duplicate, respawn, and progression-critical-item handling.
-- Level-to-cap action: expose one shared sequential leveling flow from both the
-  party menu and Pokemon Storage, preserving every move-learning and evolution
-  opportunity and writing boxed changes back without requiring a party slot.
+- Level-to-cap action: implementation is in progress on
+  `romhack/qol-level-to-cap`. `TryAdvanceMonOneLevelToCap` provides the shared
+  one-level stat/experience step and stops at the active cap. Expose a stateful
+  sequential flow from both the party menu and Pokemon Storage around that step,
+  preserving every move-learning and evolution opportunity and writing boxed
+  changes back without requiring a party slot.
 - Streamlined progression: remove breeding and berry planting/growth/harvesting
   as supported mechanics. Audit the Day Care, eggs, inherited moves,
   breeding-only content, berry plots, berry tutorials and NPCs, and any dependent

@@ -37,6 +37,29 @@ TEST("Hard level cap removes experience at the cap")
     EXPECT_EQ(GetSoftLevelCapExpValue(16, 100), 0);
 }
 
+TEST("Level-to-cap stepping advances exactly one level and stops at the cap")
+{
+    struct Pokemon mon;
+    u32 previousLevel;
+
+    ClearProgressionFlags();
+    CreateRandomMonWithIVs(&mon, SPECIES_PIKACHU, 5, 0);
+
+    previousLevel = GetMonData(&mon, MON_DATA_LEVEL);
+    EXPECT(TryAdvanceMonOneLevelToCap(&mon));
+    EXPECT_EQ(GetMonData(&mon, MON_DATA_LEVEL), previousLevel + 1);
+
+    while (TryAdvanceMonOneLevelToCap(&mon))
+        previousLevel = GetMonData(&mon, MON_DATA_LEVEL);
+
+    EXPECT_EQ(GetMonData(&mon, MON_DATA_LEVEL), GetCurrentLevelCap());
+    EXPECT_EQ(previousLevel, GetCurrentLevelCap());
+    EXPECT(!TryAdvanceMonOneLevelToCap(&mon));
+
+    CreateRandomMonWithIVs(&mon, SPECIES_EGG, 5, 0);
+    EXPECT(!TryAdvanceMonOneLevelToCap(&mon));
+}
+
 TEST("EV gain is disabled for battles and EV items")
 {
     struct Pokemon mon;

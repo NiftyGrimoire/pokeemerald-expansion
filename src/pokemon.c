@@ -5244,6 +5244,25 @@ bool8 TryIncrementMonLevel(struct Pokemon *mon)
     }
 }
 
+bool32 TryAdvanceMonOneLevelToCap(struct Pokemon *mon)
+{
+    enum Species species = GetMonData(mon, MON_DATA_SPECIES);
+    u32 currentLevel = GetMonData(mon, MON_DATA_LEVEL);
+    u32 nextLevel;
+    u32 targetExp;
+
+    if (species <= SPECIES_NONE || species >= NUM_SPECIES || species == SPECIES_EGG)
+        return FALSE;
+    if (currentLevel >= GetCurrentLevelCap() || currentLevel >= MAX_LEVEL)
+        return FALSE;
+
+    nextLevel = currentLevel + 1;
+    targetExp = gExperienceTables[gSpeciesInfo[species].growthRate][nextLevel];
+    SetMonData(mon, MON_DATA_EXP, &targetExp);
+    CalculateMonStats(mon);
+    return GetMonData(mon, MON_DATA_LEVEL) == nextLevel;
+}
+
 u8 CanLearnTeachableMove(enum Species species, enum Move move)
 {
     const u16 *teachableLearnset = GetSpeciesTeachableLearnset(species);
