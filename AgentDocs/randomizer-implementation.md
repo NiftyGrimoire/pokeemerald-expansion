@@ -572,8 +572,11 @@ replacement routes retain their intended target.
   one-level stat/experience step and stops at the active cap. The field party
   menu exposes `LEVEL TO CAP` and runs the existing stat, move-learning, and
   evolution presentation after every individual level before continuing.
-  Pokemon Storage still needs the equivalent stateful flow and must write boxed
-  changes back without requiring a party slot.
+  Evolution scenes now retain the supplied Pokemon pointer instead of looking
+  it up again by party index, including their move-replacement summary screen;
+  this permits the forthcoming Storage flow to operate on a temporary boxed
+  Pokemon without occupying a party slot. Pokemon Storage still needs the
+  equivalent stateful flow and must write boxed changes back afterward.
 - Streamlined progression: remove breeding and berry planting/growth/harvesting
   as supported mechanics. Audit the Day Care, eggs, inherited moves,
   breeding-only content, berry plots, berry tutorials and NPCs, and any dependent

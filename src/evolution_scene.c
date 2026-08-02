@@ -48,6 +48,7 @@ struct EvoInfo
 
 static EWRAM_DATA struct EvoInfo *sEvoStructPtr = NULL;
 static EWRAM_DATA u16 *sBgAnimPal = NULL;
+static EWRAM_DATA struct Pokemon *sEvolutionMon = NULL;
 
 COMMON_DATA void (*gCB2_AfterEvolution)(void) = NULL;
 
@@ -185,7 +186,7 @@ static void Task_BeginEvolutionScene(u8 taskId)
             bool32 canStopEvo;
             u8 partyId;
 
-            mon = &gParties[B_TRAINER_PLAYER][gTasks[taskId].tPartyId];
+            mon = sEvolutionMon;
             postEvoSpecies = gTasks[taskId].tPostEvoSpecies;
             canStopEvo = gTasks[taskId].tCanStop;
             partyId = gTasks[taskId].tPartyId;
@@ -200,6 +201,7 @@ static void Task_BeginEvolutionScene(u8 taskId)
 void BeginEvolutionScene(struct Pokemon *mon, enum Species postEvoSpecies, bool32 canStopEvo, u8 partyId)
 {
     u8 taskId = CreateTask(Task_BeginEvolutionScene, 0);
+    sEvolutionMon = mon;
     gTasks[taskId].tState = 0;
     gTasks[taskId].tPostEvoSpecies = postEvoSpecies;
     gTasks[taskId].tCanStop = canStopEvo;
@@ -215,6 +217,7 @@ void EvolutionScene(struct Pokemon *mon, enum Species postEvoSpecies, bool32 can
     bool32 isShiny;
     u8 id;
 
+    sEvolutionMon = mon;
     SetHBlankCallback(NULL);
     SetVBlankCallback(NULL);
     CpuFill32(0, (void *)(VRAM), VRAM_SIZE);
@@ -314,7 +317,7 @@ static void CB2_EvolutionSceneLoadGraphics(void)
     u8 id;
     enum Species postEvoSpecies;
     u32 personality;
-    struct Pokemon *mon = &gParties[B_TRAINER_PLAYER][gTasks[sEvoStructPtr->evoTaskId].tPartyId];
+    struct Pokemon *mon = sEvolutionMon;
     bool32 isShiny;
 
     postEvoSpecies = gTasks[sEvoStructPtr->evoTaskId].tPostEvoSpecies;
@@ -653,7 +656,7 @@ enum {
 static void Task_EvolutionScene(u8 taskId)
 {
     u32 var;
-    struct Pokemon *mon = &gParties[B_TRAINER_PLAYER][gTasks[taskId].tPartyId];
+    struct Pokemon *mon = sEvolutionMon;
 
     // check if B Button was held, so the evolution gets stopped
     if (gMain.heldKeys == B_BUTTON
@@ -981,7 +984,7 @@ static void Task_EvolutionScene(u8 taskId)
             if (!gPaletteFade.active)
             {
                 FreeAllWindowBuffers();
-                ShowSelectMovePokemonSummaryScreen(gParties[B_TRAINER_PLAYER], gTasks[taskId].tPartyId,
+                ShowSelectMovePokemonSummaryScreen(sEvolutionMon, 0,
                             CB2_EvolutionSceneLoadGraphics,
                             gMoveToLearn);
                 gTasks[taskId].tLearnMoveState++;
