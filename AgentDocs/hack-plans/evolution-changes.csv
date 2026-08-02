@@ -1,0 +1,90 @@
+Category,Source,Target,Original requirement,New requirement,Notes
+Friendship,Pichu,Pikachu,High friendship,Level 20,None
+Friendship,Cleffa,Clefairy,High friendship,Level 20,None
+Friendship,Igglybuff,Jigglypuff,High friendship,Level 20,None
+Friendship,Togepi,Togetic,High friendship,Level 20,None
+Friendship,Azurill,Marill,High friendship,Level 20,None
+Friendship,Budew,Roselia,High friendship during the day,Level 20,Clock restriction removed
+Friendship,Chingling,Chimecho,High friendship at night,Level 20,Clock restriction removed
+Friendship,Munchlax,Snorlax,High friendship,Level 20,None
+Friendship,Golbat,Crobat,High friendship,Level 30,None
+Friendship,Alolan Meowth,Alolan Persian,High friendship,Level 30,None
+Friendship,Eevee,Sylveon,High friendship while knowing a Fairy-type move,Level 30 while knowing a Fairy-type move,Fairy-type move remains required
+Friendship and seeded branch,Eevee,Espeon or Umbreon,High friendship during the corresponding time,Level 30,One target is selected per save; clock restriction removed
+Friendship,Buneary,Lopunny,High friendship,Level 30,None
+Friendship,Riolu,Lucario,High friendship during the day,Level 30,Clock restriction removed
+Friendship,Woobat,Swoobat,High friendship,Level 30,None
+Friendship,Swadloon,Leavanny,High friendship,Level 30,None
+Friendship,Snom,Frosmoth,High friendship at night,Level 30,Clock restriction removed
+Friendship,Chansey,Blissey,High friendship,Level 40,None
+Friendship,Type: Null,Silvally,High friendship,Level 40,None
+Clock,Alolan Rattata,Alolan Raticate,Level 20 at night,Level 20,Clock restriction removed
+Clock and seeded branch,Cubone,Marowak or Alolan Marowak,Level 28 with time and region deciding form,Level 28,One target is selected per save; clock and region restrictions removed
+Clock,Happiny,Chansey,Oval Stone during the day,Use Oval Stone from the Bag,Clock restriction removed
+Clock,Gligar,Gliscor,Razor Fang at night,Use Razor Fang from the Bag,Clock restriction removed
+Clock,Sneasel,Weavile,Razor Claw at night,Use Razor Claw from the Bag,Clock restriction removed
+Clock,Hisuian Sneasel,Sneasler,Razor Claw during the day,Use Razor Claw from the Bag,Clock restriction removed
+Clock,Galarian Linoone,Obstagoon,Level 35 at night,Level 35,Clock restriction removed
+Clock,Tyrunt,Tyrantrum,Level 39 during the day,Level 39,Clock restriction removed
+Clock,Amaura,Aurorus,Level 39 at night,Level 39,Clock restriction removed
+Clock,Yungoos,Gumshoos,Level 20 during the day,Level 20,Clock restriction removed
+Clock and seeded branch,Rockruff,Midday or Midnight Lycanroc,Level 25 during the corresponding time,Level 25,One target is selected per save; clock restriction removed
+Clock,Own Tempo Rockruff,Dusk Lycanroc,Level 25 during evening,Level 25,Clock restriction removed
+Clock,Fomantis,Lurantis,Level 34 during the day,Level 34,Clock restriction removed
+Clock and seeded branch,Cosmoem,Solgaleo or Lunala,Level 53 during the corresponding time,Level 53,One target is selected per save; clock restriction removed
+Clock,Greavard,Houndstone,Level 30 at night,Level 30,Clock restriction removed
+Clock and region,Ursaring,Ursaluna,Peat Block at night in Hisui,Use Peat Block from the Bag,Clock and region restrictions removed
+Seeded regional branch,Pikachu,Raichu or Alolan Raichu,Thunder Stone with region deciding form,Thunder Stone,One target is selected per save
+Seeded regional branch,Exeggcute,Exeggutor or Alolan Exeggutor,Leaf Stone with region deciding form,Leaf Stone,One target is selected per save
+Seeded regional branch,Koffing,Weezing or Galarian Weezing,Level 35 with region deciding form,Level 35,One target is selected per save
+Seeded regional branch,Mime Jr.,Mr. Mime or Galarian Mr. Mime,Know Mimic with region deciding form,Know Mimic,One target is selected per save
+Seeded regional branch,Quilava,Typhlosion or Hisuian Typhlosion,Level 36 with region deciding form,Level 36,One target is selected per save
+Seeded regional branch,Dewott,Samurott or Hisuian Samurott,Level 36 with region deciding form,Level 36,One target is selected per save
+Seeded regional branch,Petilil,Lilligant or Hisuian Lilligant,Sun Stone with region deciding form,Sun Stone,One target is selected per save
+Seeded regional branch,Rufflet,Braviary or Hisuian Braviary,Level 54 with region deciding form,Level 54,One target is selected per save
+Seeded regional branch,Goomy,Sliggoo or Hisuian Sliggoo,Level 40 with region deciding form,Level 40,One target is selected per save
+Seeded regional branch,Bergmite,Avalugg or Hisuian Avalugg,Level 37 with region deciding form,Level 37,One target is selected per save
+Seeded regional branch,Dartrix,Decidueye or Hisuian Decidueye,Authored level 34 or 36 with region deciding form,Authored level 34 or 36,One target is selected per save
+Location,Magneton,Magnezone,Level up in New Mauville,Thunder Stone,Location route removed
+Location,Nosepass,Probopass,Level up in New Mauville,Thunder Stone,Location route removed
+Location,Charjabug,Vikavolt,Level up in New Mauville,Thunder Stone,Location route removed
+Location,Crabrawler,Crabominable,Level up in Shoal Cave ice room,Ice Stone,Location route removed
+Location,Eevee,Leafeon,Level up in Petalburg Woods,Leaf Stone,Location route removed
+Location,Eevee,Glaceon,Level up in Shoal Cave ice room,Ice Stone,Location route removed
+Plain trade,Kadabra,Alakazam,Trade,Linking Cord,None
+Plain trade,Machoke,Machamp,Trade,Linking Cord,None
+Plain trade,Graveler,Golem,Trade,Linking Cord,None
+Plain trade,Alolan Graveler,Alolan Golem,Trade,Linking Cord,None
+Plain trade,Haunter,Gengar,Trade,Linking Cord,None
+Plain trade,Boldore,Gigalith,Trade,Linking Cord,None
+Plain trade,Gurdurr,Conkeldurr,Trade,Linking Cord,None
+Partner trade,Karrablast,Escavalier,Trade for Shelmet,Linking Cord,Partner requirement removed
+Partner trade,Shelmet,Accelgor,Trade for Karrablast,Linking Cord,Partner requirement removed
+Plain trade,Phantump,Trevenant,Trade,Linking Cord,None
+Plain trade,Pumpkaboo (Average),Gourgeist (Average),Trade,Linking Cord,None
+Plain trade,Pumpkaboo (Small),Gourgeist (Small),Trade,Linking Cord,None
+Plain trade,Pumpkaboo (Large),Gourgeist (Large),Trade,Linking Cord,None
+Plain trade,Pumpkaboo (Super),Gourgeist (Super),Trade,Linking Cord,None
+Held-item trade,Poliwhirl,Politoed,Trade while holding King's Rock,Dawn Stone,None
+Held-item trade,Slowpoke,Slowking,Trade while holding King's Rock,Dawn Stone,None
+Held-item trade,Onix,Steelix,Trade while holding Metal Coat,Dawn Stone,None
+Held-item trade,Scyther,Scizor,Trade while holding Metal Coat,Dusk Stone,Kleavor still uses Black Augurite
+Held-item trade,Seadra,Kingdra,Trade while holding Dragon Scale,Water Stone,None
+Held-item trade,Rhydon,Rhyperior,Trade while holding Protector,Moon Stone,None
+Held-item trade,Electabuzz,Electivire,Trade while holding Electirizer,Thunder Stone,None
+Held-item trade,Magmar,Magmortar,Trade while holding Magmarizer,Fire Stone,None
+Held-item trade,Porygon,Porygon2,Trade while holding Upgrade,Dawn Stone,None
+Held-item trade,Porygon2,Porygon-Z,Trade while holding Dubious Disc,Dusk Stone,None
+Held-item trade,Feebas,Milotic,Trade while holding Prism Scale,Shiny Stone,None
+Held-item trade,Dusclops,Dusknoir,Trade while holding Reaper Cloth,Dusk Stone,None
+Held-item trade,Clamperl,Huntail,Trade while holding Deep Sea Tooth,Water Stone,None
+Held-item trade,Clamperl,Gorebyss,Trade while holding Deep Sea Scale,Shiny Stone,None
+Held-item trade,Spritzee,Aromatisse,Trade while holding Sachet,Shiny Stone,None
+Held-item trade,Swirlix,Slurpuff,Trade while holding Whipped Dream,Sun Stone,None
+Special item,Milcery,Strawberry Alcremie,Hold Strawberry Sweet and perform a matching spin at the correct time,Use Strawberry Sweet from the Bag,Cream flavor is selected per save
+Special item,Milcery,Berry Alcremie,Hold Berry Sweet and perform a matching spin at the correct time,Use Berry Sweet from the Bag,Cream flavor is selected per save
+Special item,Milcery,Love Alcremie,Hold Love Sweet and perform a matching spin at the correct time,Use Love Sweet from the Bag,Cream flavor is selected per save
+Special item,Milcery,Star Alcremie,Hold Star Sweet and perform a matching spin at the correct time,Use Star Sweet from the Bag,Cream flavor is selected per save
+Special item,Milcery,Clover Alcremie,Hold Clover Sweet and perform a matching spin at the correct time,Use Clover Sweet from the Bag,Cream flavor is selected per save
+Special item,Milcery,Flower Alcremie,Hold Flower Sweet and perform a matching spin at the correct time,Use Flower Sweet from the Bag,Cream flavor is selected per save
+Special item,Milcery,Ribbon Alcremie,Hold Ribbon Sweet and perform a matching spin at the correct time,Use Ribbon Sweet from the Bag,Cream flavor is selected per save

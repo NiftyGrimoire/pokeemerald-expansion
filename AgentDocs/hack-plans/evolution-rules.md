@@ -13,13 +13,16 @@ Implemented on `romhack/randomizer-evolution-rules`:
 - Audited day, night, and evening restrictions are removed.
 - Audited regional pairs choose one result deterministically per save.
 - Paired clock branches choose one result deterministically per save.
-- Milcery keeps its held Sweet as the decoration choice while the save selects
-  one of nine cream flavors; any valid spin can trigger that selected result.
+- Milcery evolves by using a Sweet directly from the Bag; the Sweet chooses its
+  decoration while the save selects one of nine cream flavors.
 - Location-based level-up routes are removed in favor of their existing
   location-free evolution stones.
 - Trade routes are removed in favor of direct-use evolution items.
 
 No other evolution mechanic is globally broadened.
+
+For a spreadsheet-friendly, one-row-per-route summary of every change, see
+[`evolution-changes.csv`](evolution-changes.csv).
 
 ## Determinism contract
 
@@ -99,7 +102,7 @@ level, item, move, form, and other non-clock requirements remain intact.
 | Snom | Frosmoth | Level 30 replacement for friendship |
 | Greavard | Houndstone | Level 30 |
 | Ursaring | Ursaluna | Peat Block retained; Hisui and night checks removed |
-| Milcery | Selected Alcremie flavor | Held Sweet retained; clock and precise spin requirement removed |
+| Milcery | Selected Alcremie flavor | Use a Sweet directly from the Bag; held item, clock, and spin requirements removed |
 
 ## Regional restrictions removed and randomized
 
@@ -224,13 +227,13 @@ Focused tests cover:
 Manual gameplay checks still required:
 
 - Exercise at least one evolution from each friendship tier.
-- Exercise held-item clock conversions for Gligar and both Sneasel forms.
+- Exercise direct-use item clock conversions for Gligar and both Sneasel forms.
 - Exercise a stone-based regional pair and a level-based regional pair across
   multiple saves.
 - Verify Eevee's Fairy-move precedence and selected Espeon/Umbreon fallback.
 - Verify cancellation and retry do not change the selected target.
 - Exercise at least two different Sweets on Milcery and confirm that decoration
-  follows the held item while cream flavor stays fixed within the save.
+  follows the used item while cream flavor stays fixed within the save.
 - Use each of the Thunder, Leaf, and Ice Stone replacement routes outside the
   former required location.
 - Exercise one plain trade replacement, one former held-item trade replacement,
