@@ -125,11 +125,12 @@ Current execution order:
      without duplicates.
    - Weight damaging moves toward a level-scaled target power and shift status
      weighting from basic to strong and elite effects as levels rise. Keep every
-     eligible tier possible at nonzero weight, preserve STAB and coverage bias,
-     exclude unsuitable species-locked moves, and retain the authored move as an
-     empty-pool fallback. Saturate power-distance penalties at the minimum weight
-     without unsigned subtraction so extreme-power moves remain rare instead of
-     overflowing the weighted pool.
+     eligible tier possible at nonzero weight, use a 4x STAB multiplier versus 2x
+     coverage, and scale status-tier weights proportionally to retain their
+     approximate relationship to STAB. Exclude unsuitable species-locked moves
+     and retain the authored move as an empty-pool fallback. Saturate
+     power-distance penalties at the minimum weight without unsigned subtraction
+     so extreme-power moves remain rare instead of overflowing the weighted pool.
    - Resolve through the shared level-up accessor so initial, level-up, evolution,
      reminder, AI, and Pokedex paths agree. Regenerate into a small shared buffer
      and only add a broader cache after measuring access cost.

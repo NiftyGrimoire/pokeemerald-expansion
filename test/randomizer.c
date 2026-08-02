@@ -188,7 +188,7 @@ TEST("Learnset weights favor appropriate damaging move power by level")
     EXPECT_GT(lateEmber, 0);
     EXPECT_EQ(earlySelfDestruct, 2);
     EXPECT_EQ(earlyExplosion, 2);
-    EXPECT_EQ(earlyVCreate, 3);
+    EXPECT_EQ(earlyVCreate, 4);
     EXPECT_GT(earlyFireBlast, earlySelfDestruct);
     EXPECT_GT(earlyFireBlast, earlyExplosion);
     EXPECT_GT(earlyFireBlast, earlyVCreate);
@@ -206,12 +206,12 @@ TEST("Learnset weights shift status moves from basic to elite by level")
     EXPECT_GT(earlyGrowl, earlyQuiverDance);
     EXPECT_GT(middleCalmMind, middleGrowl);
     EXPECT_GT(lateQuiverDance, lateGrowl);
-    EXPECT_EQ(earlyGrowl, 10);
-    EXPECT_EQ(earlyQuiverDance, 3);
-    EXPECT_EQ(middleGrowl, 2);
-    EXPECT_EQ(middleCalmMind, 24);
+    EXPECT_EQ(earlyGrowl, 13);
+    EXPECT_EQ(earlyQuiverDance, 4);
+    EXPECT_EQ(middleGrowl, 3);
+    EXPECT_EQ(middleCalmMind, 32);
     EXPECT_EQ(lateGrowl, 1);
-    EXPECT_EQ(lateQuiverDance, 36);
+    EXPECT_EQ(lateQuiverDance, 48);
 }
 
 TEST("Learnset weights treat weather-setting status moves as strong tier")
@@ -226,9 +226,9 @@ TEST("Learnset weights treat weather-setting status moves as strong tier")
     EXPECT_GT(earlyGrowl, earlyRainDance);
     EXPECT_GT(middleRainDance, middleGrowl);
     EXPECT_GT(lateQuiverDance, lateRainDance);
-    EXPECT_EQ(earlyRainDance, 6);
-    EXPECT_EQ(middleRainDance, 24);
-    EXPECT_EQ(lateRainDance, 10);
+    EXPECT_EQ(earlyRainDance, 8);
+    EXPECT_EQ(middleRainDance, 32);
+    EXPECT_EQ(lateRainDance, 13);
 }
 
 TEST("Level-up learnsets separate seed and species identity")

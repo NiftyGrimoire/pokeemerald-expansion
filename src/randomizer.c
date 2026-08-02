@@ -9,7 +9,7 @@
 #define RANDOMIZER_STARTER_COUNT 3
 #define RANDOMIZER_STARTER_MIN_BST 300
 #define RANDOMIZER_STARTER_MAX_BST 350
-#define RANDOMIZER_MOVE_TYPE_WEIGHT_STAB 3
+#define RANDOMIZER_MOVE_TYPE_WEIGHT_STAB 4
 #define RANDOMIZER_MOVE_TYPE_WEIGHT_COVERAGE 2
 #define RANDOMIZER_MOVE_TYPE_WEIGHT_STATUS 1
 #define RANDOMIZER_MOVE_POWER_WEIGHT_MAX 12
@@ -363,17 +363,17 @@ static u32 GetRandomizerStatusMoveWeight(enum Move move, u8 level)
 
     if (level < 24)
     {
-        static const u8 sEarlyWeights[] = {10, 6, 3};
+        static const u8 sEarlyWeights[] = {13, 8, 4};
         return sEarlyWeights[moveTier];
     }
     else if (level < 42)
     {
-        static const u8 sMiddleWeights[] = {2, 24, 8};
+        static const u8 sMiddleWeights[] = {3, 32, 11};
         return sMiddleWeights[moveTier];
     }
     else
     {
-        static const u8 sLateWeights[] = {1, 10, 36};
+        static const u8 sLateWeights[] = {1, 13, 48};
         return sLateWeights[moveTier];
     }
 }

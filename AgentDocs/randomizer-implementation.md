@@ -55,18 +55,21 @@ been implemented.
   the engine's normal level-up table capacity. Moves are deterministic per save,
   species, and slot, with no duplicates.
 - Damaging-move weights follow a level-based target power from roughly 40 in the
-  opening game to 115 at level 80. STAB and coverage multipliers remain, but all
-  eligible power bands retain nonzero weight, so an unusually strong early move
-  or weak late move remains possible. Power-distance penalties saturate at a
-  base weight of one; this explicit saturation avoids unsigned underflow making
-  extreme-power moves such as Self-Destruct, Explosion, and V-create dominant.
+  opening game to 115 at level 80. STAB moves use a 4x multiplier and coverage
+  moves use 2x, strengthening the preference for same-type attacks. All eligible
+  power bands retain nonzero weight, so an unusually strong early move or weak
+  late move remains possible. Power-distance penalties saturate at a base weight
+  of one; this explicit saturation avoids unsigned underflow making extreme-power
+  moves such as Self-Destruct, Explosion, and V-create dominant.
 - Status moves use basic, strong, and elite potency tiers. Basic effects are
   favored before level 24, strong setup/recovery/status/hazard effects from 24,
   and elite setup or exceptional utility from 42. All status moves whose effects
   set weather, including weather-plus-switch moves, belong to the strong tier.
-  Per-move basic/strong/elite weights are 10/6/3 early, 2/24/8 from level 24,
-  and 1/10/36 from level 42. These elevated strong and elite weights compensate
-  for the larger basic-status candidate pool while every tier remains possible.
+  Per-move basic/strong/elite weights are 13/8/4 early, 3/32/11 from level 24,
+  and 1/13/48 from level 42. These are approximately 4/3 of the prior values so
+  status moves retain their relationship to the increased STAB multiplier.
+  Elevated strong and elite weights compensate for the larger basic-status
+  candidate pool while every tier remains possible.
 - Placeholder, Transform, Sketch, Dark Void, Hyperspace Fury, Aura Wheel,
   species-power-override, and Struggle moves are excluded. The authored move is
   the fallback if no candidate exists.
