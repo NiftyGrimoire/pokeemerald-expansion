@@ -20,11 +20,10 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
   Burst forms, Gigantamax forms, Tera forms, Totem forms, and other forms found to be
   unusable outside their special context. Feature-specific filters may narrow this
   pool further.
-- Evolution-family identity and the exact randomized-ability representation remain
-  open design questions. No ability hook should be implemented until both are
-  specified together.
-- Randomized learnsets resolve at runtime on the active feature branch. The version-1
-  move pool, weighting, duplicate policy, schedule, and access seam are documented in
+- Evolution-family identity and randomized ability resolution are implemented
+  through the shared deterministic family policy documented in the handoff.
+- Randomized learnsets resolve at runtime on `romhack/main`. The version-1 move
+  pool, weighting, duplicate policy, schedule, and access seam are documented in
   the implementation handoff. Add a broader cache only if profiling shows it is
   needed.
 
@@ -36,11 +35,10 @@ behavior and validation belong in `AgentDocs/randomizer-implementation.md`.
 
 Current execution order:
 
-1. Finish review, gameplay validation, and integration of Phase 8.
-2. Implement Phase 9 so evolution access matches the short-run format.
-3. Implement Phase 10's shared level-to-cap flow and Portable Healer.
-4. Specify and implement the Phase 11 world-item pool and safeguards.
-5. Audit and tune whole-game progression in Phase 12 after the preceding systems
+1. Complete the remaining manual gameplay checks for Phases 8 and 9.
+2. Implement Phase 10's shared level-to-cap flow and Portable Healer.
+3. Specify and implement the Phase 11 world-item pool and safeguards.
+4. Audit and tune whole-game progression in Phase 12 after the preceding systems
    can be evaluated together.
 
 1. Foundation — complete on `romhack/main`:
@@ -118,8 +116,7 @@ Current execution order:
      form/signature-only, Wonder Guard, placeholder, and unimplemented abilities
      from the version-1 candidate pool.
    - Cache family identities and resolved family abilities in EWRAM.
-8. Learnsets — implemented on `romhack/randomizer-learnsets`; integration and
-   manual gameplay checks remain:
+8. Learnsets — complete on `romhack/main`; manual gameplay checks remain:
    - Allow every enabled real Pokemon species to learn every configured TM while
      preserving authored HM and move-tutor compatibility.
    - Give each species four starting moves at level 1, then front-load new moves
@@ -136,8 +133,7 @@ Current execution order:
      and only add a broader cache after measuring access cost.
    - Do not expand egg-move support while breeding is planned for removal. Revisit
      egg moves only if a non-breeding acquisition path is retained or added.
-9. Evolution rules — implemented on `romhack/randomizer-evolution-rules`;
-   manual gameplay checks remain:
+9. Evolution rules — complete on `romhack/main`; manual gameplay checks remain:
    - The authoritative species-level conversion ledger is
      `AgentDocs/hack-plans/evolution-rules.md`.
    - Replace friendship evolutions from an explicit species-by-species conversion
@@ -146,6 +142,9 @@ Current execution order:
      Nuzlocke: replace day/night dependencies and deterministically randomize the
      available branch or form, including regional forms, under an explicit
      species-by-species policy.
+   - Replace move requirements with explicit levels, remove location and trade
+     requirements, and consolidate item evolutions into standard stones or the
+     Linking Cord. Preserve player choice for stone-based branches.
 10. Quality of life — planned:
    - Add a button to the party menu and Pokemon Storage that raises a selected
      Pokemon to the current level cap without requiring a boxed Pokemon to be moved
@@ -197,6 +196,9 @@ Current execution order:
   - Hard Emerald gym-based level caps.
   - No EV gain.
   - Friendship evolutions replaced by level evolutions.
+  - Move-, clock-, location-, trade-, and species-specific-item evolution barriers
+    replaced by explicit levels, deterministic seeded branches, standard stones,
+    or the Linking Cord according to the authoritative evolution ledger.
 - Store one `u32 randomizerSeed` in save data and initialize it during new-game setup.
 - Add deterministic helper functions:
   - `GetRandomizerSeed()`
@@ -274,14 +276,15 @@ Current execution order:
     - Baby/early evolutions: level 20.
     - Midgame evolutions: level 30.
     - Special/late evolutions: level 40.
-  - Preserve extra conditions where meaningful, such as day/night or known move type, unless they depended only on friendship.
+  - Remove clock and move requirements because short-run access and randomized
+    learnsets cannot reliably satisfy them.
 - Time-dependent, branched, and form evolutions:
   - Remove day/night availability barriers for a quick Nuzlocke.
   - For species with alternate evolution outcomes or forms, deterministically choose
     an available result per save, including eligible regional forms.
   - Specify the eligible form pool, branch identity, evolution trigger, and handling
-    of species whose regional form normally requires a different base form before
-    implementation.
+    of species whose regional form normally requires a different base form in the
+    authoritative evolution ledger.
 - World items:
   - Randomize eligible visible and hidden overworld item pickups deterministically
     from the save seed and a stable pickup identity.
@@ -319,7 +322,8 @@ Current execution order:
 - Confirm day/night evolution lines and alternate/regional-form branches are
   obtainable without waiting for a real-time window and remain stable within a save.
 - Confirm world item replacements are deterministic within a save, differ between
-  saves, and never produce an item outside the approved held/evolution-item pool.
+  saves, and never produce an item outside the approved Nuzlocke-useful pool of
+  standard stones, Linking Cord, and independently useful held items.
 - Confirm the party-menu and Pokemon Storage level-cap actions never exceed the active
   cap, process all intervening move-learning and evolution opportunities in order,
   resume safely after cancellation or interruption, and correctly persist changes to

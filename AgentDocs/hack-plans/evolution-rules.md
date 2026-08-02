@@ -7,7 +7,7 @@ randomizer. It records every evolution changed by
 `RANDOMIZER_EVOLUTIONS`, the replacement trigger, conditions that remain
 required, and deterministic alternate-form choices.
 
-Implemented on `romhack/randomizer-evolution-rules`:
+Integrated on `romhack/main`:
 
 - Friendship requirements are replaced by explicit levels.
 - Audited day, night, and evening restrictions are removed.
@@ -17,7 +17,7 @@ Implemented on `romhack/randomizer-evolution-rules`:
   decoration while the save selects one of nine cream flavors.
 - Location-based level-up routes are removed in favor of their existing
   location-free evolution stones.
-- Trade routes are removed in favor of direct-use evolution items.
+- Trade routes are removed in favor of standard stones or the Linking Cord.
 - Move and move-type requirements are replaced by explicit levels.
 
 No other evolution mechanic is globally broadened.
@@ -39,7 +39,7 @@ while Sylveon, Espeon, and Umbreon form one seeded level-30 choice.
 ## Friendship replacements
 
 The listed source species uses its replacement level instead of checking
-friendship. Any other authored condition on that evolution remains required.
+friendship. Conditions explicitly retained in the tables below still apply.
 
 ### Level 20: baby and early evolutions
 
@@ -282,10 +282,10 @@ after the Portable Healer design is finalized.
 
 ## Explicitly unchanged evolution behavior
 
-- Evolution stones, held items, known-move requirements, gender checks, stat
-  comparisons, weather, party composition, battle trackers, and script
-  triggers remain authored unless a row above says otherwise. The six former
-  location evolutions explicitly use their listed stones.
+- Gender checks, stat comparisons, weather, party composition, battle trackers,
+  and script triggers remain authored unless a row above says otherwise. Move
+  requirements are removed, and every item evolution uses a standard stone or
+  Linking Cord. The six former location evolutions use their listed stones.
 - No trade trigger remains. Former held-item trades use the stones listed above,
   and plain or partner-specific trades use the Linking Cord.
 - Eevee's Jolteon, Vaporeon, Flareon, Leafeon, and Glaceon routes remain
@@ -313,7 +313,7 @@ Focused tests cover:
 - All six former location targets retaining their item route and having no
   remaining level-up route.
 - Every enabled evolution table containing no trade method, with representative
-  Linking Cord and direct-use item routes retained.
+  Linking Cord and stone replacement routes retained.
 - Every enabled evolution table containing no move or move-type condition.
 
 Manual gameplay checks still required:
@@ -323,7 +323,8 @@ Manual gameplay checks still required:
 - Exercise all three stone-based Applin branches and Dipplin's level-40 follow-up.
 - Exercise a stone-based regional pair and a level-based regional pair across
   multiple saves.
-- Verify Eevee's Fairy-move precedence and selected Espeon/Umbreon fallback.
+- Verify Eevee selects exactly one of Sylveon, Espeon, or Umbreon at level 30
+  while all five stone branches remain player-controlled.
 - Verify cancellation and retry do not change the selected target.
 - Exercise at least two different stones on Milcery and confirm that decoration
   follows the used stone while cream flavor stays fixed within the save.

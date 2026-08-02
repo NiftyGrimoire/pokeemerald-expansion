@@ -119,11 +119,10 @@ The randomizer is runtime-resolved and deterministic per save:
   an algorithm-version change.
 
 Foundation, ordinary and scripted encounter randomization, level caps and EV
-removal, starters, enemy trainer parties, and evolution-family abilities are
-implemented on `romhack/main`. The active learnset branch adds universal TM
-compatibility and deterministic, level-weighted level-up learnsets. Consult the
-handoff for its exact branch and validation state rather than assuming feature
-work is already integrated.
+removal, starters, enemy trainer parties, evolution-family abilities, universal
+TM compatibility, deterministic level-weighted learnsets, and streamlined
+evolution rules are implemented on `romhack/main`. Consult the implementation
+handoff and evolution ledger for exact behavior and remaining manual checks.
 
 The encounter system preserves vanilla encounter checks, method, weighted slot
 selection, and level, then replaces only the species. DexNav, visible overworld

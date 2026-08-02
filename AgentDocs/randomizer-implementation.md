@@ -3,7 +3,8 @@
 ## Current branch
 
 - Integration branch: `romhack/main`.
-- Active feature branch: `romhack/randomizer-evolution-rules`.
+- Evolution work is integrated into `romhack/main`; no evolution feature branch
+  remains active after this handoff update.
 - Base: `pokeemerald-expansion` stable `1.16.2`.
 - Push only to the NiftyGrimoire fork through `origin`.
 - Never push to `upstream`.
@@ -35,11 +36,10 @@ Wild encounter randomization, BST-scaled ordinary encounter pools, scripted
 encounter randomization, level caps and EV removal, starter randomization, enemy
 trainer randomization, and evolution-family ability randomization are merged into
 `romhack/main`, including universal TM compatibility and randomized level-up
-learnsets. Evolution rules are in progress on
-`romhack/randomizer-evolution-rules`; quality-of-life hooks have not been
-implemented.
+learnsets and the streamlined evolution rules. Quality-of-life hooks have not
+been implemented.
 
-## Learnset phase in progress
+## Learnset phase complete
 
 - Every enabled real Pokemon species can learn every configured TM through the
   shared `CanLearnTeachableMove` compatibility seam.
@@ -484,29 +484,28 @@ Manual gameplay validation still required:
 - Exercise Castform, Cherrim, Aegislash, Wishiwashi, Minior, Mimikyu, Cramorant,
   Eiscue, Morpeko, Zygarde, Silvally, Arceus, and Terapagos form behavior.
 
-## Learnset branch follow-up
+## Learnset manual follow-up
 
-Before integrating `romhack/randomizer-learnsets` into `romhack/main`:
+After integration into `romhack/main`:
 
-1. Review the complete branch diff against `romhack/main` and rerun the focused
-   randomizer tests plus a normal ROM build.
-2. Manually verify initial moves, ordinary level-up learning, evolution learning,
+1. Manually verify initial moves, ordinary level-up learning, evolution learning,
    Move Reminder output, Pokedex output, and trainer/wild/gift initial moves.
-3. Check representative early-, middle-, and late-game species across multiple
+2. Check representative early-, middle-, and late-game species across multiple
    seeds for useful move variety and the intended power/status progression.
-4. Profile learnset access only if gameplay shows visible delay; retain the single
+3. Profile learnset access only if gameplay shows visible delay; retain the single
    shared EWRAM buffer unless measurement justifies a broader cache.
-5. Leave egg moves authored while breeding is slated for removal. Define a new
+4. Leave egg moves authored while breeding is slated for removal. Define a new
    policy only if egg moves receive a non-breeding acquisition path.
 
-## Evolution phase in progress
+## Evolution phase complete
 
 The authoritative species-by-species behavior is documented in
 `AgentDocs/hack-plans/evolution-rules.md`.
 
 - All enabled friendship evolutions use explicit level 20, 30, or 40 tiers.
-- Audited clock-only restrictions are removed while held-item, known-move, and
-  other secondary requirements remain authored.
+- Audited clock-only restrictions are removed. Move and move-type requirements
+  are replaced by explicit levels, and species-specific item requirements are
+  consolidated into ordinary stones.
 - Paired clock and regional outcomes are selected deterministically from the
   saved seed through the dedicated evolution hash category.
 - The target filter is used by normal, trade, item, battle-special, overworld,
@@ -541,18 +540,14 @@ and a region-independent Pikachu stone evolution. Milcery coverage verifies one
 stable flavor across all decorations and an actual stone evolution. The
 location-route test verifies all six targets retain their
 item evolution and no longer have a level-up route. An exhaustive enabled-species
-scan verifies that no trade evolution methods remain and checks representative
-direct-use replacements.
+scan verifies that no trade or move-dependent evolution methods remain, every
+item evolution uses a standard stone or Linking Cord, and all declared
+replacement routes retain their intended target.
 
 ## Other unresolved architecture
 
-- Evolution rules: complete the manual gameplay checks from the evolution
-  ledger before integration.
 - Starter randomization: the player-facing three-choice policy is implemented.
   Rival parties are governed independently by the enemy-trainer policy above.
-- Time-dependent and alternate-form evolutions: define a species-level policy that
-  removes day/night availability barriers and deterministically selects eligible
-  alternate or regional-form outcomes for a save.
 - World item randomization: identify all visible and hidden pickup paths, define a
   stable pickup identity, and build an approved Nuzlocke-useful replacement pool
   limited initially to genuinely useful held items and the standard stones or
