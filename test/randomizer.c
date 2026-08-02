@@ -1,6 +1,7 @@
 #include "global.h"
 #include "event_data.h"
 #include "item.h"
+#include "move.h"
 #include "pokemon.h"
 #include "random.h"
 #include "randomizer.h"
@@ -183,6 +184,57 @@ TEST("Learnset weights favor appropriate damaging move power by level")
     EXPECT_GT(lateFireBlast, lateEmber);
     EXPECT_GT(earlyFireBlast, 0);
     EXPECT_GT(lateEmber, 0);
+}
+
+TEST("Level-one learnsets exclude exceptional attacks and strongly favor at most 60 power")
+{
+    static const enum Species species[] =
+    {
+        SPECIES_BULBASAUR,
+        SPECIES_CHARMANDER,
+        SPECIES_SQUIRTLE,
+        SPECIES_PIKACHU,
+    };
+    u32 ordinaryPowerCount = 0;
+    u32 reducedPowerCount = 0;
+
+    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_FLAMETHROWER, 1), 0);
+    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_HYPER_BEAM, 1), 0);
+    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_DRAGON_RAGE, 1), 0);
+    EXPECT_GT(GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_EMBER, 1),
+              GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_FIRE_FANG, 1));
+    EXPECT_GT(GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_FLAMETHROWER, 5), 0);
+
+    // Full learnset generation scans the complete move pool for every slot, so
+    // keep this representative sample small enough for the GBA test timeout.
+    for (u32 seed = 1; seed <= 8; seed++)
+    {
+        gSaveBlock3Ptr->randomizerSeed = seed;
+        for (u32 speciesIndex = 0; speciesIndex < ARRAY_COUNT(species); speciesIndex++)
+        {
+            const struct LevelUpMove *learnset = GetSpeciesLevelUpLearnset(species[speciesIndex]);
+
+            for (u32 slot = 0; slot < 4; slot++)
+            {
+                enum Move move = learnset[slot].move;
+
+                EXPECT_EQ(learnset[slot].level, 1);
+                if (GetMoveCategory(move) != DAMAGE_CATEGORY_STATUS)
+                {
+                    u32 power = GetMovePower(move);
+
+                    EXPECT_GT(power, 0);
+                    EXPECT_LT(power, 80);
+                    if (power <= 60)
+                        ordinaryPowerCount++;
+                    else
+                        reducedPowerCount++;
+                }
+            }
+        }
+    }
+
+    EXPECT_GT(ordinaryPowerCount, reducedPowerCount);
 }
 
 TEST("Learnset weights shift status moves from basic to elite by level")
