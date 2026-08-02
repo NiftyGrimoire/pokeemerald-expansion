@@ -522,6 +522,8 @@ The authoritative species-by-species behavior is documented in
 - All trade methods are removed. Plain trades, Pumpkaboo forms, Karrablast, and
   Shelmet use the Linking Cord; former held-item trades are distributed across
   ordinary evolution stones to balance their usefulness.
+- Happiny's Oval Stone, Gligar's Razor Fang, and both Sneasel forms' Razor Claw
+  routes are likewise consolidated into Shiny, Moon, Dusk, and Dawn Stones.
 
 Focused validation currently covers the explicit friendship tiers, an actual
 zero-friendship level evolution, allowlisted condition bypasses, deterministic

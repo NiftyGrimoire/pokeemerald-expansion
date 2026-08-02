@@ -20,10 +20,10 @@ Friendship,Chansey,Blissey,High friendship,Level 40,None
 Friendship,Type: Null,Silvally,High friendship,Level 40,None
 Clock,Alolan Rattata,Alolan Raticate,Level 20 at night,Level 20,Clock restriction removed
 Clock and seeded branch,Cubone,Marowak or Alolan Marowak,Level 28 with time and region deciding form,Level 28,One target is selected per save; clock and region restrictions removed
-Clock,Happiny,Chansey,Oval Stone during the day,Use Oval Stone from the Bag,Clock restriction removed
-Clock,Gligar,Gliscor,Razor Fang at night,Use Razor Fang from the Bag,Clock restriction removed
-Clock,Sneasel,Weavile,Razor Claw at night,Use Razor Claw from the Bag,Clock restriction removed
-Clock,Hisuian Sneasel,Sneasler,Razor Claw during the day,Use Razor Claw from the Bag,Clock restriction removed
+Held item and clock,Happiny,Chansey,Oval Stone during the day,Shiny Stone,Special item and clock restriction removed
+Held item and clock,Gligar,Gliscor,Razor Fang at night,Moon Stone,Special item and clock restriction removed
+Held item and clock,Sneasel,Weavile,Razor Claw at night,Dusk Stone,Special item and clock restriction removed
+Held item and clock,Hisuian Sneasel,Sneasler,Razor Claw during the day,Dawn Stone,Special item and clock restriction removed
 Clock,Galarian Linoone,Obstagoon,Level 35 at night,Level 35,Clock restriction removed
 Clock,Tyrunt,Tyrantrum,Level 39 during the day,Level 39,Clock restriction removed
 Clock,Amaura,Aurorus,Level 39 at night,Level 39,Clock restriction removed

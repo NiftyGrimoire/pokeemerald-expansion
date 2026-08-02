@@ -389,7 +389,7 @@ TEST("Evolution tables contain no trade methods")
     EXPECT(HasTestEvolutionMethod(SPECIES_SHELMET, SPECIES_ACCELGOR, EVO_ITEM));
 }
 
-TEST("Former held-item trades use balanced evolution stones")
+TEST("Consolidated held-item evolutions use balanced evolution stones")
 {
     static const struct
     {
@@ -414,6 +414,10 @@ TEST("Former held-item trades use balanced evolution stones")
         {SPECIES_CLAMPERL, SPECIES_GOREBYSS, ITEM_SHINY_STONE},
         {SPECIES_SPRITZEE, SPECIES_AROMATISSE, ITEM_SHINY_STONE},
         {SPECIES_SWIRLIX, SPECIES_SLURPUFF, ITEM_SUN_STONE},
+        {SPECIES_HAPPINY, SPECIES_CHANSEY, ITEM_SHINY_STONE},
+        {SPECIES_GLIGAR, SPECIES_GLISCOR, ITEM_MOON_STONE},
+        {SPECIES_SNEASEL, SPECIES_WEAVILE, ITEM_DUSK_STONE},
+        {SPECIES_SNEASEL_HISUI, SPECIES_SNEASLER, ITEM_DAWN_STONE},
     };
 
     for (u32 i = 0; i < ARRAY_COUNT(cases); i++)

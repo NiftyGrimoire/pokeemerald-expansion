@@ -83,11 +83,11 @@ level, item, move, form, and other non-clock requirements remain intact.
 | --- | --- | --- |
 | Alolan Rattata | Alolan Raticate | Level 20 |
 | Cubone | Marowak or Alolan Marowak | Level 28; deterministic form selection |
-| Happiny | Chansey | Oval Stone requirement and supported item/level paths |
+| Happiny | Chansey | Shiny Stone; Oval Stone and clock requirements removed |
 | Eevee | Espeon or Umbreon | Level 30 replacement for friendship; deterministic pair |
-| Gligar | Gliscor | Razor Fang requirement and supported item/level paths |
-| Sneasel | Weavile | Razor Claw requirement and supported item/level paths |
-| Hisuian Sneasel | Sneasler | Razor Claw requirement and supported item/level paths |
+| Gligar | Gliscor | Moon Stone; Razor Fang and clock requirements removed |
+| Sneasel | Weavile | Dusk Stone; Razor Claw and clock requirements removed |
+| Hisuian Sneasel | Sneasler | Dawn Stone; Razor Claw and clock requirements removed |
 | Galarian Linoone | Obstagoon | Level 35 |
 | Budew | Roselia | Level 20 replacement for friendship |
 | Chingling | Chimecho | Level 20 replacement for friendship |
@@ -189,6 +189,15 @@ other direct-use evolution items, including Milcery's Sweets.
 | Spritzee | Aromatisse | Shiny Stone |
 | Swirlix | Slurpuff | Sun Stone |
 
+### Other held-item evolution replacements
+
+| Source | Target | Former item | Replacement stone |
+| --- | --- | --- | --- |
+| Happiny | Chansey | Oval Stone | Shiny Stone |
+| Gligar | Gliscor | Razor Fang | Moon Stone |
+| Sneasel | Weavile | Razor Claw | Dusk Stone |
+| Hisuian Sneasel | Sneasler | Razor Claw | Dawn Stone |
+
 ## Explicitly unchanged evolution behavior
 
 - Evolution stones, held items, known-move requirements, gender checks, stat
@@ -227,7 +236,7 @@ Focused tests cover:
 Manual gameplay checks still required:
 
 - Exercise at least one evolution from each friendship tier.
-- Exercise direct-use item clock conversions for Gligar and both Sneasel forms.
+- Exercise the replacement stones for Happiny, Gligar, and both Sneasel forms.
 - Exercise a stone-based regional pair and a level-based regional pair across
   multiple saves.
 - Verify Eevee's Fairy-move precedence and selected Espeon/Umbreon fallback.
