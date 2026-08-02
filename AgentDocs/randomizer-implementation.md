@@ -520,8 +520,8 @@ The authoritative species-by-species behavior is documented in
   location-free: their duplicate level-up entries are removed and their existing
   Thunder, Leaf, or Ice Stone entries are the sole triggers.
 - All trade methods are removed. Plain trades, Pumpkaboo forms, Karrablast, and
-  Shelmet use the Linking Cord; former held-item trades use the same evolution
-  item directly from the Bag, enabled by `I_USE_EVO_HELD_ITEMS_FROM_BAG`.
+  Shelmet use the Linking Cord; former held-item trades are distributed across
+  ordinary evolution stones to balance their usefulness.
 
 Focused validation currently covers the explicit friendship tiers, an actual
 zero-friendship level evolution, allowlisted condition bypasses, deterministic

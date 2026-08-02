@@ -145,8 +145,9 @@ Sylveon/Espeon/Umbreon logic.
 
 No enabled species retains an `EVO_TRADE` method. Plain trades and the former
 Karrablast/Shelmet partner trade use the Linking Cord. Former held-item trades
-evolve by using that item directly from the Bag. The Expansion config
-`I_USE_EVO_HELD_ITEMS_FROM_BAG` is enabled so these item routes are usable.
+are distributed across ordinary evolution stones to keep those items similarly
+useful. The Expansion config `I_USE_EVO_HELD_ITEMS_FROM_BAG` remains enabled for
+other direct-use evolution items, including Milcery's Sweets.
 
 ### Linking Cord replacements
 
@@ -168,22 +169,22 @@ evolve by using that item directly from the Bag. The Expansion config
 
 | Source | Target | Direct-use item |
 | --- | --- | --- |
-| Poliwhirl | Politoed | King's Rock |
-| Slowpoke | Slowking | King's Rock |
-| Onix | Steelix | Metal Coat |
-| Scyther | Scizor | Metal Coat |
-| Seadra | Kingdra | Dragon Scale |
-| Rhydon | Rhyperior | Protector |
-| Electabuzz | Electivire | Electirizer |
-| Magmar | Magmortar | Magmarizer |
-| Porygon | Porygon2 | Upgrade |
-| Porygon2 | Porygon-Z | Dubious Disc |
-| Feebas | Milotic | Prism Scale |
-| Dusclops | Dusknoir | Reaper Cloth |
-| Clamperl | Huntail | Deep Sea Tooth |
-| Clamperl | Gorebyss | Deep Sea Scale |
-| Spritzee | Aromatisse | Sachet |
-| Swirlix | Slurpuff | Whipped Dream |
+| Poliwhirl | Politoed | Dawn Stone |
+| Slowpoke | Slowking | Dawn Stone |
+| Onix | Steelix | Dawn Stone |
+| Scyther | Scizor | Dusk Stone |
+| Seadra | Kingdra | Water Stone |
+| Rhydon | Rhyperior | Moon Stone |
+| Electabuzz | Electivire | Thunder Stone |
+| Magmar | Magmortar | Fire Stone |
+| Porygon | Porygon2 | Dawn Stone |
+| Porygon2 | Porygon-Z | Dusk Stone |
+| Feebas | Milotic | Shiny Stone |
+| Dusclops | Dusknoir | Dusk Stone |
+| Clamperl | Huntail | Water Stone |
+| Clamperl | Gorebyss | Shiny Stone |
+| Spritzee | Aromatisse | Shiny Stone |
+| Swirlix | Slurpuff | Sun Stone |
 
 ## Explicitly unchanged evolution behavior
 
@@ -191,8 +192,8 @@ evolve by using that item directly from the Bag. The Expansion config
   comparisons, weather, party composition, battle trackers, and script
   triggers remain authored unless a row above says otherwise. The six former
   location evolutions explicitly use their listed stones.
-- No trade trigger remains. Former trade items are used directly, and plain or
-  partner-specific trades use the Linking Cord.
+- No trade trigger remains. Former held-item trades use the stones listed above,
+  and plain or partner-specific trades use the Linking Cord.
 - Eevee's Jolteon, Vaporeon, Flareon, Leafeon, Glaceon, and Sylveon routes remain
   available. Only Espeon versus Umbreon is a deterministic pair.
 - Own Tempo Rockruff still evolves only into Dusk Lycanroc; only its evening

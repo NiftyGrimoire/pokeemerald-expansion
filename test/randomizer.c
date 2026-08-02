@@ -31,6 +31,20 @@ static bool32 HasTestEvolutionMethod(enum Species species, enum Species targetSp
     return FALSE;
 }
 
+static bool32 HasTestItemEvolution(enum Species species, enum Species targetSpecies, enum Item item)
+{
+    const struct Evolution *evolutions = GetSpeciesEvolutions(species);
+
+    for (u32 i = 0; evolutions != NULL && evolutions[i].method != EVOLUTIONS_END; i++)
+    {
+        if (evolutions[i].targetSpecies == targetSpecies
+         && evolutions[i].method == EVO_ITEM
+         && evolutions[i].param == item)
+            return TRUE;
+    }
+    return FALSE;
+}
+
 TEST("Randomizer hash is deterministic and keeps categories and keys separate")
 {
     u32 hash = RandomizerHash(0x12345678, RANDOMIZER_CATEGORY_ENCOUNTER, 1, 2, 3);
@@ -373,6 +387,37 @@ TEST("Evolution tables contain no trade methods")
     EXPECT(HasTestEvolutionMethod(SPECIES_ONIX, SPECIES_STEELIX, EVO_ITEM));
     EXPECT(HasTestEvolutionMethod(SPECIES_KARRABLAST, SPECIES_ESCAVALIER, EVO_ITEM));
     EXPECT(HasTestEvolutionMethod(SPECIES_SHELMET, SPECIES_ACCELGOR, EVO_ITEM));
+}
+
+TEST("Former held-item trades use balanced evolution stones")
+{
+    static const struct
+    {
+        enum Species source;
+        enum Species target;
+        enum Item item;
+    } cases[] =
+    {
+        {SPECIES_POLIWHIRL, SPECIES_POLITOED, ITEM_DAWN_STONE},
+        {SPECIES_SLOWPOKE, SPECIES_SLOWKING, ITEM_DAWN_STONE},
+        {SPECIES_ONIX, SPECIES_STEELIX, ITEM_DAWN_STONE},
+        {SPECIES_SCYTHER, SPECIES_SCIZOR, ITEM_DUSK_STONE},
+        {SPECIES_SEADRA, SPECIES_KINGDRA, ITEM_WATER_STONE},
+        {SPECIES_RHYDON, SPECIES_RHYPERIOR, ITEM_MOON_STONE},
+        {SPECIES_ELECTABUZZ, SPECIES_ELECTIVIRE, ITEM_THUNDER_STONE},
+        {SPECIES_MAGMAR, SPECIES_MAGMORTAR, ITEM_FIRE_STONE},
+        {SPECIES_PORYGON, SPECIES_PORYGON2, ITEM_DAWN_STONE},
+        {SPECIES_PORYGON2, SPECIES_PORYGON_Z, ITEM_DUSK_STONE},
+        {SPECIES_FEEBAS, SPECIES_MILOTIC, ITEM_SHINY_STONE},
+        {SPECIES_DUSCLOPS, SPECIES_DUSKNOIR, ITEM_DUSK_STONE},
+        {SPECIES_CLAMPERL, SPECIES_HUNTAIL, ITEM_WATER_STONE},
+        {SPECIES_CLAMPERL, SPECIES_GOREBYSS, ITEM_SHINY_STONE},
+        {SPECIES_SPRITZEE, SPECIES_AROMATISSE, ITEM_SHINY_STONE},
+        {SPECIES_SWIRLIX, SPECIES_SLURPUFF, ITEM_SUN_STONE},
+    };
+
+    for (u32 i = 0; i < ARRAY_COUNT(cases); i++)
+        EXPECT(HasTestItemEvolution(cases[i].source, cases[i].target, cases[i].item));
 }
 
 TEST("Milcery selects one stable cream flavor for every Sweet")
