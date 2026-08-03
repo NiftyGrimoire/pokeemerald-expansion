@@ -164,8 +164,9 @@ Current execution order:
      into the party first. Process the intervening levels in order so every
      move-learning opportunity and evolution check occurs normally rather than
      jumping directly to the final level.
-   - Add an option on the Pokemon summary stats page to display the Pokemon's
-     individual IV values, with a clear way to return to the normal stat view.
+   - The Pokemon Skills summary page now uses the A button to toggle between the
+     normal stats view and all six numeric stored IV values. Pressing A again
+     returns to normal stats.
    - The Repel Toggle Key Item is implemented. It enables or disables an
      indefinite block on standard random encounters regardless of level and is
      granted with the starter.
@@ -304,8 +305,9 @@ Current execution order:
     and never exceed the active cap.
   - The Portable Healer Key Item fully heals the party outside battle, is not
     consumed, and is granted when the starter is created.
-  - Add a summary-screen stats-page option that toggles between the normal stat
-    presentation and explicit IV values without changing the Pokemon.
+  - On the Pokemon Skills summary page, A toggles from normal stats to all six
+    numeric stored IV values and back without changing the Pokemon. Hyper Training
+    does not disguise the stored IV values shown by this view.
   - The reusable Repel Toggle Key Item enables or disables an indefinite standard
     random-encounter block. It ignores wild and lead-Pokemon levels, persists
     through steps and saves, and is granted when the starter is created.

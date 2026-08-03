@@ -596,9 +596,11 @@ replacement routes retain their intended target.
   rewards behind clearly optional trainer battles, preserving a deliberate
   risk-and-reward choice without blocking required progression. Do not add hidden
   item spots.
-- Summary IV view: add an option on the Pokemon summary stats page to show all six
-  IV values and return cleanly to the normal stat display. This is display-only;
-  it must not mutate IVs or other Pokemon data.
+- Summary IV view is implemented on `romhack/qol-summary-ivs`. On the Pokemon
+  Skills page, A toggles between the normal stat display and all six numeric
+  stored IVs, then back to stats. EV cycling is disabled, the page label changes
+  between STATS and IVs, and Hyper Training does not replace displayed stored IVs
+  with 31. The feature is display-only and does not mutate Pokemon data.
 - Portable Healer and Repel Toggle are integrated into `romhack/main`. Both are
   reusable Key Items granted when the starter is created. Portable Healer
   restores HP, PP, and status for every party
