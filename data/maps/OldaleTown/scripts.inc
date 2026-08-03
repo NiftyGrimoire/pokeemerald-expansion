@@ -30,7 +30,26 @@ OldaleTown_EventScript_TownSign::
 	end
 
 OldaleTown_EventScript_Girl::
-	msgbox OldaleTown_Text_SavingMyProgress, MSGBOX_NPC
+	lock
+	faceplayer
+	goto_if_set FLAG_RECEIVED_OLDALE_SUPPLIES, OldaleTown_EventScript_GirlSuppliesReceived
+	msgbox OldaleTown_Text_GirlOffersSupplies, MSGBOX_DEFAULT
+	giveitem ITEM_ULTRA_BALL, 200
+	goto_if_eq VAR_RESULT, FALSE, OldaleTown_EventScript_GirlBagFull
+	addmoney 200000
+	setflag FLAG_RECEIVED_OLDALE_SUPPLIES
+	msgbox OldaleTown_Text_GirlGaveMoney, MSGBOX_DEFAULT
+	release
+	end
+
+OldaleTown_EventScript_GirlBagFull::
+	msgbox OldaleTown_Text_GirlBagFull, MSGBOX_DEFAULT
+	release
+	end
+
+OldaleTown_EventScript_GirlSuppliesReceived::
+	msgbox OldaleTown_Text_GirlSuppliesReceived, MSGBOX_DEFAULT
+	release
 	end
 
 OldaleTown_EventScript_MartEmployee::
@@ -343,6 +362,22 @@ OldaleTown_Text_SavingMyProgress:
 	.string "I want to take a rest, so I'm saving my\n"
 	.string "progress.$"
 
+OldaleTown_Text_GirlOffersSupplies:
+	.string "You're taking on the Nuzlocke\n"
+	.string "challenge, right? You'll need these!$"
+
+OldaleTown_Text_GirlGaveMoney:
+	.string "And here's ¥200,000 for\n"
+	.string "anything else you need. Good luck!$"
+
+OldaleTown_Text_GirlBagFull:
+	.string "Your BAG can't hold all 200 ULTRA\n"
+	.string "BALLS. Make some room and come back!$"
+
+OldaleTown_Text_GirlSuppliesReceived:
+	.string "Those supplies should keep your\n"
+	.string "challenge moving. Good luck!$"
+
 OldaleTown_Text_IWorkAtPokemonMart:
 	.string "Hi!\n"
 	.string "I work at a POKéMON MART.\p"
@@ -394,4 +429,3 @@ OldaleTown_Text_BrendanLetsGoBack:
 OldaleTown_Text_TownSign:
 	.string "OLDALE TOWN\n"
 	.string "“Where things start off scarce.”$"
-

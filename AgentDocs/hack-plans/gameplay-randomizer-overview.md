@@ -173,8 +173,8 @@ Current execution order:
    - Badge-authorized HM field actions are implemented on
      `romhack/qol-badge-hms`. Each action remains locked behind its corresponding
      badge but no longer requires a party Pokemon to know the HM move.
-   - Add an Oldale Town NPC who gives the player 200 Ultra Balls and ₽9,999 as
-     an early-game supply grant.
+   - An Oldale Town NPC grants 200 Ultra Balls and ¥200,000 once as an early-game
+     supply package on `romhack/qol-oldale-supplies`.
    - Remove hidden item spots so all obtainable overworld pickups are visibly
      represented to the player.
    - The Portable Healer Key Item is implemented and granted with the starter. It
@@ -321,9 +321,9 @@ Current execution order:
   - Badge-authorized HM field actions are implemented on
     `romhack/qol-badge-hms`. The existing badge gates remain intact, while the
     first non-Egg party Pokemon can perform an unlocked HM without knowing it.
-  - Add an Oldale Town NPC who gives the player 200 Ultra Balls and ₽9,999 as
-    an early-game supply grant. Choose the NPC and exact script placement during
-    implementation.
+  - The stationary girl in Oldale Town grants 200 Ultra Balls and ¥200,000 once on
+    `romhack/qol-oldale-supplies`. The reward flag is set only after the balls fit
+    in the Bag, allowing a failed attempt to be retried.
   - Add a trainer-battle modifier that suppresses the free switch prompt after an
     opposing Pokemon faints. The modifier should affect trainer battles only and
     use Set-style replacement flow while enabled.

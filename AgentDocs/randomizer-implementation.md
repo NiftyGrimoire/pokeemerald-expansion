@@ -618,9 +618,10 @@ replacement routes retain their intended target.
   menu exposes only unlocked HMs that are usable in the current field context,
   prioritizing them within its fixed action capacity; learned non-HM field moves
   retain their original requirements.
-- Oldale supply grant: add an Oldale Town NPC who gives the player 200 Ultra
-  Balls and ₽9,999. Choose the NPC and exact script placement during
-  implementation.
+- Oldale supply grant is implemented on `romhack/qol-oldale-supplies`. The
+  stationary girl in Oldale gives 200 Ultra Balls followed by ¥200,000 exactly
+  once. A dedicated flag is set only after the item grant succeeds, so a full Bag
+  does not consume the reward and the player can retry after making room.
 - No-free-switch trainer modifier: add an optional modifier that suppresses the
   switch prompt after the player knocks out an opposing trainer's Pokemon. While
   enabled, the trainer sends out the replacement before the player can switch;
