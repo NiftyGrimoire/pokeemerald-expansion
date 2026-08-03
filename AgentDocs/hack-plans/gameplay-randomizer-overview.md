@@ -168,10 +168,22 @@ Current execution order:
    - Add a Bag Repel QoL option. Specify whether it is a reusable Key Item or a
      direct Bag toggle, along with its encounter-level rule and how the player
      disables it, before implementation.
+   - Allow each HM field action once its corresponding badge has been earned,
+     without requiring any Pokemon in the party to know the HM move. Preserve
+     the badge-based story progression checks.
+   - Add an Oldale Town NPC who gives the player 200 Ultra Balls and ₽9,999 as
+     an early-game supply grant.
+   - Remove hidden item spots so all obtainable overworld pickups are visibly
+     represented to the player.
    - Implement and grant the Portable Healer after its exact item-use behavior is
      specified.
 11. World items — planned:
-   - Deterministically randomize item pickups found in the overworld.
+   - Deterministically randomize visible item pickups found in the overworld;
+     hidden item spots are removed rather than randomized.
+   - After reviewing item availability and progression balance, consider adding
+     new visible overworld pickup spots in areas that need more useful rewards.
+     Prefer placing these rewards behind optional trainer battles so obtaining
+     them involves a visible, deliberate risk-and-reward choice.
    - Limit replacements to items useful in a Nuzlocke, initially held items and
      evolution items; define exclusions and progression safeguards before
      implementation.
@@ -297,6 +309,12 @@ Current execution order:
   - Add a Bag Repel option for enabling and disabling repel behavior without
     consuming ordinary Repel items; finalize its exact Bag UX and encounter rule
     before implementation.
+  - Once the corresponding badge is earned, allow an HM field action without a
+    party Pokemon knowing the move. Keep the existing badge gates so field
+    traversal cannot bypass normal story progression.
+  - Add an Oldale Town NPC who gives the player 200 Ultra Balls and ₽9,999 as
+    an early-game supply grant. Choose the NPC and exact script placement during
+    implementation.
 - Friendship evolutions:
   - Replace all `IF_MIN_FRIENDSHIP` evolution conditions with level-based equivalents:
     - Baby/early evolutions: level 20.
@@ -312,8 +330,13 @@ Current execution order:
     of species whose regional form normally requires a different base form in the
     authoritative evolution ledger.
 - World items:
-  - Randomize eligible visible and hidden overworld item pickups deterministically
-    from the save seed and a stable pickup identity.
+  - Remove hidden item spots. Randomize only eligible visible overworld item
+    pickups deterministically from the save seed and a stable pickup identity.
+  - Review the distribution and usefulness of available pickups across the game.
+    Add new visible pickup spots where the balance review identifies a resource
+    or progression gap; do not add new hidden spots. Prefer rewards guarded by
+    optional trainers, with placement that makes the battle and reward clearly
+    avoidable rather than blocking required progression.
   - Restrict the initial replacement pool to held items and evolution items that are
     usable during a Nuzlocke.
   - Do not infer usefulness from `ITEM_TYPE_EVOLUTION_ITEM`: all species-specific
@@ -347,8 +370,9 @@ Current execution order:
 - Confirm friendship evolution species evolve by the new level thresholds.
 - Confirm day/night evolution lines and alternate/regional-form branches are
   obtainable without waiting for a real-time window and remain stable within a save.
-- Confirm world item replacements are deterministic within a save, differ between
-  saves, and never produce an item outside the approved Nuzlocke-useful pool of
+- Confirm hidden item spots cannot be collected and visible world item
+  replacements are deterministic within a save, differ between saves, and never
+  produce an item outside the approved Nuzlocke-useful pool of
   standard stones, Linking Cord, and independently useful held items.
 - Confirm the party-menu and Pokemon Storage level-cap actions never exceed the active
   cap, process all intervening move-learning and evolution opportunities in order,

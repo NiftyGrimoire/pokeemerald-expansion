@@ -581,20 +581,32 @@ replacement routes retain their intended target.
   formerly Starmobile-only moves normally obtainable.
 - Starter randomization: the player-facing three-choice policy is implemented.
   Rival parties are governed independently by the enemy-trainer policy above.
-- World item randomization: identify all visible and hidden pickup paths, define a
-  stable pickup identity, and build an approved Nuzlocke-useful replacement pool
-  limited initially to genuinely useful held items and the standard stones or
-  Linking Cord. Exclude retired species-specific evolution items unless they
-  retain a worthwhile independent battle effect. Audit Potions and other medicine
-  against the Portable Healer design, and X-items against the intended battle-item
-  rules, so dead or low-value rewards do not enter the pool. Explicitly decide
-  key-item, TM, duplicate, respawn, and progression-critical-item handling.
+- World item randomization: remove hidden item spots, identify all visible pickup
+  paths, define a stable pickup identity, and build an approved Nuzlocke-useful
+  replacement pool limited initially to genuinely useful held items and the
+  standard stones or Linking Cord. Exclude retired species-specific evolution
+  items unless they retain a worthwhile independent battle effect. Audit Potions
+  and other medicine against the Portable Healer design, and X-items against the
+  intended battle-item rules, so dead or low-value rewards do not enter the
+  pool. Explicitly decide key-item, TM, duplicate, respawn, and
+  progression-critical-item handling.
+  Review pickup distribution and progression balance, then consider adding new
+  visible pickup spots where useful resources are too sparse. Prefer placing new
+  rewards behind clearly optional trainer battles, preserving a deliberate
+  risk-and-reward choice without blocking required progression. Do not add hidden
+  item spots.
 - Summary IV view: add an option on the Pokemon summary stats page to show all six
   IV values and return cleanly to the normal stat display. This is display-only;
   it must not mutate IVs or other Pokemon data.
 - Bag Repel: add a reusable Bag-facing option for enabling and disabling repel
   behavior without consuming standard Repel items. Specify whether this is a Key
   Item or direct Bag toggle and define its encounter-level behavior before coding.
+- Badge-authorized HM actions: allow each HM field action after earning its
+  corresponding badge without requiring a party Pokemon to know the move. Retain
+  the existing badge gates so this QoL feature does not bypass story progression.
+- Oldale supply grant: add an Oldale Town NPC who gives the player 200 Ultra
+  Balls and ₽9,999. Choose the NPC and exact script placement during
+  implementation.
 - Level-to-cap action: implementation is complete on
   `romhack/qol-level-to-cap`. `TryAdvanceMonOneLevelToCap` provides the shared
   one-level stat/experience step and stops at the active cap. The field party
