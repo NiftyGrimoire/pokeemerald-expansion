@@ -175,8 +175,9 @@ Current execution order:
      badge but no longer requires a party Pokemon to know the HM move.
    - An Oldale Town NPC grants 200 Ultra Balls and ¥200,000 once as an early-game
      supply package on `romhack/qol-oldale-supplies`.
-   - Remove hidden item spots so all obtainable overworld pickups are visibly
-     represented to the player.
+   - Hidden item spots are disabled on `romhack/qol-remove-hidden-items`: they
+     cannot be collected or detected with the Itemfinder, so all obtainable
+     overworld pickups are visibly represented to the player.
    - The Portable Healer Key Item is implemented and granted with the starter. It
      fully restores every party Pokemon outside battle without being consumed.
    - Add an optional trainer-battle modifier that removes the prompt to switch
@@ -346,8 +347,9 @@ Current execution order:
     of species whose regional form normally requires a different base form in the
     authoritative evolution ledger.
 - World items:
-  - Remove hidden item spots. Randomize only eligible visible overworld item
-    pickups deterministically from the save seed and a stable pickup identity.
+  - Hidden item spots are disabled centrally on
+    `romhack/qol-remove-hidden-items`. Randomize only eligible visible overworld
+    item pickups deterministically from the save seed and a stable pickup identity.
   - Review the distribution and usefulness of available pickups across the game.
     Add new visible pickup spots where the balance review identifies a resource
     or progression gap; do not add new hidden spots. Prefer rewards guarded by

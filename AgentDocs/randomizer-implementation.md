@@ -582,8 +582,10 @@ replacement routes retain their intended target.
   formerly Starmobile-only moves normally obtainable.
 - Starter randomization: the player-facing three-choice policy is implemented.
   Rival parties are governed independently by the enemy-trainer policy above.
-- World item randomization: remove hidden item spots, identify all visible pickup
-  paths, define a stable pickup identity, and build an approved Nuzlocke-useful
+- Hidden item spots are disabled on `romhack/qol-remove-hidden-items`: direct
+  interaction cannot collect them and the Itemfinder does not detect them.
+- World item randomization: identify all visible pickup paths, define a stable
+  pickup identity, and build an approved Nuzlocke-useful
   replacement pool limited initially to genuinely useful held items and the
   standard stones or Linking Cord. Exclude retired species-specific evolution
   items unless they retain a worthwhile independent battle effect. Audit Potions
