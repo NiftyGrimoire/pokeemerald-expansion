@@ -182,6 +182,10 @@ Current execution order:
    - Add an optional trainer-battle modifier that removes the prompt to switch
      after an opposing Pokemon faints. When enabled, replacement Pokemon enter
      before the player can make a free switch, matching Set-style battle flow.
+   - Review trainer AI flag assignments for randomized teams and learnsets. Test
+     smart mid-battle switching, post-KO replacement choices, and smart move
+     scoring; define fair AI tiers for ordinary trainers, bosses, and rematches
+     without giving every opponent omniscient knowledge by default.
 11. World items — planned:
    - Deterministically randomize visible item pickups found in the overworld;
      hidden item spots are removed rather than randomized.
@@ -323,6 +327,10 @@ Current execution order:
   - Add a trainer-battle modifier that suppresses the free switch prompt after an
     opposing Pokemon faints. The modifier should affect trainer battles only and
     use Set-style replacement flow while enabled.
+  - Audit trainer AI flags and playtest `AI_FLAG_SMART_SWITCHING`,
+    `AI_FLAG_SMART_MON_CHOICES`, and the move-selection flags. Establish separate
+    ordinary-trainer and boss tiers, preferring strong scoring and limited
+    assumptions over universal `AI_FLAG_OMNISCIENT` knowledge.
 - Friendship evolutions:
   - Replace all `IF_MIN_FRIENDSHIP` evolution conditions with level-based equivalents:
     - Baby/early evolutions: level 20.

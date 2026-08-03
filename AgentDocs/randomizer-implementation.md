@@ -621,6 +621,13 @@ replacement routes retain their intended target.
   switch prompt after the player knocks out an opposing trainer's Pokemon. While
   enabled, the trainer sends out the replacement before the player can switch;
   do not change wild-battle flow or ordinary voluntary switching.
+- Trainer AI review: audit the AI flags assigned across ordinary trainers,
+  bosses, and rematches after party and learnset randomization. Evaluate smart
+  mid-battle switching and post-KO replacement selection alongside move scoring
+  from `AI_FLAG_CHECK_BAD_MOVE`, `AI_FLAG_TRY_TO_FAINT`, and
+  `AI_FLAG_CHECK_VIABILITY`. Define and playtest difficulty tiers; consider
+  prediction or restricted knowledge flags for bosses, but do not enable
+  `AI_FLAG_OMNISCIENT` globally without a separate fairness decision.
 - Level-to-cap action: implementation is integrated into `romhack/main`.
   `TryAdvanceMonOneLevelToCap` provides the shared
   one-level stat/experience step and stops at the active cap. The field party
