@@ -4,6 +4,7 @@
 #include "fldeff.h"
 #include "fldeff_misc.h"
 #include "party_menu.h"
+#include "pokemon.h"
 #include "constants/field_move.h"
 #include "constants/moves.h"
 #include "constants/party_menu.h"
@@ -231,3 +232,28 @@ const struct FieldMoveInfo gFieldMoveInfo[FIELD_MOVES_COUNT] =
         .partyMsgID = PARTY_MSG_CANT_USE_HERE,
     },
 };
+
+bool32 IsBadgeAuthorizedFieldMove(enum FieldMove fieldMove)
+{
+    return fieldMove >= FIELD_MOVE_CUT && fieldMove <= FIELD_MOVE_WATERFALL;
+}
+
+u32 GetFieldMoveUser(enum FieldMove fieldMove)
+{
+    enum Move move = FieldMove_GetMoveId(fieldMove);
+    bool32 canUseWithoutMove = IsBadgeAuthorizedFieldMove(fieldMove) && IsFieldMoveUnlocked(fieldMove);
+
+    for (u32 i = 0; i < PARTY_SIZE; i++)
+    {
+        enum Species species = GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SPECIES);
+
+        if (species == SPECIES_NONE)
+            break;
+        if (GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_IS_EGG))
+            continue;
+        if (canUseWithoutMove || MonKnowsMove(&gParties[B_TRAINER_PLAYER][i], move))
+            return i;
+    }
+
+    return PARTY_SIZE;
+}

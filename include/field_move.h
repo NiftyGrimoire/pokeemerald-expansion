@@ -34,4 +34,7 @@ static inline u32 FieldMove_GetPartyMsgID(enum FieldMove fieldMove)
     return gFieldMoveInfo[fieldMove].partyMsgID;
 }
 
+bool32 IsBadgeAuthorizedFieldMove(enum FieldMove fieldMove);
+u32 GetFieldMoveUser(enum FieldMove fieldMove);
+
 #endif //GUARD_FIELD_MOVE_H

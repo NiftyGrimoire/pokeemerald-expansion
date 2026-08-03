@@ -170,9 +170,9 @@ Current execution order:
    - The Repel Toggle Key Item is implemented. It enables or disables an
      indefinite block on standard random encounters regardless of level and is
      granted with the starter.
-   - Allow each HM field action once its corresponding badge has been earned,
-     without requiring any Pokemon in the party to know the HM move. Preserve
-     the badge-based story progression checks.
+   - Badge-authorized HM field actions are implemented on
+     `romhack/qol-badge-hms`. Each action remains locked behind its corresponding
+     badge but no longer requires a party Pokemon to know the HM move.
    - Add an Oldale Town NPC who gives the player 200 Ultra Balls and ₽9,999 as
      an early-game supply grant.
    - Remove hidden item spots so all obtainable overworld pickups are visibly
@@ -318,9 +318,9 @@ Current execution order:
   - The reusable Repel Toggle Key Item enables or disables an indefinite standard
     random-encounter block. It ignores wild and lead-Pokemon levels, persists
     through steps and saves, and is granted when the starter is created.
-  - Once the corresponding badge is earned, allow an HM field action without a
-    party Pokemon knowing the move. Keep the existing badge gates so field
-    traversal cannot bypass normal story progression.
+  - Badge-authorized HM field actions are implemented on
+    `romhack/qol-badge-hms`. The existing badge gates remain intact, while the
+    first non-Egg party Pokemon can perform an unlocked HM without knowing it.
   - Add an Oldale Town NPC who gives the player 200 Ultra Balls and ₽9,999 as
     an early-game supply grant. Choose the NPC and exact script placement during
     implementation.

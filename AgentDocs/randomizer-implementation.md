@@ -611,9 +611,13 @@ replacement routes retain their intended target.
   available. Because spray and Lure state continues to use the existing shared
   variable, a Lure replaces the toggle state; disable the toggle before using an
   ordinary Repel spray.
-- Badge-authorized HM actions: allow each HM field action after earning its
-  corresponding badge without requiring a party Pokemon to know the move. Retain
-  the existing badge gates so this QoL feature does not bypass story progression.
+- Badge-authorized HM actions are implemented on `romhack/qol-badge-hms`. A
+  shared field-move user selector preserves every existing badge gate and, once
+  unlocked, selects the first non-Egg party Pokemon without requiring the HM in
+  its moveset. Direct overworld interactions use the same selector. The party
+  menu exposes only unlocked HMs that are usable in the current field context,
+  prioritizing them within its fixed action capacity; learned non-HM field moves
+  retain their original requirements.
 - Oldale supply grant: add an Oldale Town NPC who gives the player 200 Ultra
   Balls and ₽9,999. Choose the NPC and exact script placement during
   implementation.

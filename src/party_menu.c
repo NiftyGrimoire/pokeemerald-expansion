@@ -2960,17 +2960,33 @@ static void SetPartyMonSelectionActions(struct Pokemon *mons, u8 slotId, u8 acti
 static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
 {
     u8 i, j;
+    u8 reservedActions = InBattlePike() ? 1 : 3; // Cancel, plus Switch and Item outside the Pike.
 
     sPartyMenuInternal->numActions = 0;
     AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_SUMMARY);
     if (GetMonData(&mons[slotId], MON_DATA_LEVEL) < GetCurrentLevelCap())
         AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_LEVEL_TO_CAP);
 
-    // Add field moves to action list
+    // Badge-authorized HMs are available from any non-Egg party Pokemon. Only
+    // show actions that are usable in the player's current field context, and
+    // prioritize them over optional learned field moves if the menu is full.
+    for (j = FIELD_MOVE_CUT; j <= FIELD_MOVE_WATERFALL; j++)
+    {
+        if (sPartyMenuInternal->numActions >= ARRAY_COUNT(sPartyMenuInternal->actions) - reservedActions)
+            break;
+        if (IsFieldMoveUnlocked(j) && SetUpFieldMove(j))
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, j + MENU_FIELD_MOVES);
+    }
+
+    // Add learned non-HM field moves to the remaining action slots.
     for (i = 0; i < MAX_MON_MOVES; i++)
     {
+        if (sPartyMenuInternal->numActions >= ARRAY_COUNT(sPartyMenuInternal->actions) - reservedActions)
+            break;
         for (j = 0; j != FIELD_MOVES_COUNT; j++)
         {
+            if (IsBadgeAuthorizedFieldMove(j))
+                continue;
             if (GetMonData(&mons[slotId], i + MON_DATA_MOVE1) == FieldMove_GetMoveId(j))
             {
                 AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, j + MENU_FIELD_MOVES);
@@ -4308,7 +4324,7 @@ bool32 SetUpFieldMove_Surf(void)
     if (!CheckFollowerNPCFlag(FOLLOWER_NPC_FLAG_CAN_SURF))
         return FALSE;
 
-    if (PartyHasMonWithSurf() == TRUE && IsPlayerFacingSurfableFishableWater() == TRUE)
+    if (GetFieldMoveUser(FIELD_MOVE_SURF) != PARTY_SIZE && IsPlayerFacingSurfableFishableWater() == TRUE)
     {
         gFieldCallback2 = FieldCallback_PrepareFadeInFromMenu;
         gPostMenuFieldCallback = FieldCallback_Surf;
