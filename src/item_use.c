@@ -96,6 +96,9 @@ static const u8 sText_UsedVar2WildRepelled[] = _("{PLAYER} used the\n{STR_VAR_2}
 static const u8 sText_PlayedPokeFluteCatchy[] = _("Played the POKé FLUTE.\pNow, that's a catchy tune!{PAUSE_UNTIL_PRESS}");
 static const u8 sText_PlayedPokeFlute[] = _("Played the POKé FLUTE.");
 static const u8 sText_PokeFluteAwakenedMon[] = _("The POKé FLUTE awakened sleeping\nPOKéMON.{PAUSE_UNTIL_PRESS}");
+static const u8 sText_PortableHealerUsed[] = _("Your party was fully healed!{PAUSE_UNTIL_PRESS}");
+static const u8 sText_PortableRepelOn[] = _("The REPEL TOGGLE was turned on.\pRandom encounters are disabled.{PAUSE_UNTIL_PRESS}");
+static const u8 sText_PortableRepelOff[] = _("The REPEL TOGGLE was turned off.{PAUSE_UNTIL_PRESS}");
 
 // EWRAM variables
 EWRAM_DATA static TaskFunc sItemUseOnFieldCB = NULL;
@@ -270,6 +273,46 @@ void ItemUseOutOfBattle_ExpShare(u8 taskId)
 #else
     DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
 #endif
+}
+
+static void DisplayReusableItemMessage(u8 taskId, const u8 *text)
+{
+    if (!gTasks[taskId].data[2]) // Account for using a registered item in the field.
+        DisplayItemMessageOnField(taskId, text, Task_CloseCantUseKeyItemMessage);
+    else
+        DisplayItemMessage(taskId, FONT_NORMAL, text, CloseItemMessage);
+}
+
+void ItemUseOutOfBattle_PortableHealer(u8 taskId)
+{
+    HealPlayerPartyWithPortableHealer();
+    PlaySE(SE_EXP_MAX);
+    DisplayReusableItemMessage(taskId, sText_PortableHealerUsed);
+}
+
+void HealPlayerPartyWithPortableHealer(void)
+{
+    for (u32 i = 0; i < gPartiesCount[B_TRAINER_PLAYER]; i++)
+        HealPokemon(&gParties[B_TRAINER_PLAYER][i]);
+}
+
+bool32 IsPortableRepelActive(void)
+{
+    return VarGet(VAR_REPEL_STEP_COUNT) == PORTABLE_REPEL_STEPS;
+}
+
+void SetPortableRepelActive(bool32 active)
+{
+    VarSet(VAR_REPEL_STEP_COUNT, active ? PORTABLE_REPEL_STEPS : 0);
+}
+
+void ItemUseOutOfBattle_RepelToggle(u8 taskId)
+{
+    bool32 enable = !IsPortableRepelActive();
+
+    SetPortableRepelActive(enable);
+    PlaySE(enable ? SE_REPEL : SE_PC_OFF);
+    DisplayReusableItemMessage(taskId, enable ? sText_PortableRepelOn : sText_PortableRepelOff);
 }
 
 void ItemUseOutOfBattle_Bike(u8 taskId)

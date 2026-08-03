@@ -13,6 +13,7 @@ enum Pocket
 };
 
 #define REPEL_LURE_MASK         (1 << 15)
+#define PORTABLE_REPEL_STEPS    (REPEL_LURE_MASK - 1)
 #define IS_LAST_USED_LURE(var)  (var & REPEL_LURE_MASK)
 #define REPEL_LURE_STEPS(var)   (var & (REPEL_LURE_MASK - 1))
 #define LURE_STEP_COUNT         (IS_LAST_USED_LURE(VarGet(VAR_REPEL_STEP_COUNT)) ? REPEL_LURE_STEPS(VarGet(VAR_REPEL_STEP_COUNT)) : 0)

@@ -38,7 +38,8 @@ behavior and validation belong in `AgentDocs/randomizer-implementation.md`.
 Current execution order:
 
 1. Complete the remaining manual gameplay checks for Phases 8 and 9.
-2. Implement Phase 10's shared level-to-cap flow and Portable Healer.
+2. Complete Phase 10's remaining QoL work and manual validation; level-to-cap,
+   Portable Healer, and Repel Toggle are implemented.
 3. Specify and implement the Phase 11 world-item pool and safeguards.
 4. Audit and tune whole-game progression in Phase 12 after the preceding systems
    can be evaluated together.
@@ -157,7 +158,7 @@ Current execution order:
    - Replace move requirements with explicit levels, remove location and trade
      requirements, and consolidate item evolutions into standard stones or the
      Linking Cord. Preserve player choice for stone-based branches.
-10. Quality of life — planned:
+10. Quality of life — partially complete on `romhack/main`:
    - Add a button to the party menu and Pokemon Storage that raises a selected
      Pokemon to the current level cap without requiring a boxed Pokemon to be moved
      into the party first. Process the intervening levels in order so every
@@ -165,9 +166,9 @@ Current execution order:
      jumping directly to the final level.
    - Add an option on the Pokemon summary stats page to display the Pokemon's
      individual IV values, with a clear way to return to the normal stat view.
-   - Add a Bag Repel QoL option. Specify whether it is a reusable Key Item or a
-     direct Bag toggle, along with its encounter-level rule and how the player
-     disables it, before implementation.
+   - The Repel Toggle Key Item is implemented. It enables or disables an
+     indefinite block on standard random encounters regardless of level and is
+     granted with the starter.
    - Allow each HM field action once its corresponding badge has been earned,
      without requiring any Pokemon in the party to know the HM move. Preserve
      the badge-based story progression checks.
@@ -175,8 +176,8 @@ Current execution order:
      an early-game supply grant.
    - Remove hidden item spots so all obtainable overworld pickups are visibly
      represented to the player.
-   - Implement and grant the Portable Healer after its exact item-use behavior is
-     specified.
+   - The Portable Healer Key Item is implemented and granted with the starter. It
+     fully restores every party Pokemon outside battle without being consumed.
 11. World items — planned:
    - Deterministically randomize visible item pickups found in the overworld;
      hidden item spots are removed rather than randomized.
@@ -301,14 +302,13 @@ Current execution order:
     learn-move prompt or evolution opportunity is skipped; stop safely if the flow is
     cancelled or interrupted, persist all changes to the correct party or box slot,
     and never exceed the active cap.
-  - Add a Portable Healer Key Item that heals the party outside battle using existing
-    party-heal behavior, and grant it early in the game, preferably during
-    starter/new-game setup.
+  - The Portable Healer Key Item fully heals the party outside battle, is not
+    consumed, and is granted when the starter is created.
   - Add a summary-screen stats-page option that toggles between the normal stat
     presentation and explicit IV values without changing the Pokemon.
-  - Add a Bag Repel option for enabling and disabling repel behavior without
-    consuming ordinary Repel items; finalize its exact Bag UX and encounter rule
-    before implementation.
+  - The reusable Repel Toggle Key Item enables or disables an indefinite standard
+    random-encounter block. It ignores wild and lead-Pokemon levels, persists
+    through steps and saves, and is granted when the starter is created.
   - Once the corresponding badge is earned, allow an HM field action without a
     party Pokemon knowing the move. Keep the existing badge gates so field
     traversal cannot bypass normal story progression.
@@ -379,6 +379,9 @@ Current execution order:
   resume safely after cancellation or interruption, and correctly persist changes to
   party and boxed Pokemon without requiring a free party slot.
 - Confirm the Portable Healer works outside battle and is blocked or harmless in battle.
+- Confirm both reusable Key Items appear after receiving the starter, the Repel
+  Toggle persists across saving and loading, and Lures or ordinary Repels interact
+  with the toggle as documented.
 
 ## Assumptions
 - Development is based on `expansion/1.16.2` and integrated into `romhack/main`.

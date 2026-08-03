@@ -39,7 +39,8 @@ encounter randomization, level caps and EV removal, starter randomization, enemy
 trainer randomization, and evolution-family ability randomization are merged into
 `romhack/main`, including universal TM compatibility and randomized level-up
 learnsets and the streamlined evolution rules. Quality-of-life hooks have not
-been implemented.
+all been implemented; level-to-cap, Portable Healer, and Repel Toggle are
+integrated into `romhack/main`.
 
 ## Learnset phase complete
 
@@ -598,17 +599,24 @@ replacement routes retain their intended target.
 - Summary IV view: add an option on the Pokemon summary stats page to show all six
   IV values and return cleanly to the normal stat display. This is display-only;
   it must not mutate IVs or other Pokemon data.
-- Bag Repel: add a reusable Bag-facing option for enabling and disabling repel
-  behavior without consuming standard Repel items. Specify whether this is a Key
-  Item or direct Bag toggle and define its encounter-level behavior before coding.
+- Portable Healer and Repel Toggle are integrated into `romhack/main`. Both are
+  reusable Key Items granted when the starter is created. Portable Healer
+  restores HP, PP, and status for every party
+  Pokemon outside battle. Repel Toggle stores an indefinite active state in the
+  existing repel variable and blocks all standard random encounters regardless of
+  the lead Pokemon's level. It remains active while walking until explicitly
+  disabled. Scripted/static and deliberately triggered encounters remain
+  available. Because spray and Lure state continues to use the existing shared
+  variable, a Lure replaces the toggle state; disable the toggle before using an
+  ordinary Repel spray.
 - Badge-authorized HM actions: allow each HM field action after earning its
   corresponding badge without requiring a party Pokemon to know the move. Retain
   the existing badge gates so this QoL feature does not bypass story progression.
 - Oldale supply grant: add an Oldale Town NPC who gives the player 200 Ultra
   Balls and ₽9,999. Choose the NPC and exact script placement during
   implementation.
-- Level-to-cap action: implementation is complete on
-  `romhack/qol-level-to-cap`. `TryAdvanceMonOneLevelToCap` provides the shared
+- Level-to-cap action: implementation is integrated into `romhack/main`.
+  `TryAdvanceMonOneLevelToCap` provides the shared
   one-level stat/experience step and stops at the active cap. The field party
   menu exposes `LEVEL TO CAP` and runs the existing stat, move-learning, and
   evolution presentation after every individual level before continuing.

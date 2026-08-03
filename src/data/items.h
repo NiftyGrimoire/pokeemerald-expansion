@@ -15839,6 +15839,38 @@ const struct ItemInfo gItemsInfo[] =
         .iconPic = gItemIcon_PokeshiDoll,
         .iconPalette = gItemIconPalette_PokeshiDoll,
     },
+
+    [ITEM_PORTABLE_HEALER] =
+    {
+        .name = ITEM_NAME("Portable Healer"),
+        .price = 0,
+        .description = COMPOUND_STRING(
+            "A reusable device\n"
+            "that fully heals\n"
+            "your party."),
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_FIELD,
+        .fieldUseFunc = ItemUseOutOfBattle_PortableHealer,
+        .iconPic = gItemIcon_LargePotion,
+        .iconPalette = gItemIconPalette_MaxPotion,
+    },
+
+    [ITEM_REPEL_TOGGLE] =
+    {
+        .name = ITEM_NAME("Repel Toggle"),
+        .price = 0,
+        .description = COMPOUND_STRING(
+            "Stops random wild\n"
+            "encounters until\n"
+            "turned off."),
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_FIELD,
+        .fieldUseFunc = ItemUseOutOfBattle_RepelToggle,
+        .iconPic = gItemIcon_Repel,
+        .iconPalette = gItemIconPalette_Repel,
+    },
 };
 
 #undef ITEM_NAME

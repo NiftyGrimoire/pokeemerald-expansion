@@ -1120,6 +1120,8 @@ bool8 UpdateRepelCounter(void)
         return FALSE;
     if (InUnionRoom() == TRUE)
         return FALSE;
+    if (!isLure && steps == PORTABLE_REPEL_STEPS)
+        return FALSE;
 
     if (steps != 0)
     {
@@ -1151,6 +1153,8 @@ bool8 IsWildLevelAllowedByRepel(u8 wildLevel)
 {
     u8 i;
 
+    if (VarGet(VAR_REPEL_STEP_COUNT) == PORTABLE_REPEL_STEPS)
+        return FALSE;
     if (!REPEL_STEP_COUNT)
         return TRUE;
 
