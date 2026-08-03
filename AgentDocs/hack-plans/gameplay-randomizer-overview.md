@@ -179,6 +179,9 @@ Current execution order:
      represented to the player.
    - The Portable Healer Key Item is implemented and granted with the starter. It
      fully restores every party Pokemon outside battle without being consumed.
+   - Add an optional trainer-battle modifier that removes the prompt to switch
+     after an opposing Pokemon faints. When enabled, replacement Pokemon enter
+     before the player can make a free switch, matching Set-style battle flow.
 11. World items — planned:
    - Deterministically randomize visible item pickups found in the overworld;
      hidden item spots are removed rather than randomized.
@@ -317,6 +320,9 @@ Current execution order:
   - Add an Oldale Town NPC who gives the player 200 Ultra Balls and ₽9,999 as
     an early-game supply grant. Choose the NPC and exact script placement during
     implementation.
+  - Add a trainer-battle modifier that suppresses the free switch prompt after an
+    opposing Pokemon faints. The modifier should affect trainer battles only and
+    use Set-style replacement flow while enabled.
 - Friendship evolutions:
   - Replace all `IF_MIN_FRIENDSHIP` evolution conditions with level-based equivalents:
     - Baby/early evolutions: level 20.

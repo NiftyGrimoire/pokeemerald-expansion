@@ -617,6 +617,10 @@ replacement routes retain their intended target.
 - Oldale supply grant: add an Oldale Town NPC who gives the player 200 Ultra
   Balls and ₽9,999. Choose the NPC and exact script placement during
   implementation.
+- No-free-switch trainer modifier: add an optional modifier that suppresses the
+  switch prompt after the player knocks out an opposing trainer's Pokemon. While
+  enabled, the trainer sends out the replacement before the player can switch;
+  do not change wild-battle flow or ordinary voluntary switching.
 - Level-to-cap action: implementation is integrated into `romhack/main`.
   `TryAdvanceMonOneLevelToCap` provides the shared
   one-level stat/experience step and stops at the active cap. The field party
