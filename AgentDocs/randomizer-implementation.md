@@ -640,6 +640,85 @@ replacement routes retain their intended target.
   randomized level-up schedule and opening-move weighting. Deterministic trainer,
   learnset, TM, and item mappings from earlier development versions are stale.
 
+### TM move randomization versus level-up learnset randomization
+
+The two systems deliberately share move-safety classification, but they solve
+different gameplay problems and therefore use different identities, weighting,
+and duplicate rules.
+
+Shared candidate policy:
+
+- Both systems begin with `IsMoveRandomizerEligible`. Invalid sentinels,
+  placeholders, Transform, Sketch, Dark Void, species-power-override moves,
+  Hyperspace Fury, Aura Wheel, Struggle, and Tera Blast are excluded.
+- TM selection additionally calls `IsAuthoredHMMove`. An authored HM move may
+  appear naturally in a species' randomized level-up learnset, but it may not
+  occupy a randomized TM slot. This preserves one unambiguous HM reverse lookup
+  and prevents a TM from duplicating Cut through Dive.
+- Neither system changes move type, power, accuracy, effect, priority, PP, or
+  other move data. They select existing implemented moves.
+
+TM mapping rules:
+
+- The unit of identity is the TM slot, not a species. `TM01` through `TM50` form
+  one global mapping for the save, keyed by the save seed,
+  `RANDOMIZER_CATEGORY_TM`, the one-based TM index, and the shrinking candidate
+  count. The mapping is cached and rebuilt when the active save seed changes.
+- Selection is weighted without replacement. After a move is assigned, it is
+  removed from the candidate array before the next slot is selected. All 50 TMs
+  are therefore unique within a save, although a TM move may also occur in one
+  or more species' level-up learnsets.
+- TM weighting is intentionally species-neutral and uses the late-game level-80
+  curves. Damaging moves target approximately 115 power: moves near that target
+  receive up to weight 12, while increasingly distant power bands fall toward a
+  minimum weight of 1. Fixed- and level-based-damage moves with listed power 0
+  are normalized to power 50 for weighting.
+- Status moves use the late basic/strong/elite weights 1/13/48. Elite moves such
+  as Spore, Shell Smash, Quiver Dance, and comparable reviewed effects are much
+  more likely than basic status moves; strong setup, recovery, status, hazard,
+  screen, weather, and Protect-like effects occupy the middle tier.
+- Explosion/self-KO moves, ordinary recoil-effect moves, and recoil-on-miss
+  moves retain access but have their computed weight divided by four, with a
+  floor of 1. This is a TM-specific permanent-resource safeguard; high listed
+  power alone should not make a severe-drawback move dominant.
+- The randomized move is resolved everywhere the TM is presented or consumed:
+  item description, Bag use, compatibility checks, Move Reminder and Pokedex
+  displays, reverse move-to-item lookup, and debug helpers. The item remains its
+  authored TM slot, so finding TM24 still gives TM24, but the taught move and
+  description are save-dependent.
+- Every enabled real Pokemon is compatible with every TM. This universal TM
+  compatibility is separate from the move-selection algorithm.
+
+Level-up learnset rules:
+
+- The unit of identity is `(species, learnset slot)`, keyed with
+  `RANDOMIZER_CATEGORY_LEARNSET`. Each species receives its own deterministic
+  20-move schedule. The same species has the same moves in wild, gift, trainer,
+  level-up, evolution-learning, Move Reminder, and Pokedex paths.
+- Moves are selected without duplication inside one species' 20-move learnset,
+  using the previously selected moves as an exclusion list. Different species
+  may freely share moves, and no global uniqueness is intended.
+- Weighting depends on both species type and the scheduled learn level.
+  Damaging STAB buckets receive a 4x type multiplier, coverage receives 2x, and
+  status receives 1x. The target damaging power rises with level from roughly 40
+  early to 115 at level 80. Status weighting shifts from basic moves early to
+  strong moves from level 24 and elite moves from level 42.
+- The two level-1 slots use a special opening policy: attacks at 40 power or
+  below receive the dominant weight, 41-60 power attacks receive a small
+  fallback weight, stronger attacks receive zero, and only basic-tier status
+  moves are eligible. Later slots use the normal level-scaled curves.
+- Learnset weighting does not apply the TM system's blanket recoil/self-KO
+  quarter-weight penalty. Its power curve, level placement, typing multipliers,
+  and no-duplicate rule govern selection instead; detrimental damaging moves
+  remain an explicit balance-review concern.
+- If a valid move cannot be selected, the resolver returns the authored move as
+  a safe fallback. TM initialization instead expects the reviewed candidate pool
+  to contain substantially more than the 50 required unique moves.
+
+In short: TM randomization builds one species-neutral, late-game-weighted set of
+50 globally unique reusable teaching resources. Learnset randomization builds a
+different type-aware, level-progressive set of 20 moves for every species.
+
 ## Committed 1.1.0 changelist review ledger
 
 The release-sized changelist was reviewed, corrected, and committed as
@@ -663,7 +742,7 @@ semantics rather than assuming that a 64-slot pocket can never fill.
 | 3 | Randomized TMs displayed the authored TM slot's move description. | Resolved. TM01-TM50 descriptions now resolve from the randomized move while their item names remain stable TM slot names. | Manually inspect representative Bag descriptions and retain focused automated coverage. |
 | 4 | Authored HM moves could also occupy randomized TM slots, creating duplicate and ambiguous reverse mappings. | Resolved. Every authored HM move is excluded from randomized TM candidates and the invariant is tested across multiple seeds. | Manual Bag/use validation remains. |
 | 5 | Exchanges, vendors, repeatable systems, and prize systems were broadly converted with `giveitem_randomized` even though they were outside the original direct-gift phase. | Resolved case by case. Authored transactions were restored where appropriate; selected vendors and challenge rewards retain documented deterministic randomization; daily and peripheral systems were made one-time, disabled, or deliberately redesigned; fossils and the E-Reader delivery are authored. See the completed decision queue below. | Perform the separate future streamlining and whole-game vendor audits already documented; do not silently extend randomization to unaudited transactions. |
-| 6 | The randomized TM candidate filter admitted moves known to be unsuitable, with Tera Blast explicitly excused by a test. | Resolved. TM selection reuses the reviewed practical-move eligibility gate, excludes Tera Blast and other unusable/context-dependent cases, and separately excludes every authored HM. | Revisit only if the TM-specific balance policy is deliberately broadened. |
+| 6 | The randomized TM candidate filter admitted moves known to be unsuitable, with Tera Blast explicitly excused by a test. | Resolved. TM selection reuses the reviewed practical-move eligibility gate, excludes Tera Blast and other unusable/context-dependent cases, and separately excludes every authored HM. The detailed TM-versus-learnset contract above records the intentional identity, weighting, uniqueness, drawback, and integration differences. | Revisit only if the TM-specific balance policy is deliberately broadened. |
 | 7 | Authored quantities were copied blindly to randomized replacements, producing disproportionate stacks such as five or six identical held/evolution items. | Resolved for every retained multi-item gift in this changelist. Birch's tutorial is restored to five authored Poke Balls; Oldale is authored; Seashore's six-copy challenge reward is an explicit temporary exception. | Reconsider Seashore only when its fights, reward, and vendor are disabled together during streamlining. |
 | 8 | Tests cover pure randomizer resolution better than the actual script integration risks. | Partially addressed. TM descriptions and HM/TM collision coverage were added, and normal ROM builds now succeed after the hidden-item flag-zero build blocker was fixed. | Add or perform coverage for ordinary item-ball templates, `RandomizeFreeItemGift` variable handling, protected story-item macros, exchanges/repeatable rewards, multi-item quantities, and Bag-full retry stability. Keep the manual checklist as the gameplay gate where script-level unit coverage is impractical. |
 
