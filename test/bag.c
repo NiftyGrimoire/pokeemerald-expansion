@@ -3,6 +3,7 @@
 #include "event_data.h"
 #include "item_menu.h"
 #include "pokemon.h"
+#include "script_pokemon_util.h"
 #include "test/overworld_script.h"
 #include "test/test.h"
 
@@ -95,6 +96,18 @@ TEST("Berries are sorted correctly in the bag")
     EXPECT_EQ(pocket->itemSlots[6].itemId, ITEM_ORAN_BERRY);
     EXPECT_EQ(pocket->itemSlots[7].itemId, ITEM_POMEG_BERRY);
     EXPECT_EQ(pocket->itemSlots[8].itemId, ITEM_NONE);
+}
+
+TEST("Kiri Berry pair preflight rejects a full existing Berry stack")
+{
+    memset(gSaveBlock1Ptr->bag.berries, 0, sizeof(gSaveBlock1Ptr->bag.berries));
+
+    for (enum Item item = ITEM_POMEG_BERRY; item <= ITEM_NOMEL_BERRY; item++)
+        EXPECT(AddBagItem(item, MAX_BAG_ITEM_CAPACITY));
+
+    SelectKiriBerryPair();
+
+    EXPECT_EQ(gSpecialVar_Result, FALSE);
 }
 
 TEST("Items are correctly sorted and compacted in the bag")

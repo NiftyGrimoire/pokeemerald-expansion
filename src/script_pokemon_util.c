@@ -663,3 +663,56 @@ void Script_GiveRandomBerry(struct ScriptContext *ctx)
 
     gSpecialVar_Result = BerryTypeToItemId(RandomUniform(RNG_RANDOM_BERRY, loBerry, hiBerry));
 }
+
+void SelectKiriBerryPair(void)
+{
+    struct ItemSlot simulatedPocket[BAG_BERRIES_COUNT];
+    enum Item rewards[2];
+    u32 i, reward;
+
+    rewards[0] = BerryTypeToItemId(RandomUniform(RNG_RANDOM_BERRY, BERRY_ID_POMEG, BERRY_ID_NOMEL));
+    rewards[1] = RandomUniform(RNG_RANDOM_BERRY, 0, 1) == 0 ? ITEM_FIGY_BERRY : ITEM_IAPAPA_BERRY;
+
+    for (i = 0; i < BAG_BERRIES_COUNT; i++)
+        simulatedPocket[i] = GetBagItemIdAndQuantity(POCKET_BERRIES, i);
+
+    for (reward = 0; reward < ARRAY_COUNT(rewards); reward++)
+    {
+        for (i = 0; i < BAG_BERRIES_COUNT; i++)
+        {
+            if (simulatedPocket[i].itemId == rewards[reward])
+            {
+                if (simulatedPocket[i].quantity >= MAX_BAG_ITEM_CAPACITY)
+                {
+                    gSpecialVar_Result = FALSE;
+                    return;
+                }
+                simulatedPocket[i].quantity++;
+                break;
+            }
+        }
+
+        if (i == BAG_BERRIES_COUNT)
+        {
+            for (i = 0; i < BAG_BERRIES_COUNT; i++)
+            {
+                if (simulatedPocket[i].itemId == ITEM_NONE)
+                {
+                    simulatedPocket[i].itemId = rewards[reward];
+                    simulatedPocket[i].quantity = 1;
+                    break;
+                }
+            }
+        }
+
+        if (i == BAG_BERRIES_COUNT)
+        {
+            gSpecialVar_Result = FALSE;
+            return;
+        }
+    }
+
+    gSpecialVar_0x8008 = rewards[0];
+    gSpecialVar_0x8009 = rewards[1];
+    gSpecialVar_Result = TRUE;
+}

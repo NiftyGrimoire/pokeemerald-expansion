@@ -4,14 +4,7 @@ ShoalCave_LowTideInnerRoom_MapScripts::
 	.byte 0
 
 ShoalCave_LowTideInnerRoom_OnTransition:
-	goto_if_set FLAG_SYS_SHOAL_TIDE, ShoalCave_LowTideInnerRoom_EventScript_SetHighTide
-	goto ShoalCave_LowTideInnerRoom_EventScript_SetLowTide
-
-ShoalCave_LowTideInnerRoom_EventScript_SetHighTide::
-	setmaplayoutindex LAYOUT_SHOAL_CAVE_HIGH_TIDE_INNER_ROOM
-	end
-
-ShoalCave_LowTideInnerRoom_EventScript_SetLowTide::
+	clearflag FLAG_SYS_SHOAL_TIDE
 	setmaplayoutindex LAYOUT_SHOAL_CAVE_LOW_TIDE_INNER_ROOM
 	end
 
@@ -62,7 +55,7 @@ ShoalCave_LowTideInnerRoom_EventScript_SetShoalItemMetatilesEnd::
 ShoalCave_LowTideInnerRoom_EventScript_ShoalShell1::
 	lockall
 	goto_if_set FLAG_RECEIVED_SHOAL_SHELL_1, ShoalCave_LowTideInnerRoom_EventScript_ReceivedShoalShell
-	giveitem ITEM_SHOAL_SHELL
+	giveitem_randomized ITEM_SHOAL_SHELL
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	setmetatile 41, 20, METATILE_Cave_ShoalCave_BlueStone_Small, FALSE
 	special DrawWholeMapView
@@ -78,7 +71,7 @@ ShoalCave_LowTideInnerRoom_EventScript_ReceivedShoalShell::
 ShoalCave_LowTideInnerRoom_EventScript_ShoalShell2::
 	lockall
 	goto_if_set FLAG_RECEIVED_SHOAL_SHELL_2, ShoalCave_LowTideInnerRoom_EventScript_ReceivedShoalShell
-	giveitem ITEM_SHOAL_SHELL
+	giveitem_randomized ITEM_SHOAL_SHELL
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	setmetatile 41, 10, METATILE_Cave_ShoalCave_BlueStone_Small, FALSE
 	special DrawWholeMapView
@@ -89,7 +82,7 @@ ShoalCave_LowTideInnerRoom_EventScript_ShoalShell2::
 ShoalCave_LowTideInnerRoom_EventScript_ShoalShell3::
 	lockall
 	goto_if_set FLAG_RECEIVED_SHOAL_SHELL_3, ShoalCave_LowTideInnerRoom_EventScript_ReceivedShoalShell
-	giveitem ITEM_SHOAL_SHELL
+	giveitem_randomized ITEM_SHOAL_SHELL
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	setmetatile 6, 9, METATILE_Cave_ShoalCave_BlueStone_Small, FALSE
 	special DrawWholeMapView
@@ -100,7 +93,7 @@ ShoalCave_LowTideInnerRoom_EventScript_ShoalShell3::
 ShoalCave_LowTideInnerRoom_EventScript_ShoalShell4::
 	lockall
 	goto_if_set FLAG_RECEIVED_SHOAL_SHELL_4, ShoalCave_LowTideInnerRoom_EventScript_ReceivedShoalShell
-	giveitem ITEM_SHOAL_SHELL
+	giveitem_randomized ITEM_SHOAL_SHELL
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	setmetatile 16, 13, METATILE_Cave_ShoalCave_BlueStone_Small, FALSE
 	special DrawWholeMapView
@@ -111,7 +104,7 @@ ShoalCave_LowTideInnerRoom_EventScript_ShoalShell4::
 ShoalCave_LowTideInnerRoom_EventScript_ShoalSalt1::
 	lockall
 	goto_if_set FLAG_RECEIVED_SHOAL_SALT_1, ShoalCave_LowTideInnerRoom_EventScript_ReceivedShoalSalt
-	giveitem ITEM_SHOAL_SALT
+	giveitem_randomized ITEM_SHOAL_SALT
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	setmetatile 31, 8, METATILE_Cave_ShoalCave_DirtPile_Small, FALSE
 	special DrawWholeMapView
@@ -127,7 +120,7 @@ ShoalCave_LowTideInnerRoom_EventScript_ReceivedShoalSalt::
 ShoalCave_LowTideInnerRoom_EventScript_ShoalSalt2::
 	lockall
 	goto_if_set FLAG_RECEIVED_SHOAL_SALT_2, ShoalCave_LowTideInnerRoom_EventScript_ReceivedShoalSalt
-	giveitem ITEM_SHOAL_SALT
+	giveitem_randomized ITEM_SHOAL_SALT
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	setmetatile 14, 26, METATILE_Cave_ShoalCave_DirtPile_Small, FALSE
 	special DrawWholeMapView

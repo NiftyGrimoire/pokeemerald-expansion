@@ -11,6 +11,11 @@ in unit tests.
 Record the ROM commit, emulator or hardware, save seed, and result for every test
 session. Do not treat a feature as manually validated from source review alone.
 
+Agent task note: open manual checks do not block the next implementation task unless
+the user explicitly asks for manual validation. Keep appending new checklist items as
+code review or implementation uncovers additional behavior that should be verified
+later.
+
 ## Test record
 
 - ROM commit:
@@ -28,6 +33,7 @@ Result notation:
 - `[x]` Passed
 - `[!]` Failed; record reproduction steps and an issue or follow-up
 - `[-]` Not applicable; record why
+- `[~]` Deferred or low priority; does not block the next implementation task
 
 ## Recommended save coverage
 
@@ -91,8 +97,8 @@ correct.
 - [ ] Confirm Mythical Pokemon and Ultra Beasts do not appear in this pool.
 - [ ] Exercise a non-special `setwildbattle` encounter and confirm it uses the
       ordinary level/BST-scaled pool.
-- [ ] Determine whether the included FRLG static maps are reachable. If they are,
-      add and run coverage for Mewtwo and the Kanto birds; otherwise record `[-]`.
+- [-] FRLG static maps are outside Emerald gameplay scope; no FRLG coverage is
+      required for this randomizer.
 
 ## 4. Level caps and zero EVs
 
@@ -104,7 +110,10 @@ correct.
       and 58.
 - [ ] Confirm the post-Champion fallback cap is 100.
 - [ ] Starting from a zero-EV Pokemon, confirm battle participation produces no
-      positive EVs.
+      positive EVs, including ordinary battles, Exp. Share recipients, and a
+      level-100 Pokemon receiving battle rewards.
+- [ ] Confirm vitamins, feathers, and EV-raising items cannot change EVs while
+      EV-reducing items retain their documented behavior.
 - [ ] Confirm vitamins cannot produce positive EVs.
 - [ ] Confirm feathers cannot produce positive EVs.
 - [ ] Confirm EV-affecting berries cannot produce positive EVs or underflow EVs.
@@ -170,7 +179,7 @@ changes form correctly without losing data, crashing, or becoming stuck.
 
 ## 8. Learnsets and teachable moves
 
-- [ ] Confirm a newly created low-level Pokemon receives four deterministic
+- [ ] Confirm a newly created low-level Pokemon receives two deterministic
       starting moves.
 - [ ] Confirm an ordinary level-up move is offered at the expected level.
 - [ ] Confirm an evolution move is offered during evolution.
@@ -182,6 +191,12 @@ changes form correctly without losing data, crashing, or becoming stuck.
 - [ ] Confirm gift Pokemon initial moves match their species and level.
 - [ ] Confirm every enabled real species can learn representative configured TMs.
 - [ ] Confirm authored HM compatibility remains intact.
+- [ ] Confirm all 50 TM slots teach distinct moves for a save and that the
+      mapping changes across seeds.
+- [ ] Confirm TM descriptions, bag use, compatibility, Move Reminder, Pokedex,
+      reverse move-to-TM lookups, and debug helpers all use the same mapping.
+- [ ] Confirm HM descriptions, field use, compatibility, and move mappings remain
+      authored after TM randomization.
 - [ ] Confirm authored tutor compatibility remains intact.
 - [ ] Confirm egg moves remain authored.
 - [ ] Across Seeds A and B, review representative early-, mid-, and late-game
@@ -221,6 +236,14 @@ changes form correctly without losing data, crashing, or becoming stuck.
 - [ ] Exercise one former held-item trade replacement.
 - [ ] Exercise Karrablast and Shelmet replacement routes.
 - [ ] Exercise at least two Pumpkaboo sizes.
+- [ ] Open Captain Stern's Scanner exchange and confirm the scrollable menu lists
+      all ten retained evolution stones, the Linking Cord, and Exit.
+- [ ] Select and confirm both a representative stone and the Linking Cord on
+      separate saves; confirm the selected item is received unchanged and the
+      Scanner is consumed exactly once.
+- [ ] Back out of the Scanner menu, decline its confirmation, and attempt the
+      exchange with a full applicable Bag pocket; confirm each path preserves
+      the Scanner and permits a later retry.
 
 ## 10. Quality-of-life features
 
@@ -305,14 +328,15 @@ changes form correctly without losing data, crashing, or becoming stuck.
 
 ### Player-facing move descriptions
 
-- [ ] Inspect Blazing Torque, Combat Torque, Magical Torque, Noxious Torque, and
-      Wicked Torque wherever their descriptions are displayed.
-- [ ] Record every remaining placeholder description for the pending Torque
+- [~] Low priority: inspect Blazing Torque, Combat Torque, Magical Torque,
+      Noxious Torque, and Wicked Torque wherever their descriptions are displayed.
+- [~] Low priority: record every remaining placeholder description for the Torque
       description cleanup.
 
-## 11. Trainer AI review and future validation
+## 11. Trainer AI implementation and future validation
 
-Run this section after the AI tier policy is implemented.
+Trainer AI tier assignment is implemented and has focused automated coverage.
+The remaining items below are gameplay validation or broader scenario coverage.
 
 - [ ] Confirm ordinary trainers use the approved ordinary-tier flags.
 - [ ] Confirm bosses use the approved boss-tier flags.
@@ -326,22 +350,38 @@ Run this section after the AI tier policy is implemented.
 
 ## 12. World items and streamlined progression
 
-Run these sections after their policies and implementations are complete.
+Emerald visible item-ball pickups and eligible direct gift scripts are
+implemented. Run the item checks below for manual gameplay validation and audit
+the remaining excluded item sources separately.
 
 ### World items
 
-- [ ] Confirm visible pickups are deterministic within a save and differ across
-      seeds.
-- [ ] Confirm key items, TMs, duplicates, respawns, and progression-critical items
-      follow the approved policy.
+- [ ] Confirm ordinary visible item-ball pickups are deterministic within a save
+      and differ across seeds.
+- [ ] Confirm duplicate useful rewards are possible and no duplicate-tracking
+      state is required.
+- [ ] Confirm Poke Ball variants, HMs, TMs as replacement items, and pure money
+      rewards never appear in generated results.
+- [ ] Confirm authored Poke Ball and money pickups convert to useful rewards.
+- [ ] Confirm authored key items, HMs, TM item slots, and berry gifts remain unchanged.
+- [ ] Confirm no evolution stone, Linking Cord, or other resource is guaranteed;
+      record seeds where a needed resource is unavailable.
 - [ ] Confirm every replacement belongs to the approved Nuzlocke-useful pool.
-- [ ] Confirm retired evolution items, redundant medicine, and disallowed X-items
-      do not appear.
-- [ ] Confirm required evolution resources are obtainable before they are needed.
-- [ ] Confirm any new pickup spots are visible and optional rather than hidden.
+- [ ] Confirm retired evolution items, redundant medicine, disallowed X-items,
+      and unapproved mixed-use sellables do not appear.
+- [ ] Confirm invalid special templates remain unchanged and hidden items remain
+      disabled.
+- [ ] Confirm Emerald item-ball scripts and eligible NPC/story gifts use the
+      deterministic mapping, while key items, HMs, TM slots, berries, shops, prize
+      tables, Battle Pyramid items, and FRLG content remain unchanged or out of
+      scope.
+- [ ] Confirm any future pickup spots are visible and optional rather than hidden.
 
 ### Streamlined progression
 
+- [ ] Confirm the Route 117 Day Care closure NPC blocks the entrance and explains
+      that the service is closed.
+- [ ] Confirm the interior Day Care cannot be reached through the normal entrance.
 - [ ] Complete a badge-to-Champion playthrough while recording party level versus
       each cap.
 - [ ] Record every mandatory grinding point.
@@ -366,3 +406,46 @@ Run these sections after their policies and implementations are complete.
 - [ ] Review all `[!]` entries and confirm each is fixed, explicitly accepted, or
       tracked before release.
 - [ ] Record the final validated commit in this document or the release notes.
+
+## Agent Implementation Backlog
+
+These are non-manual tasks to pick up before treating validation-only items as the
+next work queue.
+
+- [x] Review trainer AI flag assignments for randomized teams and learnsets.
+- [x] Define fair AI tiers for ordinary trainers, bosses, and rematches without
+      giving every opponent omniscient knowledge by default.
+- [ ] Optional follow-up: expand automated coverage for smart move scoring,
+      mid-battle switching, and post-KO replacement selection under locked Set
+      battle style where the existing test harness can support it.
+- [x] Specify the first visible world-item slice: stable pickup identity;
+      ordinary visible item balls only; key items and HMs remain authored; TM
+      item slots remain authored for separate move randomization; invalid special
+      templates remain unchanged.
+- [x] Decide the world-item assignment policy: stateless pure random selection,
+      duplicates allowed, no progression guarantees, no progression bands, and no
+      added save state or pickup counters.
+- [x] Exclude Poke Ball variants, HMs and TMs as replacement items, and pure money
+      rewards; convert authored Poke Ball and money pickups into useful rewards.
+- [x] Define the initial Nuzlocke-useful replacement pool: standard evolution
+      stones, Linking Cord, selected evolution-held items with independent
+      utility, and broadly useful held items.
+- [x] Exclude retired species-specific evolution items, redundant medicine,
+      X-items, mixed-use sellables, berries, and other low-value rewards from the
+      initial general useful-item pool; broader distribution review remains.
+- [x] Implement Emerald visible item-ball and eligible direct-gift mapping with
+      protected key items, HMs, TM slots, and berries; exclude shops and prize
+      tables. Focused automated coverage passes; manual gameplay validation remains.
+- [x] Implement the 50-slot per-save unique TM move mapping with high-power
+      and high-tier-status weighting, route every TM lookup path through it, and
+      preserve authored HMs. Focused automated coverage passes; manual gameplay
+      validation remains.
+- [~] Low priority: audit and replace the remaining Torque move descriptions.
+- [x] Block the Emerald Day Care entrance with a closure NPC and document the
+      remaining breeding and dependent-reward cleanup.
+- [x] Preserve the existing no-EV-gain toggle and exclude EV-effect items from the random item pool.
+- [ ] Disable or replace the remaining breeding, egg, and inherited-move paths
+      after auditing their progression and reward dependencies.
+- [ ] When changing learnset randomizer weighting, include detrimental-move review
+      cases such as `IsExplosionMove` moves, recoil-heavy attacks, fixed-damage
+      edge cases, and Misty Explosion as the late-game sentinel.

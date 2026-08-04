@@ -102,11 +102,16 @@ MtChimney_EventScript_LavaCookieLady::
 	checkmoney 200
 	goto_if_eq VAR_RESULT, FALSE, MtChimney_EventScript_NotEnoughMoney
 	msgbox MtChimney_Text_ThankYouDear, MSGBOX_DEFAULT
-	checkitemspace ITEM_LAVA_COOKIE
-	call_if_eq VAR_RESULT, TRUE, MtChimney_EventScript_RemoveMoney
-.if OW_SHOW_ITEM_DESCRIPTIONS == OW_ITEM_DESCRIPTIONS_OFF
-	giveitem ITEM_LAVA_COOKIE
+	setorcopyvar VAR_0x8000, ITEM_LAVA_COOKIE
+	setorcopyvar VAR_0x8001, 1
+	callnative RandomizeFreeItemGift
+	checkitemspace VAR_0x8000
 	goto_if_eq VAR_RESULT, FALSE, MtChimney_EventScript_BagIsFull
+	removemoney 200
+	updatemoneybox
+.if OW_SHOW_ITEM_DESCRIPTIONS == OW_ITEM_DESCRIPTIONS_OFF
+	callstd STD_OBTAIN_ITEM
+	goto_if_eq VAR_RESULT, FALSE, MtChimney_EventScript_RefundFailedPurchase
 	hidemoneybox
 	release
 	end
@@ -118,8 +123,8 @@ MtChimney_EventScript_BagIsFull::
 	end
 .else
 	hidemoneybox
-	giveitem ITEM_LAVA_COOKIE
-	goto_if_eq VAR_RESULT, FALSE, MtChimney_EventScript_BagIsFull
+	callstd STD_OBTAIN_ITEM
+	goto_if_eq VAR_RESULT, FALSE, MtChimney_EventScript_RefundFailedPurchase
 	release
 	end
 
@@ -129,11 +134,9 @@ MtChimney_EventScript_BagIsFull::
 	end
 .endif @ OW_SHOW_ITEM_DESCRIPTIONS
 
-
-MtChimney_EventScript_RemoveMoney::
-	removemoney 200
-	updatemoneybox
-	return
+MtChimney_EventScript_RefundFailedPurchase::
+	addmoney 200
+	goto MtChimney_EventScript_BagIsFull
 
 MtChimney_EventScript_DeclineLavaCookie::
 	msgbox MtChimney_Text_OhFineThen, MSGBOX_DEFAULT

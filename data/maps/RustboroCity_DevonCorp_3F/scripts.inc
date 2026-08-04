@@ -47,7 +47,7 @@ RustboroCity_DevonCorp_3F_EventScript_MeetPresident::
 	applymovement LOCALID_PLAYER, RustboroCity_DevonCorp_3F_Movement_PlayerApproachDesk
 	waitmovement 0
 	msgbox RustboroCity_DevonCorp_3F_Text_MrStoneIHaveFavor, MSGBOX_DEFAULT
-	giveitem ITEM_LETTER
+	giveitem_randomized ITEM_LETTER
 	msgbox RustboroCity_DevonCorp_3F_Text_MrStoneWantYouToHaveThis, MSGBOX_DEFAULT
 	playfanfare MUS_OBTAIN_ITEM
 	message RustboroCity_DevonCorp_3F_Text_ReceivedPokenav
@@ -160,7 +160,7 @@ RustboroCity_DevonCorp_3F_EventScript_MrStone::
 
 RustboroCity_DevonCorp_3F_EventScript_GiveExpShare::
 	msgbox RustboroCity_DevonCorp_3F_Text_ThankYouForDeliveringLetter, MSGBOX_DEFAULT
-	giveitem ITEM_EXP_SHARE
+	giveitem_randomized ITEM_EXP_SHARE
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	setflag FLAG_RECEIVED_EXP_SHARE
 	msgbox RustboroCity_DevonCorp_3F_Text_ExplainExpShare, MSGBOX_DEFAULT

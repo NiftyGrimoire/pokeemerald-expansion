@@ -9,9 +9,17 @@ MysteryGiftScript_BattleCard::
 	vmessage sText_MysteryGiftBattleCountCard_WonPrize
 	waitmessage
 	waitbuttonpress
-	giveitem ITEM_POTION
-	release
+	giveitem_randomized ITEM_POTION
+	vgoto_if_eq VAR_RESULT, FALSE, MysteryGiftScript_BattleCardBagFull
 	setflag FLAG_MYSTERY_GIFT_DONE
+	release
+	end
+
+MysteryGiftScript_BattleCardBagFull:
+	vmessage sText_MysteryGiftBattleCountCard_BagFull
+	waitmessage
+	waitbuttonpress
+	release
 	end
 
 MysteryGiftScript_BattleCardInfo:
@@ -43,3 +51,7 @@ sText_MysteryGiftBattleCountCard_WonPrize:
 	.string "three battles!\p"
 	.string "We hope you will be inspired to\n"
 	.string "battle some more.$"
+
+sText_MysteryGiftBattleCountCard_BagFull:
+	.string "Your BAG is full. Please make room\n"
+	.string "and return for your prize.$"

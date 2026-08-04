@@ -1,6 +1,7 @@
 #include "global.h"
 #include "event_data.h"
 #include "item.h"
+#include "move.h"
 #include "pokemon.h"
 #include "random.h"
 #include "randomizer.h"
@@ -86,6 +87,152 @@ TEST("Randomizer hash does not advance either global RNG")
     EXPECT_EQ(rng2.b, gRng2Value.b);
     EXPECT_EQ(rng2.c, gRng2Value.c);
     EXPECT_EQ(rng2.ctr, gRng2Value.ctr);
+}
+
+TEST("TM randomization creates a deterministic unique 50-move mapping")
+{
+    enum Move moves[NUM_TECHNICAL_MACHINES];
+    u32 seed = 0x12345678;
+
+    gSaveBlock3Ptr->randomizerSeed = seed;
+    for (u32 i = 0; i < NUM_TECHNICAL_MACHINES; i++)
+    {
+        moves[i] = GetTMHMMoveId(i + 1);
+        EXPECT(IsMoveRandomizerEligible(moves[i]));
+
+        for (u32 j = 0; j < i; j++)
+            EXPECT_NE(moves[i], moves[j]);
+    }
+
+    gSaveBlock3Ptr->randomizerSeed = seed;
+    for (u32 i = 0; i < NUM_TECHNICAL_MACHINES; i++)
+        EXPECT_EQ(moves[i], GetTMHMMoveId(i + 1));
+
+    gSaveBlock3Ptr->randomizerSeed = 0x87654321;
+    EXPECT_NE(moves[0], GetTMHMMoveId(1));
+
+    gSaveBlock3Ptr->randomizerSeed = seed;
+    EXPECT_EQ(GetTMHMMoveId(NUM_TECHNICAL_MACHINES + 1), MOVE_CUT);
+    EXPECT_EQ(GetTMHMMoveId(NUM_TECHNICAL_MACHINES + 2), MOVE_FLY);
+}
+
+TEST("TM reverse lookup follows randomized TM assignments and authored HMs")
+{
+    for (u32 seed = 1; seed <= 32; seed++)
+    {
+        gSaveBlock3Ptr->randomizerSeed = seed;
+
+        for (u32 tmIndex = 1; tmIndex <= NUM_TECHNICAL_MACHINES; tmIndex++)
+        {
+            enum Move move = GetTMHMMoveId(tmIndex);
+
+            EXPECT_EQ(GetTMHMItemIdFromMoveId(move), GetTMHMItemId(tmIndex));
+            for (u32 hmIndex = NUM_TECHNICAL_MACHINES + 1; hmIndex <= NUM_ALL_MACHINES; hmIndex++)
+                EXPECT_NE(move, gTMHMItemMoveIds[hmIndex].moveId);
+        }
+    }
+
+    for (u32 hmIndex = NUM_TECHNICAL_MACHINES + 1; hmIndex <= NUM_ALL_MACHINES; hmIndex++)
+    {
+        EXPECT_EQ(GetTMHMMoveId(hmIndex), gTMHMItemMoveIds[hmIndex].moveId);
+        EXPECT_EQ(GetTMHMItemIdFromMoveId(gTMHMItemMoveIds[hmIndex].moveId),
+                  gTMHMItemMoveIds[hmIndex].itemId);
+    }
+
+    EXPECT_EQ(GetTMHMMoveId(NUM_ALL_MACHINES), MOVE_DIVE);
+    EXPECT_EQ(GetTMHMItemIdFromMoveId(MOVE_DIVE), ITEM_HM_DIVE);
+}
+
+TEST("TM item descriptions follow randomized moves without changing other items")
+{
+    bool32 foundChangedDescription = FALSE;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+
+    for (u32 index = 1; index <= NUM_TECHNICAL_MACHINES; index++)
+    {
+        enum Item item = GetTMHMItemId(index);
+
+        EXPECT_EQ(GetItemDescription(item), GetMoveDescription(GetTMHMMoveId(index)));
+        if (GetItemDescription(item) != gItemsInfo[item].description)
+            foundChangedDescription = TRUE;
+    }
+
+    EXPECT(foundChangedDescription);
+    EXPECT_EQ(GetItemDescription(ITEM_HM_CUT), gItemsInfo[ITEM_HM_CUT].description);
+    EXPECT_EQ(GetItemDescription(ITEM_POTION), gItemsInfo[ITEM_POTION].description);
+}
+
+TEST("World item randomizer preserves key items and TMs")
+{
+    EXPECT(!IsWorldItemRandomizerEligible(ITEM_OLD_ROD));
+    EXPECT(!IsWorldItemRandomizerEligible(ITEM_TM_THUNDERBOLT));
+    EXPECT(!IsWorldItemRandomizerEligible(ITEM_NONE));
+    EXPECT(IsWorldItemRandomizerEligible(ITEM_HP_UP));
+    EXPECT(IsWorldItemRandomizerEligible(ITEM_HEALTH_FEATHER));
+    EXPECT_EQ(GetRandomizedWorldItem(ITEM_OLD_ROD, 1, 2, 3), ITEM_OLD_ROD);
+    EXPECT_EQ(GetRandomizedWorldItem(ITEM_TM_THUNDERBOLT, 1, 2, 3), ITEM_TM_THUNDERBOLT);
+    EXPECT_NE(GetRandomizedWorldItem(ITEM_HP_UP, 1, 2, 3), ITEM_HP_UP);
+    EXPECT_NE(GetRandomizedWorldItem(ITEM_HEALTH_FEATHER, 1, 2, 4), ITEM_HEALTH_FEATHER);
+}
+
+TEST("Free item randomizer preserves protected item categories")
+{
+    EXPECT(IsFreeItemRandomizerEligible(ITEM_POTION));
+    EXPECT(!IsFreeItemRandomizerEligible(ITEM_OLD_ROD));
+    EXPECT(!IsFreeItemRandomizerEligible(ITEM_TM_THUNDERBOLT));
+    EXPECT(!IsFreeItemRandomizerEligible(ITEM_ORAN_BERRY));
+    EXPECT(IsFreeItemRandomizerEligible(ITEM_HP_UP));
+    EXPECT(IsFreeItemRandomizerEligible(ITEM_HEALTH_FEATHER));
+    EXPECT(IsFreeItemRandomizerEligible(ITEM_MUSCLE_FEATHER));
+    EXPECT_EQ(GetRandomizedFreeItem(ITEM_OLD_ROD, 1, 2, 3), ITEM_OLD_ROD);
+    EXPECT_EQ(GetRandomizedFreeItem(ITEM_TM_THUNDERBOLT, 1, 2, 3), ITEM_TM_THUNDERBOLT);
+    EXPECT_EQ(GetRandomizedFreeItem(ITEM_ORAN_BERRY, 1, 2, 3), ITEM_ORAN_BERRY);
+    EXPECT_NE(GetRandomizedFreeItem(ITEM_HP_UP, 1, 2, 3), ITEM_HP_UP);
+    EXPECT_NE(GetRandomizedFreeItem(ITEM_HEALTH_FEATHER, 1, 2, 4), ITEM_HEALTH_FEATHER);
+    EXPECT_NE(GetRandomizedFreeItem(ITEM_MUSCLE_FEATHER, 1, 2, 5), ITEM_MUSCLE_FEATHER);
+}
+
+TEST("Free item randomizer is deterministic and context separated")
+{
+    enum Item item;
+    bool32 contextDiffers = FALSE;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    item = GetRandomizedFreeItem(ITEM_POTION, 1, 2, 3);
+    EXPECT_EQ(item, GetRandomizedFreeItem(ITEM_POTION, 1, 2, 3));
+    EXPECT(IsFreeItemRandomizerEligible(item));
+
+    for (u32 contextId = 4; contextId < 32; contextId++)
+    {
+        if (GetRandomizedFreeItem(ITEM_POTION, 1, 2, contextId) != item)
+        {
+            contextDiffers = TRUE;
+            break;
+        }
+    }
+    EXPECT(contextDiffers);
+}
+
+TEST("World item randomizer is deterministic and uses pickup identity")
+{
+    enum Item item;
+    bool32 contextDiffers = FALSE;
+
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
+    item = GetRandomizedWorldItem(ITEM_POTION, 1, 2, 3);
+    EXPECT_EQ(item, GetRandomizedWorldItem(ITEM_POTION, 1, 2, 3));
+    EXPECT(IsWorldItemRandomizerEligible(item));
+
+    for (u32 objectId = 4; objectId < 32; objectId++)
+    {
+        if (GetRandomizedWorldItem(ITEM_POTION, 1, 2, objectId) != item)
+        {
+            contextDiffers = TRUE;
+            break;
+        }
+    }
+    EXPECT(contextDiffers);
 }
 
 TEST("Randomizer data initialization stores a versioned nonzero seed")
@@ -190,18 +337,21 @@ TEST("Standard learnset schedule front-loads moves within level-cap bands")
 {
     static const u8 capBandStarts[] = {1, 15, 19, 24, 29, 31, 33, 42, 46, 58};
     static const u8 capBandEnds[] = {15, 19, 24, 29, 31, 33, 42, 46, 58, 100};
-    static const u8 expectedMoveCounts[] = {3, 3, 2, 2, 1, 1, 1, 1, 1, 1};
+    static const u8 expectedMoveCounts[] = {3, 3, 2, 2, 1, 1, 1, 1, 2, 2};
 
     EXPECT_EQ(GetRandomizerLevelUpMoveLevel(0), 1);
     EXPECT_EQ(GetRandomizerLevelUpMoveLevel(1), 1);
-    EXPECT_EQ(GetRandomizerLevelUpMoveLevel(2), 1);
-    EXPECT_EQ(GetRandomizerLevelUpMoveLevel(3), 1);
+    EXPECT_EQ(GetRandomizerLevelUpMoveLevel(2), 5);
+    EXPECT_EQ(GetRandomizerLevelUpMoveLevel(3), 10);
+    EXPECT_EQ(GetRandomizerLevelUpMoveLevel(4), 15);
+    EXPECT_EQ(GetRandomizerLevelUpMoveLevel(16), 50);
+    EXPECT_EQ(GetRandomizerLevelUpMoveLevel(18), 60);
 
     for (u32 band = 0; band < ARRAY_COUNT(capBandEnds); band++)
     {
         u32 moveCount = 0;
 
-        for (u32 slot = 4; slot < RANDOMIZER_LEVEL_UP_MOVE_COUNT; slot++)
+        for (u32 slot = 2; slot < RANDOMIZER_LEVEL_UP_MOVE_COUNT; slot++)
         {
             u8 level = GetRandomizerLevelUpMoveLevel(slot);
 
@@ -213,6 +363,55 @@ TEST("Standard learnset schedule front-loads moves within level-cap bands")
         EXPECT_EQ(moveCount, expectedMoveCounts[band]);
     }
     EXPECT_EQ(GetRandomizerLevelUpMoveLevel(RANDOMIZER_LEVEL_UP_MOVE_COUNT), 0);
+}
+
+TEST("Generated level 1 learnsets use the aggressive opening bucket")
+{
+    static const struct
+    {
+        enum Species species;
+        u32 seed;
+    } cases[] =
+    {
+        {SPECIES_BULBASAUR, 0x12345678},
+        {SPECIES_CHARMANDER, 0x87654321},
+        {SPECIES_PIKACHU, 0x13572468},
+        {SPECIES_DRAGONITE, 0x24681357},
+    };
+
+    for (u32 caseId = 0; caseId < ARRAY_COUNT(cases); caseId++)
+    {
+        const struct LevelUpMove *learnset;
+
+        gSaveBlock3Ptr->randomizerSeed = cases[caseId].seed;
+        learnset = GetSpeciesLevelUpLearnset(cases[caseId].species);
+
+        for (u32 i = 0; i < 2; i++)
+        {
+            enum Move move = learnset[i].move;
+
+            EXPECT_EQ(learnset[i].level, 1);
+            if (GetMoveCategory(move) != DAMAGE_CATEGORY_STATUS)
+                EXPECT_LE(GetMovePower(move), 60);
+            EXPECT_GT(GetRandomizerMoveWeightForLevel(cases[caseId].species, move, 1), 0);
+        }
+        EXPECT_GT(learnset[2].level, 1);
+    }
+}
+
+TEST("Level 1 learnset buckets restrict power and status potency aggressively")
+{
+    EXPECT_GT(GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_EMBER, 1), 0);
+    EXPECT_GT(GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_WATER_GUN, 1), 0);
+    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_FLAMETHROWER, 1), 0);
+    EXPECT_GT(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_GROWL, 1), 0);
+    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_SWORDS_DANCE, 1), 0);
+    EXPECT_GT(GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_EMBER, 1),
+              GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_WATER_GUN, 1));
+
+    // The strict opening bucket does not leak into later learn events.
+    EXPECT_GT(GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_FLAMETHROWER, 5), 0);
+    EXPECT_GT(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_SWORDS_DANCE, 5), 0);
 }
 
 TEST("Learnset weights favor appropriate damaging move power by level")
@@ -316,6 +515,7 @@ TEST("Level-up learnsets reject special-case moves and preserve invalid species 
     EXPECT(!IsMoveRandomizerEligible(MOVE_DARK_VOID));
     EXPECT(!IsMoveRandomizerEligible(MOVE_HYPERSPACE_FURY));
     EXPECT(!IsMoveRandomizerEligible(MOVE_AURA_WHEEL));
+    EXPECT(!IsMoveRandomizerEligible(MOVE_TERA_BLAST));
     EXPECT(!IsMoveRandomizerEligible(MOVE_STRUGGLE));
     EXPECT_EQ(GetSpeciesLevelUpLearnset(SPECIES_NONE)[0].move, gSpeciesInfo[SPECIES_NONE].levelUpLearnset[0].move);
     EXPECT_EQ(GetSpeciesLevelUpLearnset(SPECIES_EGG)[0].move, gSpeciesInfo[SPECIES_EGG].levelUpLearnset[0].move);

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "item.h"
+#include "move.h"
 #include "berry.h"
 #include "pokeball.h"
 #include "string_util.h"
@@ -856,7 +857,17 @@ u32 GetItemHoldEffectParam(enum Item itemId)
 
 const u8 *GetItemDescription(enum Item itemId)
 {
-    return gItemsInfo[SanitizeItemId(itemId)].description;
+    enum TMHMIndex index;
+
+    itemId = SanitizeItemId(itemId);
+    index = GetItemTMHMIndex(itemId);
+
+#if RANDOMIZER_ENABLED && RANDOMIZER_TMS
+    if (index > 0 && index <= NUM_TECHNICAL_MACHINES)
+        return GetMoveDescription(GetTMHMMoveId(index));
+#endif
+
+    return gItemsInfo[itemId].description;
 }
 
 u8 GetItemImportance(enum Item itemId)

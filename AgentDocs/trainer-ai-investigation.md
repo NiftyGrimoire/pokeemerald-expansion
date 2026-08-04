@@ -7,8 +7,7 @@ pokeemerald-expansion base and proposes fair trainer tiers for randomized enemy
 species and learnsets. It covers move selection, voluntary mid-battle switching,
 post-KO replacement selection, knowledge, prediction, and special-purpose flags.
 
-No trainer behavior is changed by this investigation. Implement and playtest a
-tier policy separately.
+Implementation status: complete. Commit `5193a8111d` added the ordinary and boss trainer tiers; follow-up commits `81e473f853` and `d932605110` cover randomized-ability awareness and absent-trainer handling. Focused automated coverage exists in `test/trainer_ai.c`; broader battle-scenario validation remains separate follow-up work.
 
 ## Current trainer data
 

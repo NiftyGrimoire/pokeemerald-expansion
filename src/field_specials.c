@@ -2502,6 +2502,16 @@ void ShowScrollableMultichoice(void)
         task->tScrollOffset = sElevatorScroll;
         task->tSelectedRow = sElevatorCursorPos;
         break;
+    case SCROLL_MULTI_SCANNER_EVOLUTION_ITEMS:
+        task->tMaxItemsOnScreen = MAX_SCROLL_MULTI_ON_SCREEN;
+        task->tNumItems = 12;
+        task->tLeft = 15;
+        task->tTop = 1;
+        task->tWidth = 14;
+        task->tHeight = 12;
+        task->tKeepOpenAfterSelect = FALSE;
+        task->tTaskId = taskId;
+        break;
     default:
         gSpecialVar_Result = MULTI_B_PRESSED;
         DestroyTask(taskId);
@@ -2689,7 +2699,22 @@ static const u8 *const sScrollableMultichoiceOptions[][MAX_SCROLL_MULTI_LENGTH] 
         gText_2F,
         gText_1F,
         gText_Exit,
-    }
+    },
+    [SCROLL_MULTI_SCANNER_EVOLUTION_ITEMS] =
+    {
+        COMPOUND_STRING("FIRE STONE"),
+        COMPOUND_STRING("WATER STONE"),
+        COMPOUND_STRING("THUNDER STONE"),
+        COMPOUND_STRING("LEAF STONE"),
+        COMPOUND_STRING("ICE STONE"),
+        COMPOUND_STRING("SUN STONE"),
+        COMPOUND_STRING("MOON STONE"),
+        COMPOUND_STRING("SHINY STONE"),
+        COMPOUND_STRING("DUSK STONE"),
+        COMPOUND_STRING("DAWN STONE"),
+        COMPOUND_STRING("LINKING CORD"),
+        gText_Exit,
+    },
 };
 
 static void Task_ShowScrollableMultichoice(u8 taskId)

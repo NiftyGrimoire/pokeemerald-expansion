@@ -5,3 +5,6 @@ Text_ThisIsATestSignpostMsg::
 EventScript_TestSignpostMsg::
 	msgbox Text_ThisIsATestSignpostMsg, MSGBOX_SIGN
 	end
+
+EventScript_NoOp::
+	end

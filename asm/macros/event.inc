@@ -570,6 +570,13 @@
 	.2byte \quantity
 	.endm
 
+	.macro additem_randomized itemId:req, quantity=1
+	setorcopyvar VAR_0x8000, \itemId
+	setorcopyvar VAR_0x8001, \quantity
+	callnative RandomizeFreeItemGift
+	additem VAR_0x8000, VAR_0x8001
+	.endm
+
 	@ Removes quantity of the specified item from the player's Bag. If the player has fewer than 'quantity' in their bag
 	@ then none will be removed and VAR_RESULT will be set to FALSE. Otherwise it will be set to TRUE.
 	.macro removeitem itemId:req, quantity=1
@@ -2149,11 +2156,26 @@
 	callstd STD_OBTAIN_ITEM
 	.endm
 
+	.macro giveitem_randomized item:req, amount=1
+	setorcopyvar VAR_0x8000, \item
+	setorcopyvar VAR_0x8001, \amount
+	callnative RandomizeFreeItemGift
+	callstd STD_OBTAIN_ITEM
+	.endm
+
 	@ For picking up items in the overworld. Similar to giveitem, but with different language and
 	@ sets the flag of the last-talked to object (the item the player picked up).
 	.macro finditem item:req, amount=1
 	setorcopyvar VAR_0x8000, \item
 	setorcopyvar VAR_0x8001, \amount
+	callstd STD_FIND_ITEM
+	.endm
+
+	@ For custom visible item-ball scripts. NPC and story rewards continue to use giveitem.
+	.macro finditem_randomized item:req, amount=1
+	setorcopyvar VAR_0x8000, \item
+	setorcopyvar VAR_0x8001, \amount
+	callnative RandomizeVisibleItemPickup
 	callstd STD_FIND_ITEM
 	.endm
 
@@ -2923,10 +2945,27 @@
 	callstd STD_RECEIVED_ITEM
 	.endm
 
+	.macro msgreceiveditem_randomized msg:req, item:req, amount=1, fanfare=MUS_LEVEL_UP
+	loadword 0, \msg
+	setorcopyvar VAR_0x8000, \item
+	setorcopyvar VAR_0x8001, \amount
+	setorcopyvar VAR_0x8002, \fanfare
+	callnative RandomizeFreeItemGift
+	callstd STD_RECEIVED_ITEM
+	.endm
+
 	@ Adds the specified item to the bag, then prints a message with fanfare. See description of msgreceiveditem.
 	.macro giveitem_msg msg:req, item:req, amount=1, fanfare=MUS_LEVEL_UP
 	additem \item, \amount
 	msgreceiveditem \msg, \item, \amount, \fanfare
+	.endm
+
+	.macro giveitem_msg_randomized msg:req, item:req, amount=1, fanfare=MUS_LEVEL_UP
+	setorcopyvar VAR_0x8000, \item
+	setorcopyvar VAR_0x8001, \amount
+	callnative RandomizeFreeItemGift
+	additem VAR_0x8000, VAR_0x8001
+	msgreceiveditem \msg, VAR_0x8000, VAR_0x8001, \fanfare
 	.endm
 
 	@ Depends on the provided function. With the default argument, unlocks the specified entry in the Fame Checker.

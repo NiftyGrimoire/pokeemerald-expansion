@@ -1,13 +1,13 @@
 #ifndef GUARD_ITEM_H
 #define GUARD_ITEM_H
 
+#include "global.h"
 #include "constants/item.h"
 #include "constants/item_effects.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/tms_hms.h"
 #include "constants/berries.h"
-#include "constants/item_effects.h"
 #include "constants/hold_effects.h"
 
 /* Each of these TM_HM enums corresponds an index in the list of TMs + HMs item ids in
@@ -102,6 +102,9 @@ struct TmHmIndexKey
     enum Move moveId;
 };
 
+enum Move GetRandomizerTMHMMoveId(enum TMHMIndex index);
+enum Item GetRandomizerTMHMItemIdFromMoveId(enum Move move);
+
 extern const u8 gQuestionMarksItemName[];
 extern const struct ItemInfo gItemsInfo[];
 extern struct BagPocket gBagPockets[];
@@ -133,36 +136,14 @@ static inline enum TMHMIndex GetItemTMHMIndex(enum Item item)
 
 static inline enum Move GetItemTMHMMoveId(enum Item item)
 {
-    switch (item)
-    {
-    /* Expands to:
-        * case ITEM_TM_FOCUS_PUNCH:
-        *     return MOVE_FOCUS_PUNCH;
-        * case ITEM_TM_DRAGON_CLAW:
-        *      return MOVE_DRAGON_CLAW;
-        * etc */
-    FOREACH_TM(UNPACK_ITEM_TO_TM_MOVE_ID)
-    FOREACH_HM(UNPACK_ITEM_TO_HM_MOVE_ID)
-    default:
-        return MOVE_NONE;
-    }
+    enum TMHMIndex index = GetItemTMHMIndex(item);
+
+    return (index != 0) ? GetRandomizerTMHMMoveId(index) : MOVE_NONE;
 }
 
 static inline enum Item GetTMHMItemIdFromMoveId(enum Move move)
 {
-    switch (move)
-    {
-    /* Expands to:
-        * case MOVE_FOCUS_PUNCH:
-        *     return ITEM_TM_FOCUS_PUNCH;
-        * case MOVE_DRAGON_CLAW:
-        *      return ITEM_TM_DRAGON_CLAW;
-        * etc */
-    FOREACH_TM(UNPACK_TM_MOVE_TO_ITEM_ID)
-    FOREACH_HM(UNPACK_HM_MOVE_TO_ITEM_ID)
-    default:
-        return ITEM_NONE;
-    }
+    return GetRandomizerTMHMItemIdFromMoveId(move);
 }
 
 #undef UNPACK_ITEM_TO_TM_INDEX
@@ -179,7 +160,7 @@ static inline enum Item GetTMHMItemId(enum TMHMIndex index)
 
 static inline enum Move GetTMHMMoveId(enum TMHMIndex index)
 {
-    return gTMHMItemMoveIds[index].moveId;
+    return GetRandomizerTMHMMoveId(index);
 }
 
 #define GET_BERRY_ID(_berry) case ITEM_##_berry##_BERRY: return BERRY_ID_##_berry;

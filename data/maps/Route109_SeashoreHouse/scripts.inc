@@ -24,7 +24,7 @@ Route109_SeashoreHouse_EventScript_AlreadyGaveIntroduction::
 
 Route109_SeashoreHouse_EventScript_DefeatedTrainers::
 	msgbox Route109_SeashoreHouse_Text_TakeTheseSodaPopBottles, MSGBOX_DEFAULT
-	giveitem ITEM_SODA_POP, 6
+	giveitem_randomized ITEM_SODA_POP, 6
 	goto_if_eq VAR_RESULT, FALSE, Route109_SeashoreHouse_EventScript_BagFull
 	setflag FLAG_RECEIVED_6_SODA_POP
 	release
@@ -47,20 +47,28 @@ Route109_SeashoreHouse_EventScript_AlreadyReceivedSodaPop::
 Route109_SeashoreHouse_EventScript_BuySodaPop::
 	checkmoney 300
 	goto_if_eq VAR_RESULT, FALSE, Route109_SeashoreHouse_EventScript_NotEnoughMoney
-	checkitemspace ITEM_SODA_POP
+	setorcopyvar VAR_0x8000, ITEM_SODA_POP
+	setorcopyvar VAR_0x8001, 1
+	callnative RandomizeFreeItemGift
+	checkitemspace VAR_0x8000
 	goto_if_eq VAR_RESULT, FALSE, Route109_SeashoreHouse_EventScript_NotEnoughSpace
 	msgbox Route109_SeashoreHouse_Text_HereYouGo, MSGBOX_DEFAULT
 	removemoney 300
 	updatemoneybox
 .if OW_SHOW_ITEM_DESCRIPTIONS != OW_ITEM_DESCRIPTIONS_OFF
 	hidemoneybox
-	giveitem ITEM_SODA_POP
+	callstd STD_OBTAIN_ITEM
 .else
-	giveitem ITEM_SODA_POP
+	callstd STD_OBTAIN_ITEM
 	hidemoneybox
 .endif
+	goto_if_eq VAR_RESULT, FALSE, Route109_SeashoreHouse_EventScript_RefundFailedPurchase
 	release
 	end
+
+Route109_SeashoreHouse_EventScript_RefundFailedPurchase::
+	addmoney 300
+	goto Route109_SeashoreHouse_EventScript_NotEnoughSpace
 
 Route109_SeashoreHouse_EventScript_NotEnoughMoney::
 	msgbox Route109_SeashoreHouse_Text_NotEnoughMoney, MSGBOX_DEFAULT
@@ -179,4 +187,3 @@ Route109_SeashoreHouse_Text_SimonPostBattle:
 	.string "If one of my POKéMON knew the move\n"
 	.string "for carrying me across water on its\l"
 	.string "back, I could get rid of this inner tube.$"
-

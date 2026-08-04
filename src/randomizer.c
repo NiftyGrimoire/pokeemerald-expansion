@@ -1,6 +1,8 @@
 #include "global.h"
+#include "item.h"
 #include "move.h"
 #include "pokemon.h"
+#include "party_menu.h"
 #include "random.h"
 #include "random_mon_generation.h"
 #include "randomizer.h"
@@ -13,6 +15,10 @@
 #define RANDOMIZER_MOVE_TYPE_WEIGHT_COVERAGE 2
 #define RANDOMIZER_MOVE_TYPE_WEIGHT_STATUS 1
 #define RANDOMIZER_MOVE_POWER_WEIGHT_MAX 12
+#define RANDOMIZER_INITIAL_MOVE_POWER_PREFERRED_MAX 40
+#define RANDOMIZER_INITIAL_MOVE_POWER_ALLOWED_MAX 60
+#define RANDOMIZER_INITIAL_MOVE_POWER_WEIGHT_PREFERRED 24
+#define RANDOMIZER_INITIAL_MOVE_POWER_WEIGHT_ALLOWED 2
 #define RANDOMIZER_MOVE_BUCKET_COUNT_MAX 512
 #define RANDOMIZER_MOVE_BUCKET_NONE 0xFFFF
 #define RANDOMIZER_MOVE_BUCKET_STATUS_TYPE NUMBER_OF_MON_TYPES
@@ -27,7 +33,7 @@ struct RandomizerMoveBucket
 
 static const u8 sRandomizerLevelUpMoveLevels[RANDOMIZER_LEVEL_UP_MOVE_COUNT] =
 {
-    1, 1, 1, 1,
+    1, 1,
     5, 10, 15,
     16, 18, 19,
     22, 24,
@@ -36,7 +42,9 @@ static const u8 sRandomizerLevelUpMoveLevels[RANDOMIZER_LEVEL_UP_MOVE_COUNT] =
     33,
     42,
     46,
+    50,
     58,
+    60,
     80,
 };
 
@@ -51,8 +59,43 @@ static EWRAM_DATA u16 sRandomizerMoveBucketByMove[MOVES_COUNT] = {0};
 static EWRAM_DATA u16 sRandomizerMoveBucketCount = 0;
 static EWRAM_DATA bool8 sRandomizerMoveBucketsInitialized = FALSE;
 static EWRAM_DATA bool8 sRandomizerMoveBucketsUsable = FALSE;
+static EWRAM_DATA enum Move sRandomizerTMToMove[NUM_TECHNICAL_MACHINES + 1] = {0};
+static EWRAM_DATA u16 sRandomizerTMCandidates[MOVES_COUNT] = {0};
+static EWRAM_DATA u32 sRandomizerTMMappingSeed = 0;
+static EWRAM_DATA bool8 sRandomizerTMMappingInitialized = FALSE;
+
+static const enum Item sRandomizerWorldItemPool[] =
+{
+    ITEM_FIRE_STONE,
+    ITEM_WATER_STONE,
+    ITEM_THUNDER_STONE,
+    ITEM_LEAF_STONE,
+    ITEM_ICE_STONE,
+    ITEM_SUN_STONE,
+    ITEM_MOON_STONE,
+    ITEM_SHINY_STONE,
+    ITEM_DUSK_STONE,
+    ITEM_DAWN_STONE,
+    ITEM_METAL_COAT,
+    ITEM_KINGS_ROCK,
+    ITEM_DEEP_SEA_SCALE,
+    ITEM_DEEP_SEA_TOOTH,
+    ITEM_RAZOR_CLAW,
+    ITEM_RAZOR_FANG,
+    ITEM_EVIOLITE,
+    ITEM_LEFTOVERS,
+    ITEM_LIFE_ORB,
+    ITEM_FOCUS_SASH,
+    ITEM_ASSAULT_VEST,
+    ITEM_CLEAR_AMULET,
+    ITEM_LINKING_CORD,
+};
 
 static void InitRandomizerMoveBuckets(void);
+static void InitRandomizerTMMapping(void);
+static u32 GetRandomizerStatusMoveTier(enum Move move);
+static u32 GetRandomizerStatusTierWeight(u32 moveTier, u8 level);
+static u32 GetRandomizerDamagingMovePowerWeight(u32 power, u8 level);
 
 static u32 MixRandomizerValue(u32 value)
 {
@@ -75,6 +118,7 @@ void InitRandomizerData(void)
     gSaveBlock3Ptr->randomizerSeed = seed;
     gSaveBlock3Ptr->randomizerVersion = RANDOMIZER_ALGORITHM_VERSION;
     InitRandomizerMoveBuckets();
+    InitRandomizerTMMapping();
 #endif
 }
 
@@ -96,6 +140,206 @@ u32 RandomizerHash(u32 seed, enum RandomizerCategory category, u32 key1, u32 key
     hash = MixRandomizerValue(hash ^ key2);
     hash = MixRandomizerValue(hash ^ key3);
     return hash;
+}
+
+static bool32 IsAuthoredHMMove(enum Move move)
+{
+    for (u32 index = NUM_TECHNICAL_MACHINES + 1; index <= NUM_ALL_MACHINES; index++)
+    {
+        if (gTMHMItemMoveIds[index].moveId == move)
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
+static bool32 IsRandomizerTMEligible(enum Move move)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_TMS
+    if (!IsMoveRandomizerEligible(move)
+     || IsAuthoredHMMove(move))
+        return FALSE;
+
+    return TRUE;
+#else
+    return FALSE;
+#endif
+}
+
+static u32 GetRandomizerTMWeight(enum Move move)
+{
+    u32 weight;
+
+    if (GetMoveCategory(move) == DAMAGE_CATEGORY_STATUS)
+        weight = GetRandomizerStatusTierWeight(GetRandomizerStatusMoveTier(move), 80);
+    else
+        weight = GetRandomizerDamagingMovePowerWeight(GetMovePower(move), 80);
+
+    // Keep severe drawbacks possible without letting raw power favor them.
+    if (IsExplosionMove(move)
+     || GetMoveEffect(move) == EFFECT_RECOIL
+     || GetMoveEffect(move) == EFFECT_RECOIL_IF_MISS)
+        weight = max(1, weight / 4);
+
+    return max(1, weight);
+}
+
+static void InitRandomizerTMMapping(void)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_TMS
+    u32 seed = GetRandomizerSeed();
+    u16 candidateCount = 0;
+
+    if (sRandomizerTMMappingInitialized && sRandomizerTMMappingSeed == seed)
+        return;
+
+    sRandomizerTMMappingInitialized = TRUE;
+    sRandomizerTMMappingSeed = seed;
+
+    for (u32 i = 0; i <= NUM_TECHNICAL_MACHINES; i++)
+        sRandomizerTMToMove[i] = MOVE_NONE;
+
+    for (enum Move move = MOVE_NONE + 1; move < MOVES_COUNT; move++)
+    {
+        if (IsRandomizerTMEligible(move))
+            sRandomizerTMCandidates[candidateCount++] = move;
+    }
+
+    for (u32 tmIndex = 1; tmIndex <= NUM_TECHNICAL_MACHINES; tmIndex++)
+    {
+        u32 totalWeight = 0;
+        u32 selection;
+        u16 selected = 0;
+
+        for (u16 i = 0; i < candidateCount; i++)
+            totalWeight += GetRandomizerTMWeight(sRandomizerTMCandidates[i]);
+
+        selection = RandomizerHash(seed,
+                                   RANDOMIZER_CATEGORY_TM,
+                                   tmIndex,
+                                   candidateCount,
+                                   0) % totalWeight;
+
+        for (u16 i = 0; i < candidateCount; i++)
+        {
+            u32 weight = GetRandomizerTMWeight(sRandomizerTMCandidates[i]);
+
+            if (selection < weight)
+            {
+                selected = i;
+                break;
+            }
+            selection -= weight;
+        }
+
+        sRandomizerTMToMove[tmIndex] = sRandomizerTMCandidates[selected];
+        sRandomizerTMCandidates[selected] = sRandomizerTMCandidates[--candidateCount];
+    }
+#endif
+}
+
+enum Move GetRandomizerTMHMMoveId(enum TMHMIndex index)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_TMS
+    if (index > 0 && index <= NUM_TECHNICAL_MACHINES)
+    {
+        InitRandomizerTMMapping();
+        return sRandomizerTMToMove[index];
+    }
+#endif
+
+    if (index <= NUM_ALL_MACHINES)
+        return gTMHMItemMoveIds[index].moveId;
+    return MOVE_NONE;
+}
+
+enum Item GetRandomizerTMHMItemIdFromMoveId(enum Move move)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_TMS
+    InitRandomizerTMMapping();
+
+    for (u32 index = 1; index <= NUM_TECHNICAL_MACHINES; index++)
+    {
+        if (sRandomizerTMToMove[index] == move)
+            return gTMHMItemMoveIds[index].itemId;
+    }
+#endif
+
+    for (u32 index = NUM_TECHNICAL_MACHINES + 1; index <= NUM_ALL_MACHINES; index++)
+    {
+        if (gTMHMItemMoveIds[index].moveId == move)
+            return gTMHMItemMoveIds[index].itemId;
+    }
+
+    return ITEM_NONE;
+}
+
+static bool32 IsRandomizerItemProtected(enum Item item)
+{
+    if (item <= ITEM_NONE || item >= ITEMS_COUNT)
+        return TRUE;
+    if (GetItemImportance(item)
+     || GetItemTMHMIndex(item) != 0
+     || GetItemPocket(item) == POCKET_BERRIES)
+        return TRUE;
+
+    return FALSE;
+}
+
+bool32 IsWorldItemRandomizerEligible(enum Item item)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_WORLD_ITEMS
+    return !IsRandomizerItemProtected(item);
+#else
+    return FALSE;
+#endif
+}
+
+enum Item GetRandomizedWorldItem(enum Item originalItem, u8 mapGroup, u8 mapNum, u8 objectId)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_WORLD_ITEMS
+    u32 mapId;
+
+    if (!IsWorldItemRandomizerEligible(originalItem))
+        return originalItem;
+
+    mapId = ((u32)mapGroup << 8) | mapNum;
+    return sRandomizerWorldItemPool[RandomizerHash(GetRandomizerSeed(),
+                                                   RANDOMIZER_CATEGORY_WORLD_ITEM,
+                                                   mapId,
+                                                   objectId,
+                                                   originalItem)
+                                   % ARRAY_COUNT(sRandomizerWorldItemPool)];
+#else
+    return originalItem;
+#endif
+}
+
+bool32 IsFreeItemRandomizerEligible(enum Item item)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_FREE_ITEMS
+    return !IsRandomizerItemProtected(item);
+#else
+    return FALSE;
+#endif
+}
+
+enum Item GetRandomizedFreeItem(enum Item originalItem, u8 mapGroup, u8 mapNum, u8 contextId)
+{
+#if RANDOMIZER_ENABLED && RANDOMIZER_FREE_ITEMS
+    u32 mapId;
+    if (!IsFreeItemRandomizerEligible(originalItem))
+        return originalItem;
+    mapId = ((u32)mapGroup << 8) | mapNum;
+    return sRandomizerWorldItemPool[RandomizerHash(GetRandomizerSeed(),
+                                                   RANDOMIZER_CATEGORY_FREE_ITEM,
+                                                   mapId,
+                                                   contextId,
+                                                   originalItem)
+                                   % ARRAY_COUNT(sRandomizerWorldItemPool)];
+#else
+    return originalItem;
+#endif
 }
 
 u8 GetRandomizerFriendshipEvolutionLevel(enum Species species)
@@ -311,7 +555,8 @@ bool32 IsMoveRandomizerEligible(enum Move move)
         break;
     }
 
-    return move != MOVE_STRUGGLE;
+    return move != MOVE_STRUGGLE
+        && move != MOVE_TERA_BLAST;
 }
 
 static bool32 IsExcludedRandomizerMove(enum Move move, const u16 *excludedMoves, u8 excludedMoveCount)
@@ -381,7 +626,12 @@ static u32 GetRandomizerStatusMoveTier(enum Move move)
 
 static u32 GetRandomizerStatusTierWeight(u32 moveTier, u8 level)
 {
-    if (level < 24)
+    if (level == 1)
+    {
+        static const u8 sInitialWeights[] = {13, 0, 0};
+        return sInitialWeights[moveTier];
+    }
+    else if (level < 24)
     {
         static const u8 sEarlyWeights[] = {13, 8, 4};
         return sEarlyWeights[moveTier];
@@ -413,6 +663,14 @@ static u32 GetRandomizerDamagingMovePowerWeight(u32 power, u8 level)
     // Fixed and level-based damage moves have no listed base power.
     if (power == 0)
         power = 50;
+    if (level == 1)
+    {
+        if (power <= RANDOMIZER_INITIAL_MOVE_POWER_PREFERRED_MAX)
+            return RANDOMIZER_INITIAL_MOVE_POWER_WEIGHT_PREFERRED;
+        if (power <= RANDOMIZER_INITIAL_MOVE_POWER_ALLOWED_MAX)
+            return RANDOMIZER_INITIAL_MOVE_POWER_WEIGHT_ALLOWED;
+        return 0;
+    }
     powerDistance = (power > targetPower ? power - targetPower : targetPower - power);
     powerPenaltyBand = (level < 24) ? 7 : 10;
     powerPenalty = powerDistance / powerPenaltyBand;

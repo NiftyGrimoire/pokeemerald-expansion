@@ -16,6 +16,15 @@
 // Randomize species selected by supported enemy trainer parties.
 #define RANDOMIZER_TRAINERS TRUE
 
+// Randomize the move taught by each TM slot per save.
+#define RANDOMIZER_TMS TRUE
+
+// Randomize ordinary visible overworld item-ball pickups.
+#define RANDOMIZER_WORLD_ITEMS TRUE
+
+// Randomize eligible direct NPC and story item gifts.
+#define RANDOMIZER_FREE_ITEMS TRUE
+
 // Give each ordinary evolution family one deterministic randomized ability.
 #define RANDOMIZER_ABILITIES TRUE
 
@@ -26,6 +35,6 @@
 #define RANDOMIZER_LEARNSETS TRUE
 
 // Changing the hash algorithm or category meanings requires a new version.
-#define RANDOMIZER_ALGORITHM_VERSION 2
+#define RANDOMIZER_ALGORITHM_VERSION 4
 
 #endif // GUARD_CONFIG_RANDOMIZER_H

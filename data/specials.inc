@@ -483,6 +483,7 @@ gSpecials::
 	def_special CloseFrontierExchangeCornerItemIconWindow
 	def_special DisplayBerryPowderVendorMenu
 	def_special RemoveBerryPowderVendorMenu
+	def_special SelectKiriBerryPair
 	def_special HasEnoughBerryPowder
 	def_special TakeBerryPowder
 	def_special PrintPlayerBerryPowderAmount

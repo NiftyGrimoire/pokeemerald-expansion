@@ -49,6 +49,13 @@ Route117_EventScript_TryMoveDayCareMan::
 Route117_EventScript_StopMoveDayCareMan::
 	return
 
+Route117_EventScript_DaycareClosed::
+	lock
+	faceplayer
+	msgbox Route117_Text_DayCareClosed, MSGBOX_DEFAULT
+	release
+	end
+
 Route117_EventScript_Woman::
 	msgbox Route117_Text_ArentTheseFlowersPretty, MSGBOX_NPC
 	end
@@ -240,3 +247,7 @@ Route117_Text_RouteSignMauville:
 Route117_Text_DayCareSign:
 	.string "POKéMON DAY CARE\n"
 	.string "“Let us raise your POKéMON.”$"
+
+Route117_Text_DayCareClosed:
+	.string "Sorry, the DAY CARE is closed for now.\p"
+	.string "We're not accepting POKéMON."

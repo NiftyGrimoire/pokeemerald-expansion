@@ -402,7 +402,7 @@ PetalburgCity_Gym_EventScript_NormanBattle::
 	end
 
 PetalburgCity_Gym_EventScript_GiveFacade::
-	giveitem ITEM_TM_FACADE
+	giveitem_randomized ITEM_TM_FACADE
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_BagIsFull
 	setflag FLAG_RECEIVED_TM_FACADE
 	msgbox PetalburgCity_Gym_Text_ExplainFacade, MSGBOX_DEFAULT
@@ -1588,4 +1588,3 @@ PetalburgCity_Gym_Text_NormanRematchNeedTwoMons:
 	.string "capable of battle?\p"
 	.string "Sorry, but you'll have to come back\n"
 	.string "with at least two POKéMON.$"
-

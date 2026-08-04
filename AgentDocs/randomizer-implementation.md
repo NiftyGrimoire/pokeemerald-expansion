@@ -54,18 +54,19 @@ integrated into `romhack/main`.
 - Level-up learnsets are resolved at runtime through
   `GetSpeciesLevelUpLearnset`, covering initial moves, ordinary level-up and
   evolution learning, reminders, AI legality checks, and Pokedex displays.
-- Each enabled species receives four starting moves at level 1. New moves are
-  front-loaded across the cap bands with counts of 3, 3, 2, 2, 1, 1, 1, 1, 1,
-  and 1 for 1-15, 15-19, 19-24, 24-29, 29-31, 31-33, 33-42, 42-46, 46-58,
-  and 58-100 respectively. This produces exactly 20 moves without increasing
-  the engine's normal level-up table capacity. Moves are deterministic per save,
-  species, and slot, with no duplicates.
-- Follow-up balance decision: reduce the generated level-1 starting set from
-  four moves to two. Give those two slots a dedicated, more aggressive opening
-  bucket policy instead of treating them like the rest of the early-game curve:
-  strongly concentrate damaging choices in the lowest practical power bands and
-  status choices in the basic tier. Define the exact bucket boundaries and
-  fallback expansion during implementation, then regenerate seeded expectations.
+- Each enabled species receives two starting moves at level 1. New moves are
+  front-loaded across the cap bands with counts of 3, 3, 2, 2, 1, 1, 1, 1, 2,
+  and 2 for 1-15, 15-19, 19-24, 24-29, 29-31, 31-33, 33-42, 42-46, 46-58,
+  and 58-100 respectively. This keeps only five total learned moves available by
+  level 15, adds one extra learn after the eighth-gym cap, adds one extra learn
+  after the pre-Elite Four team-leader cap, and still produces exactly 20 moves
+  without increasing the engine's normal level-up table capacity. Moves are
+  deterministic per save, species, and slot, with no duplicates.
+- The two level-1 slots use a dedicated aggressive opening bucket. Damaging
+  moves at 40 power or below receive the dominant weight, moves from 41 through
+  60 retain a small fallback weight, and stronger moves receive zero weight.
+  Only basic-tier status moves are eligible at level 1. Later slots return to the
+  normal level-scaled damaging and status-tier curves.
 - Damaging-move weights follow a level-based target power from roughly 40 in the
   opening game to 115 at level 80. STAB moves use a 4x multiplier and coverage
   moves use 2x, strengthening the preference for same-type attacks. Before level
@@ -76,6 +77,12 @@ integrated into `romhack/main`.
   or weak late move remains possible. Power-distance penalties saturate at a base
   weight of one; this explicit saturation avoids unsigned underflow making
   extreme-power moves such as Self-Destruct, Explosion, and V-create dominant.
+  Review any future changes to this curve against detrimental damaging moves, not
+  just raw base power. Moves flagged by `IsExplosionMove`, recoil-heavy attacks,
+  fixed-damage edge cases, and other high-power moves with severe drawbacks can
+  become overrepresented if they sit near the level target power; Misty Explosion
+  is the canonical late-game check case because it has only 100 listed power but
+  still faints the user.
 - Status moves use basic, strong, and elite potency tiers. Basic effects are
   favored before level 24, strong setup/recovery/status/hazard effects from 24,
   and elite setup or exceptional utility from 42. All status moves whose effects
@@ -88,8 +95,8 @@ integrated into `romhack/main`.
   Elevated strong and elite weights compensate for the larger basic-status
   candidate pool while every tier remains possible.
 - Placeholder, Transform, Sketch, Dark Void, Hyperspace Fury, Aura Wheel,
-  species-power-override, and Struggle moves are excluded. The authored move is
-  the fallback if no candidate exists.
+  Tera Blast, species-power-override, and Struggle moves are excluded. The
+  authored move is the fallback if no candidate exists.
 - The full learnset resolver regenerates into one small EWRAM buffer per accessor
   call. Initial move assignment uses a behavior-preserving rolling window: it
   generates randomized slots sequentially only through the Pokemon's current
@@ -526,15 +533,13 @@ Manual gameplay validation still required:
 
 After integration into `romhack/main`:
 
-1. Implement the two-move level-1 starting set and its dedicated aggressive
-   low-power/basic-status bucket policy; update deterministic seeded tests.
-2. Manually verify initial moves, ordinary level-up learning, evolution learning,
+1. Manually verify initial moves, ordinary level-up learning, evolution learning,
    Move Reminder output, Pokedex output, and trainer/wild/gift initial moves.
-3. Check representative early-, middle-, and late-game species across multiple
+2. Check representative early-, middle-, and late-game species across multiple
    seeds for useful move variety and the intended power/status progression.
-4. Profile learnset access only if gameplay shows visible delay; retain the single
+3. Profile learnset access only if gameplay shows visible delay; retain the single
    shared EWRAM buffer unless measurement justifies a broader cache.
-5. Leave egg moves authored while breeding is slated for removal. Define a new
+4. Leave egg moves authored while breeding is slated for removal. Define a new
    policy only if egg moves receive a non-breeding acquisition path.
 
 ## Evolution phase complete
@@ -586,7 +591,7 @@ replacement routes retain their intended target.
 
 ## Other unresolved architecture
 
-- Move-description cleanup: Blazing Torque is mechanically implemented correctly
+- Low-priority move-description cleanup: Blazing Torque is mechanically implemented correctly
   (80 power, 100% accuracy, 30% burn chance), but its description is still the
   upstream `"---"` placeholder. Audit and replace the player-facing placeholders
   for all five Torque moves together, since randomized learnsets can make these
@@ -595,20 +600,136 @@ replacement routes retain their intended target.
   Rival parties are governed independently by the enemy-trainer policy above.
 - Hidden item spots are disabled on `romhack/qol-remove-hidden-items`: direct
   interaction cannot collect them and the Itemfinder does not detect them.
-- World item randomization: identify all visible pickup paths, define a stable
-  pickup identity, and build an approved Nuzlocke-useful
-  replacement pool limited initially to genuinely useful held items and the
-  standard stones or Linking Cord. Exclude retired species-specific evolution
-  items unless they retain a worthwhile independent battle effect. Audit Potions
-  and other medicine against the Portable Healer design, and X-items against the
-  intended battle-item rules, so dead or low-value rewards do not enter the
-  pool. Explicitly decide key-item, TM, duplicate, respawn, and
-  progression-critical-item handling.
-  Review pickup distribution and progression balance, then consider adding new
-  visible pickup spots where useful resources are too sparse. Prefer placing new
-  rewards behind clearly optional trainer battles, preserving a deliberate
-  risk-and-reward choice without blocking required progression. Do not add hidden
-  item spots.
+- Emerald item and direct-gift randomization is implemented on the current
+  feature branch. `GetRandomizedWorldItem` and `GetRandomizedFreeItem` use the
+  save seed, map group/number, stable object or gift context, and authored item.
+  The resolvers are stateless: duplicates are allowed, no pickup counters or new
+  save data are used, and the single useful pool is pure random with no
+  progression guarantees or bands.
+  The generated pool excludes Poke Ball variants, HMs, TMs as replacement items,
+  and pure money rewards. Pure money rewards include Nuggets, Mushrooms, Pearls,
+  Pearl String, Stardust, Star Piece, Comet Shard, Rare Bone, and equivalent
+  vendor-only treasures. Authored Poke Ball and money pickups become useful
+  randomized rewards; authored key items, HMs, and TMs remain their authored
+  item slots. Hidden items remain disabled and invalid special templates remain
+  unchanged.
+  The initial useful pool contains standard evolution stones, Linking Cord,
+  selected evolution-held items with independent utility, and broadly useful
+  held items. Medicine, X-items, berries, mixed-use sellables, retired
+  species-specific evolution items, respawn behavior, and broader distribution
+  remain audit work. Emerald item balls and eligible direct Emerald gifts
+  now share deterministic resolvers; key items, HMs, TM slots, and berries remain
+  authored. Shops, exchanges, prize tables, Battle Pyramid items, FRLG content,
+  and internal transfers remain outside this randomizer. No new pickup spots are
+  added.
+- TM move randomization is implemented on the tm-randomization branch. The existing
+  50 TM slots will map to 50 unique moves per save using the saved randomizer
+  seed and algorithm version, without adding a 50-entry save table. Candidates
+  will come from the complete implemented practical move table, excluding only
+  invalid sentinels and placeholder-only or unusable special entries. Weighted
+  selection will favor high-power damaging buckets and high-tier status moves;
+  lower-power and severe-drawback moves remain possible but receive drawback
+  penalties. The randomized mapping must flow through descriptions, bag use,
+  compatibility, Move Reminder, Pokedex, reverse lookups, and debug helpers.
+  HM move mappings and compatibility remain authored.
+  The randomizer algorithm version is now 4. Version 3 introduced randomized TM
+  mappings; version 4 added world/free-item hash categories and revised the
+  randomized level-up schedule and opening-move weighting. Deterministic trainer,
+  learnset, TM, and item mappings from earlier development versions are stale.
+
+## Pending changelist review ledger
+
+The current uncommitted changelist received a functional review before the
+reward-script audit began. Preserve this ledger until the changelist has been
+fully audited, validated, and divided into commit-ready changes. The detailed
+case-by-case reward proposals are a separate decision queue; this section tracks
+the underlying correctness findings and their implementation status.
+
+The general Items pocket is expanded from 30 to 64 distinct-item slots to make
+the broader randomized useful-item pool practical. Per-item stacks remain capped
+at 999, and the other four Bag pocket capacities are unchanged. This adds 136
+bytes to `SaveBlock1` (15,568 to 15,704 bytes) and intentionally changes its
+layout; existing development saves created with the 30-slot layout are not
+supported. Multi-reward scripts must still use correct all-or-nothing or retry
+semantics rather than assuming that a 64-slot pocket can never fill.
+
+| # | Original finding | Current status | Remaining work |
+|---|---|---|---|
+| 1 | Shoal Cave randomized its required Salt/Shell ingredients and Shell Bell exchange, making the authored loop impossible. | Resolved by intentional redesign. Shoal Cave is permanently low tide, the ingredient/exchange loop is retired, the four reachable Salt spots are one-time randomized pickups, Shell spots are inaccessible, and neither ingredient can be generated by the replacement pool. | Manual gameplay validation remains. Reconsider the entire cave only during the later streamlining pass. |
+| 2 | The Oldale package randomized 200 Ultra Balls into 200 copies of one replacement item. | Resolved. The grant is authored as 200 Ultra Balls plus ¥200,000, once. | Manually validate successful receipt and the full-Bag retry path. |
+| 3 | Randomized TMs displayed the authored TM slot's move description. | Resolved. TM01-TM50 descriptions now resolve from the randomized move while their item names remain stable TM slot names. | Manually inspect representative Bag descriptions and retain focused automated coverage. |
+| 4 | Authored HM moves could also occupy randomized TM slots, creating duplicate and ambiguous reverse mappings. | Resolved. Every authored HM move is excluded from randomized TM candidates and the invariant is tested across multiple seeds. | Manual Bag/use validation remains. |
+| 5 | Exchanges, vendors, repeatable systems, and prize systems were broadly converted with `giveitem_randomized` even though they were outside the original direct-gift phase. | Resolved case by case. Authored transactions were restored where appropriate; selected vendors and challenge rewards retain documented deterministic randomization; daily and peripheral systems were made one-time, disabled, or deliberately redesigned; fossils and the E-Reader delivery are authored. See the completed decision queue below. | Perform the separate future streamlining and whole-game vendor audits already documented; do not silently extend randomization to unaudited transactions. |
+| 6 | The randomized TM candidate filter admits moves known to be unsuitable, with Tera Blast explicitly excused by a test. | Outstanding. | Define the intentional differences between level-up and TM eligibility, remove the Tera Blast test exception, and exclude Tera Blast plus any other unusable or context-dependent TM candidates selected by that audit. |
+| 7 | Authored quantities are copied blindly to randomized replacements, producing disproportionate stacks such as five or six identical held/evolution items. | Outstanding as a general policy; the Oldale 200-item case is restored and the Seashore House quantity is deliberately accepted. | Audit every remaining multi-item randomized gift individually rather than automatically preserving its authored count. Seashore House remains six copies of one deterministic replacement until the fights, reward, and vendor are disabled together during streamlining. |
+| 8 | Tests cover pure randomizer resolution better than the actual script integration risks. | Partially addressed. TM descriptions and HM/TM collision coverage were added, and normal ROM builds now succeed after the hidden-item flag-zero build blocker was fixed. | Add or perform coverage for ordinary item-ball templates, `RandomizeFreeItemGift` variable handling, protected story-item macros, exchanges/repeatable rewards, multi-item quantities, and Bag-full retry stability. Keep the manual checklist as the gameplay gate where script-level unit coverage is impractical. |
+
+### Completed special-reward decision queue
+
+Already decided and implemented cases—Cozmo's Meteorite exchange, Harbor Mail,
+the Scanner evolution-item selector, the Mauville Bike Shop, the Powder Jar and
+Berry Powder vendor restoration, both Seashore House rewards, the Mt. Chimney
+randomized vendor, the Trick House prize table, the Battle Frontier symbol
+berries, the one-time Route 120 Berry, Berry Master's wife's one-time reward,
+the disabled Seedot/Lotad size rewards, the restored Contest scarves, the
+always-visible Mirage Tower and authored Mirage/Underpass fossils, and the Shoal
+Cave redesign, plus the restored E-Reader Enigma Berry delivery—remain listed in
+the status table above and should not be reprocessed as outstanding CSV work.
+
+Sootopolis Kiri now gives her original two-Berry reward only once per save: one
+random Pomeg-through-Nomel Berry plus either Figy or Iapapa. A preflight simulates
+both additions against the Berry pocket before either grant occurs, preventing a
+partial first grant when the second Berry would not fit. A permanent received
+flag is set only after both authored items are successfully received.
+
+Berry Master's wife no longer opens the Easy Chat phrase minigame. She gives
+exactly one authored random Berry per save from the five former special-phrase
+rewards: Spelon, Pamtre, Watmel, Durin, or Belue. A permanent flag replaces the
+daily flag and is set only after the Berry enters the Bag, preserving full-Bag
+retry behavior.
+
+The Seedot/Lotad size-judging interaction and record displays remain as flavor
+content, but neither brother grants an item for a new qualifying record. Their
+successful-record dialogue no longer promises a reward. This removes the
+repeatable randomized-item source without removing the harmless judging system.
+
+The Slateport Fan Club chairman's five condition awards are restored to their
+authored Red, Blue, Pink, Green, and Yellow Scarves. Each received flag is set
+only after the matching scarf successfully enters the Bag. These Contest-only
+rewards are temporary compatibility behavior; the later streamlining pass will
+disable the Contest system and retire this assessment interaction with it.
+
+Mirage Tower is always visible while its fossil event is unfinished; the former
+per-map-load random visibility roll is removed. Choosing its Root Fossil or Claw
+Fossil now grants that authored fossil, preserves the existing choice flags and
+collapse sequence, and remains safely retryable when the Bag is full. A broader
+choice from fossils across generations is deferred because it also requires an
+explicit policy for presentation, revival, and the later Desert Underpass item.
+
+Desert Underpass now grants the authored fossil not chosen in Mirage Tower:
+Claw after choosing Root, or Root after choosing Claw. Its existing full-Bag
+retry and object-removal behavior remain intact. The tunnel still opens only
+after game clear, so this recovery does not contribute to the primary Nuzlocke
+route.
+
+The E-Reader delivery path once again grants `ITEM_ENIGMA_BERRY_E_READER`
+directly. Its validation, Bag/PC ownership checks, downloaded custom Berry data,
+availability variable, and full-Bag retry behavior remain unchanged.
+
+Future streamlining must audit all E-Reader, Mystery Gift, and other external
+event items and unlocks that cannot be obtained through the intended standalone
+play loop. This includes the Aurora Ticket and Birth Island/Deoxys, plus the
+Mystic Ticket, Old Sea Map, Eon Ticket, and any comparable external delivery.
+For each, deliberately provide an in-game acquisition path, enable the content
+by progression, or remove it; do not leave encounters or rewards silently
+inaccessible merely because their original distribution service is unavailable.
+
+After the current special-reward audit, perform a separate whole-game vendor
+audit. Decide each shop or repeatable seller independently and document its
+inventory policy, price, repeatability, progression role, and exploit risk.
+Mt. Chimney and Seashore House are approved isolated exceptions to the present
+authored-vendor default; neither is a precedent that silently randomizes other
+vendors.
 - Summary IV view is implemented on `romhack/qol-summary-ivs`. On the Pokemon
   Skills page, A toggles between the normal stat display and all six numeric
   stored IVs, then back to stats. EV cycling is disabled, the page label changes
@@ -674,10 +795,47 @@ replacement routes retain their intended target.
   run also passed the level-to-cap and party-navigation coverage but remains
   globally red because of unrelated existing overworld-ability and battle-test
   failures; use the focused suite as this feature's automated gate.
-- Streamlined progression: remove breeding and berry planting/growth/harvesting
-  as supported mechanics. Audit the Day Care, eggs, inherited moves,
+- Battle and item EV gains remain disabled through the existing
+  `B_EV_CAP_TYPE = EV_CAP_NO_GAIN` toggle. The randomizer useful-item pool also
+  excludes all EV-effect items, including vitamins and feathers; berries remain
+  outside the general pool as a separate policy. Authored/debug/script EV edits
+  remain distinct from normal player acquisition.
+- Streamlined progression: the Emerald Route 117 Day Care entrance is blocked
+  by a stationary closure NPC at the approach to the entrance warp. The NPC
+  explains that the DAY CARE is closed and does not alter the underlying daycare
+  save data or shared breeding scripts. Shoal Cave is permanently locked to its
+  low-tide entrance and inner layouts so the full low-tide route and its item
+  pickups, including TM07, are always accessible. As an intentional design
+  change, the renewable Shoal ingredient and Shell Bell loop is removed: the old
+  man only remarks that the cave is always at low tide, performs no ingredient
+  checks or exchange, and no longer runs the daily collection reset. The four
+  reachable former Shoal Salt points retain their individual collection flags
+  and act as one-time randomized useful-item pickups. The four former Shoal Shell
+  points belong to the unavailable high-tide route and cannot be collected.
+  Neither Shoal Salt nor Shoal Shell is present in the randomizer replacement
+  pool, so randomized pickups and gifts cannot introduce obsolete ingredients.
+  A later streamlining pass may disable or bypass Shoal Cave after relocating any
+  rewards that remain important. Full removal or replacement of breeding,
+  egg production, inherited moves, berry planting/growth/harvesting, and their
+  dependent rewards remains open. If berry harvesting remains, keep it in a separate
+  berry-only randomizer and out of the general useful-item pool. Audit the Day
+  Care, eggs, inherited moves,
   breeding-only content, berry plots, berry tutorials and NPCs, and any dependent
   rewards or encounters so important content receives a direct replacement path.
   Also audit obsolete EV content, mandatory grinding against each cap, and
   optional plot detours before choosing concrete EXP, trainer, encounter, or
-  script changes.
+  script changes. The Powder Jar and all Berry Powder vendor purchases remain
+  authored for now; the later streamlining pass will retire Berry Powder and
+  remove its production, UI, vendor, dialogue, and dependent checks together.
+  The Harbor Mail-for-Coin Case exchange also remains authored for now; the
+  later streamlining pass will retire the Coin Case and Game Corner coin loop,
+  audit and relocate any retained prizes, and choose a finite replacement for
+  the Harbor Mail trade or remove that dependency. The authoritative cleanup
+  scopes and prerequisites for both systems are recorded in the Phase 12 plan.
+  The Scanner exchange is deliberately redesigned as
+  a one-time player-selected evolution resource. Captain Stern offers a
+  scrollable menu containing Fire, Water, Thunder, Leaf, Ice, Sun, Moon, Shiny,
+  Dusk, and Dawn Stones plus the Linking Cord. The selected reward is authored
+  rather than randomized. Declining the confirmation, backing out of the menu,
+  or failing the Bag-space check preserves the Scanner; Stern removes it and
+  sets the exchange flag only after the selected item is successfully received.

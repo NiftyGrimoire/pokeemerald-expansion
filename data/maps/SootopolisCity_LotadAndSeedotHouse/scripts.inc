@@ -34,14 +34,6 @@ SootopolisCity_LotadAndSeedotHouse_EventScript_SmallSeedot::
 
 SootopolisCity_LotadAndSeedotHouse_EventScript_BigSeedot::
 	msgbox SootopolisCity_LotadAndSeedotHouse_Text_GoshMightBeBiggerThanLotad, MSGBOX_DEFAULT
-	giveitem ITEM_ELIXIR
-	goto_if_eq VAR_RESULT, FALSE, SootopolisCity_LotadAndSeedotHouse_EventScript_NoRoomForElixir1
-	closemessage
-	release
-	end
-
-SootopolisCity_LotadAndSeedotHouse_EventScript_NoRoomForElixir1::
-	msgbox SootopolisCity_LotadAndSeedotHouse_Text_BagCrammedFull1, MSGBOX_DEFAULT
 	release
 	end
 
@@ -78,14 +70,6 @@ SootopolisCity_LotadAndSeedotHouse_EventScript_SmallLotad::
 
 SootopolisCity_LotadAndSeedotHouse_EventScript_BigLotad::
 	msgbox SootopolisCity_LotadAndSeedotHouse_Text_WowMightBeBiggerThanSeedot, MSGBOX_DEFAULT
-	giveitem ITEM_ELIXIR
-	goto_if_eq VAR_RESULT, FALSE, SootopolisCity_LotadAndSeedotHouse_EventScript_NoRoomForElixir2
-	closemessage
-	release
-	end
-
-SootopolisCity_LotadAndSeedotHouse_EventScript_NoRoomForElixir2::
-	msgbox SootopolisCity_LotadAndSeedotHouse_Text_BagCrammedFull2, MSGBOX_DEFAULT
 	release
 	end
 
@@ -120,16 +104,11 @@ SootopolisCity_LotadAndSeedotHouse_Text_GoshMightBeBiggerThanLotad:
 	.string "Oh, my gosh, this is a big one!\p"
 	.string "It might even beat the big LOTAD\n"
 	.string "my younger brother saw!\p"
-	.string "Thanks for showing me.\n"
-	.string "This is my thanks!$"
+	.string "Thanks for showing me!$"
 
 @ Unused
 SootopolisCity_LotadAndSeedotHouse_Text_ReceivedPotion1:
 	.string "{PLAYER} received a POTION.$"
-
-SootopolisCity_LotadAndSeedotHouse_Text_BagCrammedFull1:
-	.string "Hunh?\n"
-	.string "Your BAG is crammed full.$"
 
 SootopolisCity_LotadAndSeedotHouse_Text_SeenBiggerSeedot:
 	.string "{STR_VAR_2}, is it?\p"
@@ -168,16 +147,11 @@ SootopolisCity_LotadAndSeedotHouse_Text_WowMightBeBiggerThanSeedot:
 	.string "Wow, that is big!\p"
 	.string "It might be even bigger than the huge\n"
 	.string "SEEDOT my big brother saw.\p"
-	.string "Thanks for showing me!\n"
-	.string "This is my thanks!$"
+	.string "Thanks for showing me!$"
 
 @ Unused
 SootopolisCity_LotadAndSeedotHouse_Text_ReceivedPotion2:
 	.string "{PLAYER} received a POTION.$"
-
-SootopolisCity_LotadAndSeedotHouse_Text_BagCrammedFull2:
-	.string "Hunh?\n"
-	.string "Your BAG is crammed full.$"
 
 SootopolisCity_LotadAndSeedotHouse_Text_SeenBiggerLotad:
 	.string "{STR_VAR_2}?\p"
@@ -199,4 +173,3 @@ SootopolisCity_LotadAndSeedotHouse_Text_BiggestLotadInHistory:
 	.string "{STR_VAR_2}'s {STR_VAR_3} colossus!\p"
 	.string "A LOTAD bigger than a SEEDOT\n"
 	.string "always wanted!$"
-

@@ -10,6 +10,9 @@ enum RandomizerCategory
     RANDOMIZER_CATEGORY_STARTER,
     RANDOMIZER_CATEGORY_TRAINER,
     RANDOMIZER_CATEGORY_EVOLUTION,
+    RANDOMIZER_CATEGORY_WORLD_ITEM,
+    RANDOMIZER_CATEGORY_FREE_ITEM,
+    RANDOMIZER_CATEGORY_TM,
 };
 
 enum RandomizerEncounterType
@@ -45,5 +48,9 @@ enum Species GetRandomizedSpeciesForEncounter(enum Species originalSpecies, u16 
 enum Species GetRandomizedSpeciesForLegendaryEncounter(enum Species originalSpecies, u16 mapId, u8 slot);
 enum Species GetRandomizedSpeciesForTrainer(enum Species originalSpecies, u16 trainerId, u8 partySlot);
 enum Species GetRandomizedStarterSpecies(enum Species originalSpecies, u8 slot);
+bool32 IsWorldItemRandomizerEligible(enum Item item);
+enum Item GetRandomizedWorldItem(enum Item originalItem, u8 mapGroup, u8 mapNum, u8 objectId);
+bool32 IsFreeItemRandomizerEligible(enum Item item);
+enum Item GetRandomizedFreeItem(enum Item originalItem, u8 mapGroup, u8 mapNum, u8 contextId);
 
 #endif // GUARD_RANDOMIZER_H

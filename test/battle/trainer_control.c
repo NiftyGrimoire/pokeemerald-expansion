@@ -35,9 +35,9 @@ TEST("CreateNPCTrainerPartyForTrainer generates customized Pokémon")
     EXPECT(GetMonData(&testParty[0], MON_DATA_SPECIES, 0) == SPECIES_WOBBUFFET);
     EXPECT(GetMonData(&testParty[1], MON_DATA_SPECIES, 0) == SPECIES_WOBBUFFET);
 
-    EXPECT_EQ(GetMonAbility(&testParty[0]), ABILITY_SLOW_START);
-    EXPECT_EQ(GetMonAbility(&testParty[1]), ABILITY_SLOW_START);
-    EXPECT_EQ(GetMonAbility(&testParty[2]), ABILITY_SLOW_START);
+    EXPECT_EQ(GetMonAbility(&testParty[0]), GetRandomizedAbilityForSpecies(SPECIES_WOBBUFFET, ABILITY_SLOW_START));
+    EXPECT_EQ(GetMonAbility(&testParty[1]), GetRandomizedAbilityForSpecies(SPECIES_WOBBUFFET, ABILITY_SLOW_START));
+    EXPECT_EQ(GetMonAbility(&testParty[2]), GetRandomizedAbilityForSpecies(SPECIES_WOBBUFFET, ABILITY_SLOW_START));
 
     EXPECT(GetMonData(&testParty[0], MON_DATA_FRIENDSHIP, 0) == 42);
     EXPECT(GetMonData(&testParty[1], MON_DATA_FRIENDSHIP, 0) == 0);
@@ -110,13 +110,13 @@ TEST("Randomized enemy trainer creation preserves tuning and generates species-s
     EXPECT_NE(species, partyEntry->species);
 
     CreateRandomizedNPCTrainerPartyFromTrainer(testParty, trainer, TRUE, BATTLE_TYPE_TRAINER, trainerId);
-    EXPECT_EQ(species, SPECIES_PORYGON);
-    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_MOVE1), MOVE_MOONBLAST);
-    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_MOVE2), MOVE_GUILLOTINE);
-    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_MOVE3), MOVE_FIRST_IMPRESSION);
-    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_MOVE4), MOVE_WEATHER_BALL);
+    EXPECT_EQ(species, SPECIES_PYUKUMUKU);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_MOVE1), MOVE_SPLISHY_SPLASH);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_MOVE2), MOVE_SHADOW_PUNCH);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_MOVE3), MOVE_DOOM_DESIRE);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_MOVE4), MOVE_TRIPLE_DIVE);
     EXPECT_LT(GetMonData(&testParty[0], MON_DATA_ABILITY_NUM), NUM_ABILITY_SLOTS);
-    EXPECT_EQ(GetMonAbility(&testParty[0]), ABILITY_MIRROR_ARMOR);
+    EXPECT_EQ(GetMonAbility(&testParty[0]), ABILITY_INTIMIDATE);
     EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_SPECIES), species);
     EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_LEVEL), partyEntry->lvl);
     EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_HELD_ITEM), partyEntry->heldItem);

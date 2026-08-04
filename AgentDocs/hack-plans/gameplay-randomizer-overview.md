@@ -37,12 +37,34 @@ behavior and validation belong in `AgentDocs/randomizer-implementation.md`.
 
 Current execution order:
 
-1. Complete the remaining manual gameplay checks for Phases 8 and 9.
-2. Complete Phase 10's remaining QoL work and manual validation; level-to-cap,
-   Portable Healer, and Repel Toggle are implemented.
-3. Specify and implement the Phase 11 world-item pool and safeguards.
-4. Audit and tune whole-game progression in Phase 12 after the preceding systems
-   can be evaluated together.
+Manual gameplay checks remain recorded in `AgentDocs/manual-validation-checklist.md`,
+but they are not the next agent work item unless specifically requested. Continue
+adding new review and validation tasks to that checklist as implementation work
+uncovers them.
+
+1. Complete Phase 10's remaining non-manual QoL work; level-to-cap, Portable
+   Healer, Repel Toggle, global Set battle style, numeric IV summary, badge HM
+   actions, Oldale supplies, and hidden-item removal are implemented.
+2. Trainer AI flag assignment review is implemented on the current feature
+   history. The resolver gives ordinary trainers a limited tier and bosses a
+   stronger tier, preserves authored Risky behavior, avoids omniscient ability
+   knowledge, and leaves facilities and player-controlled partners unchanged.
+   Focused automated coverage passes; broader battle-scenario coverage remains
+   a later validation task.
+3. Complete Phase 11 item-randomization validation and the remaining item
+   audit. Emerald visible item balls and eligible direct gift scripts are
+   implemented. The stateless policy permits duplicates, uses one pure-random
+   useful pool without progression guarantees, excludes Poke Balls, HMs, TM
+   slots as replacement items, pure money rewards, and berries, and converts
+   authored Poke Ball or money pickups into useful rewards. The 50 TM slots use
+   the per-save unique move mapping with high-power/high-tier-status weighting.
+4. Battle and item EV gains remain disabled through the existing EV-cap toggle.
+   Continue the streamlined-progression implementation. The Emerald Day Care
+   entrance is now blocked by a route-side closure NPC that explains the service
+   is unavailable. Full breeding, egg, berry, and dependent-reward cleanup
+   remains open for a later pass.
+4. Complete the remaining Phase 11 item audit, then
+   audit and tune whole-game progression in Phase 12.
 
 1. Foundation — complete on `romhack/main`:
    - Add a master compile-time config gate, enabled for this hack.
@@ -122,15 +144,16 @@ Current execution order:
 8. Learnsets — complete on `romhack/main`; manual gameplay checks remain:
    - Allow every enabled real Pokemon species to learn every configured TM while
      preserving authored HM and move-tutor compatibility.
-   - Give each species four starting moves at level 1, then front-load new moves
+   - Give each species two starting moves at level 1, then front-load new moves
      across the configured cap bands while retaining the normal 20-move table
-     capacity. Deterministically replace each move per save, species, and slot
-     without duplicates.
-   - Planned balance revision: reduce the level-1 starting set to two moves and
-     select those slots through a dedicated, more aggressive opening bucket that
-     strongly favors the lowest practical damaging-power bands and basic status
-     effects. Specify fallback expansion and update seeded expectations when this
-     revision is implemented.
+     capacity. Keep only five total learned moves available by level 15, and move
+     the two displaced early learn slots to post-eighth-gym and post-team-leader
+     pre-Elite Four levels. Deterministically replace each move per save, species,
+     and slot without duplicates.
+   - Select those two starting slots through a dedicated aggressive opening
+     bucket: strongly favor damaging moves at 40 power or below, retain only a
+     small weight for 41-60 power, reject stronger damaging moves, and allow only
+     basic-tier status moves. Resume the normal level-scaled buckets afterward.
    - Weight damaging moves toward a level-scaled target power and shift status
      weighting from basic to strong and elite effects as levels rise. Keep every
      eligible tier possible at nonzero weight, use a 4x STAB multiplier versus 2x
@@ -139,6 +162,11 @@ Current execution order:
      and retain the authored move as an empty-pool fallback. Saturate
      power-distance penalties at the minimum weight without unsigned subtraction
      so extreme-power moves remain rare instead of overflowing the weighted pool.
+     When reviewing changes to this weighting, audit detrimental moves separately
+     from raw power: `IsExplosionMove` moves, recoil-heavy attacks, fixed-damage
+     cases, and other severe-drawback attacks should not become favored simply
+     because their listed power is near the level target. Include Misty Explosion
+     as the late-game sentinel case.
    - Resolve level-up, evolution, reminder, AI, and Pokedex paths through the
      shared full-table accessor. Initial move assignment generates the same
      deterministic sequence only through the Pokemon's current level and keeps a
@@ -188,38 +216,178 @@ Current execution order:
    - Battle style is globally locked to Set on `romhack/qol-no-free-switch`.
      Replacement Pokemon enter before the player can make a free switch, and the
      obsolete Battle Style option is removed from the Options menu.
-   - Review trainer AI flag assignments for randomized teams and learnsets. Test
-     smart mid-battle switching, post-KO replacement choices, and smart move
-     scoring; define fair AI tiers for ordinary trainers, bosses, and rematches
-     without giving every opponent omniscient knowledge by default.
-11. World items — planned:
-   - Deterministically randomize visible item pickups found in the overworld;
-     hidden item spots are removed rather than randomized.
-   - After reviewing item availability and progression balance, consider adding
-     new visible overworld pickup spots in areas that need more useful rewards.
-     Prefer placing these rewards behind optional trainer battles so obtaining
-     them involves a visible, deliberate risk-and-reward choice.
-   - Limit replacements to items useful in a Nuzlocke, initially held items and
-     evolution items; define exclusions and progression safeguards before
-     implementation.
-   - Build the pool from actual current utility, not an item's legacy category.
-     Exclude obsolete species-specific evolution items whose routes now use
-     stones, unless an item retains a separately useful battle effect.
-   - Audit low-value consumables before admitting them. In particular, exclude
-     X-items if in-battle stat items are outside the ruleset, and exclude basic
-     Potions or similar healing items if the Portable Healer makes them redundant.
+   - Trainer AI flag assignment review is implemented. Ordinary trainers use
+     Basic Trainer, Smart Mon Choices, and randomized equivalent switch-ins;
+     boss-class trainers additionally use Smart Switching, restrained STAB/status
+     assumptions, and PP-stall prevention. Authored Risky behavior is retained,
+     facilities and player-controlled partners keep their existing policy, and
+     randomized abilities remain unknown until revealed. Focused resolver and
+     ability-awareness tests pass; manual battle checks remain.
+11. World items, direct gifts, and TMs — implemented; validation and audit remain:
+   - Expand the general Items pocket from 30 to 64 distinct-item slots so the
+     randomized useful-item pool does not create excessive inventory pressure.
+     Keep the 999-per-item stack limit and all other pocket capacities unchanged.
+     This is an intentional `SaveBlock1` layout change and does not replace
+     proper Bag-full handling for grants or exchanges.
+   - The implemented first slice randomizes ordinary visible item-ball pickups
+     using a stateless hash keyed by save seed, map group, map number, object
+     index, and authored item. The same pickup is stable within a save, while
+     other identities or seeds can differ.
+   - Use one pure-random useful-item pool. Duplicates are allowed, and no stone,
+     Linking Cord, or other evolution resource is guaranteed to appear before
+     it is needed. Do not add pickup counters, duplicate tracking, new save data,
+     runtime map scans, progression bands, or new pickup locations.
+   - Exclude Poke Ball variants, HMs, TMs as replacement items, and pure money
+     rewards. Pure money rewards include Nuggets, Mushrooms, Pearls, Pearl
+     String, Stardust, Star Piece, Comet Shard, Rare Bone, and equivalent
+     vendor-only treasures. Do not exclude every item with a sale price when it
+     has independent utility; audit Heart Scales, shards, Honey, Bottle Caps,
+     and similar mixed-use items separately.
+   - Authored Poke Ball and pure-money pickups become useful randomized rewards.
+     Authored key items and HMs remain unchanged. Authored TMs remain TM items
+     and use the separate TM mapping policy below. Invalid special templates and
+     hidden items remain unchanged or disabled respectively.
+   - The initial useful pool contains standard evolution stones, Linking Cord,
+     selected evolution-related held items, and broadly useful held items. Keep
+     medicine, X-items, berries, and other ruleset-sensitive rewards out until
+     separately approved. Exclude retired species-specific evolution items unless
+     they retain independent battle utility.
+   - TMs retain the existing 50 item slots but will be assigned 50 unique moves
+     per save from the complete implemented practical move table. Selection will
+     favor high-power damaging buckets and high-tier status moves while keeping
+     lower-power and detrimental moves possible but penalized for severe
+     drawbacks. TMs must use the randomized mapping in item descriptions, bag
+     use, compatibility, Move Reminder, Pokedex, reverse lookups, and debug
+     helpers. HMs retain authored move mappings and compatibility.
+   - Emerald visible item balls and eligible direct NPC/story gifts use
+     deterministic save-seeded resolvers. Key items, HMs, TM slots, and berries
+     remain authored. Shops, exchanges, prize tables, Battle Pyramid generated
+     items, FRLG content, and internal item transfers remain outside this
+     randomizer. Consider new visible optional rewards only after distribution
+     review; never add hidden item spots.
+   - The Mt. Chimney Lava Cookie vendor is an intentional exception to the
+     general shop exclusion. It sells one deterministic randomized useful item
+     for ¥200 and may be used repeatedly. Because its identity is keyed by the
+     vendor's stable map and local object context, every purchase within a save
+     yields the same replacement item; it is not rerolled per transaction.
+   - The Seashore House Soda Pop vendor is a second intentional exception after
+     the three-trainer challenge unlocks it. It sells one deterministic
+     randomized useful item repeatedly for ¥300. Its stable map and owner local
+     object identity keep the replacement fixed within a save rather than
+     rerolling each purchase. The one-time challenge reward deliberately grants
+     six copies of one deterministic randomized item. These are temporary
+     retained behaviors: a later streamlining pass will disable the three house
+     trainers, their challenge reward, and the unlocked vendor together.
+   - Trick House is an approved challenge-reward exception to the general prize
+     table exclusion. Each of its seven one-time puzzle rewards retains its
+     authored reward identity as deterministic context: eligible non-TM prizes
+     resolve to useful randomized items, while the authored TM slot remains that
+     TM item and teaches its save-randomized move. Rewards are independently
+     mapped and may duplicate one another.
+   - The Route 120 Berry NPC gives exactly one authored Berry per save, selected
+     from Figy, Wiki, Mago, Aguav, or Iapapa by the player's Trainer ID as in the
+     original logic. A permanent received flag replaces the daily reset flag.
+     The flag is set only after the Berry enters the Bag, preserving retry
+     behavior when the Berry pocket is full.
+   - Sootopolis Kiri gives her authored two-Berry bundle exactly once per save:
+     one random Berry from Pomeg through Nomel and either Figy or Iapapa. Before
+     granting either item, a preflight verifies that the Berry pocket can hold
+     the complete pair. The permanent received flag is set only after both
+     grants succeed, preventing partial rewards or daily farming.
+   - Berry Master's wife no longer uses the Easy Chat phrase minigame. She gives
+     one authored random Berry per save from the five former special-phrase
+     rewards: Spelon, Pamtre, Watmel, Durin, or Belue. A permanent received flag
+     is set only after the item enters the Bag, so a full Berry pocket remains
+     safely retryable.
+   - The Sootopolis Seedot/Lotad brothers retain their size judging and record
+     displays as flavor content, but no longer grant items for qualifying new
+     records. This removes the repeatable randomized reward source while leaving
+     the optional comparison interaction intact.
+   - The Slateport Fan Club chairman retains his five condition assessments and
+     awards the authored Red, Blue, Pink, Green, or Yellow Scarf once for the
+     matching condition. Received flags are set only after successful Bag
+     insertion. These Contest-only rewards and the assessment interaction are
+     slated for removal with the Contest system during streamlining.
+   - Mirage Tower is always visible until its fossil event is completed, after
+     which the existing collapse and gone states remain authoritative. The
+     player chooses the authored Root Fossil or Claw Fossil, and the existing
+     choice flags continue to determine the later Desert Underpass fossil. A
+     future broader fossil choice is deferred until its presentation, revival,
+     and remaining-fossil behavior are designed together.
+   - Desert Underpass grants the authored fossil not selected in Mirage Tower,
+     preserving the existing Root/Claw choice flags and full-Bag retry behavior.
+     Its postgame unlock remains unchanged, so the recovered fossil is not part
+     of the primary Nuzlocke route.
+   - E-Reader Enigma Berry delivery grants the downloaded custom Enigma Berry
+     item directly. Its validation, ownership checks, availability state, and
+     full-Bag retry semantics remain authored and are not randomizer inputs.
+   - During streamlining, audit every E-Reader, Mystery Gift, and external-event
+     item or unlock that lacks a viable standalone acquisition path. Explicitly
+     cover the Aurora Ticket and Birth Island/Deoxys, Mystic Ticket, Old Sea Map,
+     Eon Ticket, and comparable distributions. Give each an intentional in-game
+     unlock, enable it through progression, or remove it instead of leaving its
+     content silently inaccessible.
+   - Perform a dedicated whole-game vendor audit in a later item-balance pass.
+     Review each ordinary shop, specialty vendor, repeatable seller, exchange
+     counter, and prize shop individually before deciding whether it remains
+     authored, receives a deterministic randomized inventory, or is removed by
+     streamlining. Record price, repeatability, progression dependencies, Bag
+     pocket behavior, and the risk of unlimited access to high-value randomized
+     items. The Mt. Chimney and Seashore House decisions do not automatically
+     authorize randomization of any other vendor.
 12. Streamlined game progression — planned:
    - Minimize mandatory grinding so a viable party can stay near each active level
      cap through normal trainer battles and exploration.
+   - Shoal Cave is intentionally locked to low tide so its complete low-tide route
+     and item pickups, especially TM07, remain continuously accessible. This is a
+     gameplay redesign rather than a clock workaround: the recurring Shoal
+     Salt/Shoal Shell collection and Shell Bell exchange have been retired. The
+     four reachable former Shoal Salt spots are one-time randomized useful-item
+     pickups, while the former high-tide Shoal Shell spots are inaccessible. The
+     old man only comments on the permanent low tide and no longer checks or
+     resets ingredients. Shoal Salt and Shoal Shell are not members of the
+     randomizer replacement pool. Consider disabling or bypassing Shoal Cave
+     entirely in a later streamlining pass after relocating any rewards that
+     remain important.
    - Remove breeding as a required or supported progression system; audit the Day
      Care, eggs, inherited moves, and breeding-only rewards or encounters so nothing
      important depends on breeding.
    - Remove berry planting, watering, growth, and harvesting as a supported
      progression mechanic. Audit berry plots, related NPCs and tutorials, and
      berry-dependent rewards or encounters; provide direct, finite acquisition
-     paths for any berries that remain important to Nuzlocke gameplay.
+     paths for any berries that remain important to Nuzlocke gameplay. If
+     harvesting remains supported, consider a separate berry-only harvest pool;
+     never mix berries into the general useful-item pool.
    - Complete the no-EV experience by removing or repurposing EV-focused items,
      rewards, dialogue, and UI that no longer provide useful choices.
+   - Retire Berry Powder as a supported system in a later streamlining pass. For
+     now, preserve the authored Powder Jar and vendor purchases rather than
+     randomizing either transaction. The removal pass must disable or remove the
+     Powder Jar grant, Berry Crush/powder-production entry points, powder display
+     and exchange UI, repeatable vendor, related dialogue and tutorials, and any
+     remaining rewards or checks that consume Berry Powder. Verify that no
+     required progression or retained reward depends on the system before making
+     its save-state fields permanently unused.
+   - Retire the Coin Case and Game Corner coin loop in a later streamlining pass.
+     For now, preserve the authored Harbor Mail exchange and Coin Case reward
+     rather than routing it through item randomization. The removal pass must
+     disable or remove coin purchasing, slot machines, roulette, coin balance
+     display, Game Corner prize exchanges, Coin Case checks, and obsolete NPC
+     dialogue. It must also choose and document a finite replacement reward for
+     the Harbor Mail trade—or remove the trade and Harbor Mail dependency—before
+     making the Coin Case unobtainable. Audit unique TMs, species, or other useful
+     prizes first and relocate anything retained by the streamlined ruleset.
+   - Disable the Seashore House battle-and-reward loop during streamlining. Remove
+     or bypass its three trainer fights, the one-time six-item challenge reward,
+     and the repeatable ¥300 randomized vendor as one coherent change. Update the
+     owner and trainer dialogue and any related flags so the house does not
+     advertise an unavailable challenge or leave a partially active reward path.
+   - Repurpose Captain Stern's Scanner exchange into a one-time choice among all
+     retained generic evolution items: the ten standard evolution stones and
+     the Linking Cord. Keep the selected item authored rather than randomized,
+     and consume the Scanner only after the reward is successfully added to the
+     Bag. Deep Sea Tooth and Deep Sea Scale remain ordinary battle items rather
+     than options in this evolution-resource exchange.
    - Review Emerald's plot progression for optional streamlining, prioritizing fewer
      forced detours, repeated conversations, and backtracking while preserving
      progression flags, essential tutorials, major encounters, and story coherence.
@@ -333,10 +501,11 @@ Current execution order:
   - Battle style is globally locked to Set on `romhack/qol-no-free-switch`; new
     and existing saves use Set-style replacement flow, and the Battle Style row
     is removed from the Options menu.
-  - Audit trainer AI flags and playtest `AI_FLAG_SMART_SWITCHING`,
-    `AI_FLAG_SMART_MON_CHOICES`, and the move-selection flags. Establish separate
-    ordinary-trainer and boss tiers, preferring strong scoring and limited
-    assumptions over universal `AI_FLAG_OMNISCIENT` knowledge.
+  - Trainer AI tier assignment is implemented: ordinary trainers use competent
+    scoring and randomized switch-ins, while boss-class trainers additionally use
+    Smart Switching, restrained STAB/status assumptions, and PP-stall prevention.
+    Authored Risky behavior is retained and omniscient knowledge is excluded.
+    Broader battle-scenario coverage remains a follow-up task.
 - Friendship evolutions:
   - Replace all `IF_MIN_FRIENDSHIP` evolution conditions with level-based equivalents:
     - Baby/early evolutions: level 20.

@@ -333,29 +333,84 @@ SlateportCity_Harbor_EventScript_AskToTradeScanner::
 	end
 
 SlateportCity_Harbor_EventScript_ChooseScannerTrade::
-	multichoice 0, 0, MULTI_STERN_DEEPSEA, FALSE
+	setvar VAR_0x8004, SCROLL_MULTI_SCANNER_EVOLUTION_ITEMS
+	special ShowScrollableMultichoice
 	switch VAR_RESULT
-	case 0, SlateportCity_Harbor_EventScript_DeepSeaTooth
-	case 1, SlateportCity_Harbor_EventScript_DeepSeaScale
-	case 2, SlateportCity_Harbor_EventScript_DeclineTrade
+	case 0, SlateportCity_Harbor_EventScript_SelectFireStone
+	case 1, SlateportCity_Harbor_EventScript_SelectWaterStone
+	case 2, SlateportCity_Harbor_EventScript_SelectThunderStone
+	case 3, SlateportCity_Harbor_EventScript_SelectLeafStone
+	case 4, SlateportCity_Harbor_EventScript_SelectIceStone
+	case 5, SlateportCity_Harbor_EventScript_SelectSunStone
+	case 6, SlateportCity_Harbor_EventScript_SelectMoonStone
+	case 7, SlateportCity_Harbor_EventScript_SelectShinyStone
+	case 8, SlateportCity_Harbor_EventScript_SelectDuskStone
+	case 9, SlateportCity_Harbor_EventScript_SelectDawnStone
+	case 10, SlateportCity_Harbor_EventScript_SelectLinkingCord
+	case 11, SlateportCity_Harbor_EventScript_DeclineTrade
 	case MULTI_B_PRESSED, SlateportCity_Harbor_EventScript_DeclineTrade
 	end
 
-SlateportCity_Harbor_EventScript_DeepSeaTooth::
-	msgbox SlateportCity_Harbor_Text_TradeForDeepSeaTooth, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, SlateportCity_Harbor_EventScript_ChooseDifferentTrade
-	giveitem ITEM_DEEP_SEA_TOOTH
-	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
-	removeitem ITEM_SCANNER
-	msgbox SlateportCity_Harbor_Text_HandedScannerToStern, MSGBOX_DEFAULT
-	setflag FLAG_EXCHANGED_SCANNER
-	goto SlateportCity_Harbor_EventScript_TradedScanner
+SlateportCity_Harbor_EventScript_SelectFireStone::
+	setvar VAR_0x8008, ITEM_FIRE_STONE
+	goto SlateportCity_Harbor_EventScript_ConfirmScannerTrade
 	end
 
-SlateportCity_Harbor_EventScript_DeepSeaScale::
-	msgbox SlateportCity_Harbor_Text_TradeForDeepSeaScale, MSGBOX_YESNO
+SlateportCity_Harbor_EventScript_SelectWaterStone::
+	setvar VAR_0x8008, ITEM_WATER_STONE
+	goto SlateportCity_Harbor_EventScript_ConfirmScannerTrade
+	end
+
+SlateportCity_Harbor_EventScript_SelectThunderStone::
+	setvar VAR_0x8008, ITEM_THUNDER_STONE
+	goto SlateportCity_Harbor_EventScript_ConfirmScannerTrade
+	end
+
+SlateportCity_Harbor_EventScript_SelectLeafStone::
+	setvar VAR_0x8008, ITEM_LEAF_STONE
+	goto SlateportCity_Harbor_EventScript_ConfirmScannerTrade
+	end
+
+SlateportCity_Harbor_EventScript_SelectIceStone::
+	setvar VAR_0x8008, ITEM_ICE_STONE
+	goto SlateportCity_Harbor_EventScript_ConfirmScannerTrade
+	end
+
+SlateportCity_Harbor_EventScript_SelectSunStone::
+	setvar VAR_0x8008, ITEM_SUN_STONE
+	goto SlateportCity_Harbor_EventScript_ConfirmScannerTrade
+	end
+
+SlateportCity_Harbor_EventScript_SelectMoonStone::
+	setvar VAR_0x8008, ITEM_MOON_STONE
+	goto SlateportCity_Harbor_EventScript_ConfirmScannerTrade
+	end
+
+SlateportCity_Harbor_EventScript_SelectShinyStone::
+	setvar VAR_0x8008, ITEM_SHINY_STONE
+	goto SlateportCity_Harbor_EventScript_ConfirmScannerTrade
+	end
+
+SlateportCity_Harbor_EventScript_SelectDuskStone::
+	setvar VAR_0x8008, ITEM_DUSK_STONE
+	goto SlateportCity_Harbor_EventScript_ConfirmScannerTrade
+	end
+
+SlateportCity_Harbor_EventScript_SelectDawnStone::
+	setvar VAR_0x8008, ITEM_DAWN_STONE
+	goto SlateportCity_Harbor_EventScript_ConfirmScannerTrade
+	end
+
+SlateportCity_Harbor_EventScript_SelectLinkingCord::
+	setvar VAR_0x8008, ITEM_LINKING_CORD
+	goto SlateportCity_Harbor_EventScript_ConfirmScannerTrade
+	end
+
+SlateportCity_Harbor_EventScript_ConfirmScannerTrade::
+	bufferitemname STR_VAR_1, VAR_0x8008
+	msgbox SlateportCity_Harbor_Text_TradeForSelectedItem, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, SlateportCity_Harbor_EventScript_ChooseDifferentTrade
-	giveitem ITEM_DEEP_SEA_SCALE
+	giveitem VAR_0x8008
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	removeitem ITEM_SCANNER
 	msgbox SlateportCity_Harbor_Text_HandedScannerToStern, MSGBOX_DEFAULT
@@ -511,8 +566,8 @@ SlateportCity_Harbor_Text_WouldYouTradeScanner:
 	.string "help us on our explorations.\p"
 	.string "{PLAYER}{KUN}, would you trade your\n"
 	.string "SCANNER for something?\p"
-	.string "Like, say, a DEEPSEATOOTH or\n"
-	.string "a DEEPSEASCALE that I have?$"
+	.string "I can offer an EVOLUTION item\n"
+	.string "of your choice in return.$"
 
 SlateportCity_Harbor_Text_IfYouWantToTradeLetMeKnow:
 	.string "CAPT. STERN: Are you certain?\n"
@@ -520,13 +575,9 @@ SlateportCity_Harbor_Text_IfYouWantToTradeLetMeKnow:
 	.string "Well, okay, then. If you want to trade\n"
 	.string "your SCANNER, let me know.$"
 
-SlateportCity_Harbor_Text_TradeForDeepSeaTooth:
+SlateportCity_Harbor_Text_TradeForSelectedItem:
 	.string "CAPT. STERN: So you'll trade it for\n"
-	.string "my DEEPSEATOOTH?$"
-
-SlateportCity_Harbor_Text_TradeForDeepSeaScale:
-	.string "CAPT. STERN: So you'll trade it for\n"
-	.string "my DEEPSEASCALE?$"
+	.string "my {STR_VAR_1}?$"
 
 SlateportCity_Harbor_Text_WhichOneDoYouWant:
 	.string "CAPT. STERN: Which one do you want?$"
