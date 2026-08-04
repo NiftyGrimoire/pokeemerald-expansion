@@ -173,7 +173,10 @@ Other form-selection conditions remain as noted.
 
 Nincada's split evolution into Shedinja intentionally retains its one Poké Ball
 requirement. Poké Balls are guaranteed by the opening-game supply changes, and
-the requirement is integral to creating the extra party member.
+the requirement is integral to creating the extra party member. When a boxed
+Nincada evolves through Storage `LEVEL TO CAP`, the resulting Ninjask is written
+back to the original box slot and Shedinja is created in the party. A full party
+or missing regular Poké Ball suppresses Shedinja without blocking Ninjask.
 
 ## Location restrictions removed
 

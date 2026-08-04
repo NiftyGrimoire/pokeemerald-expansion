@@ -151,6 +151,17 @@ counters, unavailable currency, or an unsupported map script.
 | Chest Form Gimmighoul | Gholdengo | Level 50 | Collect 999 Gimmighoul Coins |
 | Roaming Form Gimmighoul | Gholdengo | Level 50 | Collect 999 Gimmighoul Coins |
 
+### Nincada and boxed evolution
+
+Nincada still evolves into Ninjask at level 20. If there is an open party slot
+and at least one regular Poké Ball in the Bag, the evolution also creates
+Shedinja in the party and consumes one Poké Ball.
+
+This also works when Nincada is raised from the PC with `LEVEL TO CAP`: Ninjask
+returns to Nincada's original box slot, while Shedinja is added to the party.
+With a full party or no regular Poké Ball, Nincada still becomes Ninjask but no
+Shedinja is created.
+
 ## Location evolutions become stones
 
 Leveling up in the original special location no longer evolves these Pokémon.

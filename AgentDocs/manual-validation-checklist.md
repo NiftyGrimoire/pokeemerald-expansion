@@ -247,6 +247,10 @@ changes form correctly without losing data, crashing, or becoming stuck.
       matching Basculegion forms at level 40.
 - [ ] Confirm Nincada still requires a Poké Ball and an open party slot to create
       Shedinja when it evolves.
+- [ ] Raise a boxed Nincada through level 20 with a regular Poké Ball and an open
+      party slot; confirm boxed Ninjask replaces it, party Shedinja is created,
+      and one Poké Ball is consumed. Repeat with a full party and without a Poké
+      Ball; confirm Ninjask still evolves but Shedinja is not created.
 - [ ] Open Captain Stern's Scanner exchange and confirm the scrollable menu lists
       all ten retained evolution stones, the Linking Cord, and Exit.
 - [ ] Select and confirm both a representative stone and the Linking Cord on
