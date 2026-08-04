@@ -2,14 +2,16 @@
 
 ## Current branch
 
-- Integration branch: `romhack/main`.
-- Evolution work is integrated into `romhack/main`; no evolution feature branch
-  remains active after this handoff update.
+- Active release branch: `romhack/nuzlocke-1.1.0` at `4ebbfa896c`.
+- The previous integrated baseline is tagged `1.0.0-nuzlocke` at
+  `d932605110` and remains the current `romhack/main` tip.
+- The 1.1.0 branch contains the reviewed TM, world-item, direct-gift, level-1
+  learnset, EV, Day Care, reward-audit, and player-documentation changelist.
+- Do not merge this branch into `romhack/main` without explicit user approval.
 - Base: `pokeemerald-expansion` stable `1.16.2`.
 - Push only to the NiftyGrimoire fork through `origin`.
 - Never push to `upstream`.
 
-The ability randomizer was merged locally into `romhack/main` by `ea8674abb9`.
 Verify the current Git state and remote tracking state before committing or
 pushing; this handoff does not authorize a push.
 
@@ -37,13 +39,14 @@ gameplay and release-validation procedure.
 - Focused tests in `test/randomizer.c`.
 - Intentional `SaveBlock3` size guard updated from 4 to 8 bytes.
 
-Wild encounter randomization, BST-scaled ordinary encounter pools, scripted
-encounter randomization, level caps and EV removal, starter randomization, enemy
-trainer randomization, and evolution-family ability randomization are merged into
-`romhack/main`, including universal TM compatibility and randomized level-up
-learnsets and the streamlined evolution rules. Quality-of-life hooks have not
-all been implemented; level-to-cap, Portable Healer, and Repel Toggle are
-integrated into `romhack/main`.
+Wild and scripted encounter randomization, level caps and EV removal, starters,
+enemy trainers, evolution-family abilities, universal TM compatibility,
+randomized level-up learnsets, streamlined evolutions, and the implemented QoL
+features are present in the 1.0.0 baseline. The 1.1.0 branch adds randomized TM
+mappings, visible world items, eligible direct gifts, the revised two-move
+level-1 opening, the 64-slot Items pocket, the Route 117 Day Care closure, Shoal
+Cave and finite-reward redesigns, and the completed transaction audit described
+below.
 
 ## Learnset phase complete
 
@@ -622,14 +625,14 @@ replacement routes retain their intended target.
   authored. Shops, exchanges, prize tables, Battle Pyramid items, FRLG content,
   and internal transfers remain outside this randomizer. No new pickup spots are
   added.
-- TM move randomization is implemented on the tm-randomization branch. The existing
-  50 TM slots will map to 50 unique moves per save using the saved randomizer
+- TM move randomization is implemented on `romhack/nuzlocke-1.1.0`. The existing
+  50 TM slots map to 50 unique moves per save using the saved randomizer
   seed and algorithm version, without adding a 50-entry save table. Candidates
-  will come from the complete implemented practical move table, excluding only
+  come from the complete implemented practical move table, excluding
   invalid sentinels and placeholder-only or unusable special entries. Weighted
-  selection will favor high-power damaging buckets and high-tier status moves;
+  selection favors high-power damaging buckets and high-tier status moves;
   lower-power and severe-drawback moves remain possible but receive drawback
-  penalties. The randomized mapping must flow through descriptions, bag use,
+  penalties. The randomized mapping flows through descriptions, Bag use,
   compatibility, Move Reminder, Pokedex, reverse lookups, and debug helpers.
   HM move mappings and compatibility remain authored.
   The randomizer algorithm version is now 4. Version 3 introduced randomized TM
@@ -637,13 +640,13 @@ replacement routes retain their intended target.
   randomized level-up schedule and opening-move weighting. Deterministic trainer,
   learnset, TM, and item mappings from earlier development versions are stale.
 
-## Pending changelist review ledger
+## Committed 1.1.0 changelist review ledger
 
-The current uncommitted changelist received a functional review before the
-reward-script audit began. Preserve this ledger until the changelist has been
-fully audited, validated, and divided into commit-ready changes. The detailed
-case-by-case reward proposals are a separate decision queue; this section tracks
-the underlying correctness findings and their implementation status.
+The release-sized changelist was reviewed, corrected, and committed as
+`4ebbfa896c`. Preserve this ledger as implementation history and as a pointer to
+the remaining manual-validation work. The detailed case-by-case reward decisions
+are recorded below and in
+`AgentDocs/pending-changelist-review-2026-08-04.md`.
 
 The general Items pocket is expanded from 30 to 64 distinct-item slots to make
 the broader randomized useful-item pool practical. Per-item stacks remain capped
@@ -660,8 +663,8 @@ semantics rather than assuming that a 64-slot pocket can never fill.
 | 3 | Randomized TMs displayed the authored TM slot's move description. | Resolved. TM01-TM50 descriptions now resolve from the randomized move while their item names remain stable TM slot names. | Manually inspect representative Bag descriptions and retain focused automated coverage. |
 | 4 | Authored HM moves could also occupy randomized TM slots, creating duplicate and ambiguous reverse mappings. | Resolved. Every authored HM move is excluded from randomized TM candidates and the invariant is tested across multiple seeds. | Manual Bag/use validation remains. |
 | 5 | Exchanges, vendors, repeatable systems, and prize systems were broadly converted with `giveitem_randomized` even though they were outside the original direct-gift phase. | Resolved case by case. Authored transactions were restored where appropriate; selected vendors and challenge rewards retain documented deterministic randomization; daily and peripheral systems were made one-time, disabled, or deliberately redesigned; fossils and the E-Reader delivery are authored. See the completed decision queue below. | Perform the separate future streamlining and whole-game vendor audits already documented; do not silently extend randomization to unaudited transactions. |
-| 6 | The randomized TM candidate filter admits moves known to be unsuitable, with Tera Blast explicitly excused by a test. | Outstanding. | Define the intentional differences between level-up and TM eligibility, remove the Tera Blast test exception, and exclude Tera Blast plus any other unusable or context-dependent TM candidates selected by that audit. |
-| 7 | Authored quantities are copied blindly to randomized replacements, producing disproportionate stacks such as five or six identical held/evolution items. | Outstanding as a general policy; the Oldale 200-item case is restored and the Seashore House quantity is deliberately accepted. | Audit every remaining multi-item randomized gift individually rather than automatically preserving its authored count. Seashore House remains six copies of one deterministic replacement until the fights, reward, and vendor are disabled together during streamlining. |
+| 6 | The randomized TM candidate filter admitted moves known to be unsuitable, with Tera Blast explicitly excused by a test. | Resolved. TM selection reuses the reviewed practical-move eligibility gate, excludes Tera Blast and other unusable/context-dependent cases, and separately excludes every authored HM. | Revisit only if the TM-specific balance policy is deliberately broadened. |
+| 7 | Authored quantities were copied blindly to randomized replacements, producing disproportionate stacks such as five or six identical held/evolution items. | Resolved for every retained multi-item gift in this changelist. Birch's tutorial is restored to five authored Poke Balls; Oldale is authored; Seashore's six-copy challenge reward is an explicit temporary exception. | Reconsider Seashore only when its fights, reward, and vendor are disabled together during streamlining. |
 | 8 | Tests cover pure randomizer resolution better than the actual script integration risks. | Partially addressed. TM descriptions and HM/TM collision coverage were added, and normal ROM builds now succeed after the hidden-item flag-zero build blocker was fixed. | Add or perform coverage for ordinary item-ball templates, `RandomizeFreeItemGift` variable handling, protected story-item macros, exchanges/repeatable rewards, multi-item quantities, and Bag-full retry stability. Keep the manual checklist as the gameplay gate where script-level unit coverage is impractical. |
 
 ### Completed special-reward decision queue

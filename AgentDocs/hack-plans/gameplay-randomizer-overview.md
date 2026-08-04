@@ -33,7 +33,8 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
 
 Status in this list is authoritative for phase-level planning. Detailed completed
 behavior and validation belong in `AgentDocs/randomizer-implementation.md`.
-"Implemented on feature branch" does not mean merged into `romhack/main`.
+The current release branch is `romhack/nuzlocke-1.1.0`; implemented there does
+not mean merged into `romhack/main`.
 
 Current execution order:
 
@@ -42,29 +43,23 @@ but they are not the next agent work item unless specifically requested. Continu
 adding new review and validation tasks to that checklist as implementation work
 uncovers them.
 
-1. Complete Phase 10's remaining non-manual QoL work; level-to-cap, Portable
-   Healer, Repel Toggle, global Set battle style, numeric IV summary, badge HM
-   actions, Oldale supplies, and hidden-item removal are implemented.
-2. Trainer AI flag assignment review is implemented on the current feature
-   history. The resolver gives ordinary trainers a limited tier and bosses a
-   stronger tier, preserves authored Risky behavior, avoids omniscient ability
-   knowledge, and leaves facilities and player-controlled partners unchanged.
-   Focused automated coverage passes; broader battle-scenario coverage remains
-   a later validation task.
-3. Complete Phase 11 item-randomization validation and the remaining item
-   audit. Emerald visible item balls and eligible direct gift scripts are
-   implemented. The stateless policy permits duplicates, uses one pure-random
-   useful pool without progression guarantees, excludes Poke Balls, HMs, TM
-   slots as replacement items, pure money rewards, and berries, and converts
-   authored Poke Ball or money pickups into useful rewards. The 50 TM slots use
-   the per-save unique move mapping with high-power/high-tier-status weighting.
-4. Battle and item EV gains remain disabled through the existing EV-cap toggle.
-   Continue the streamlined-progression implementation. The Emerald Day Care
-   entrance is now blocked by a route-side closure NPC that explains the service
-   is unavailable. Full breeding, egg, berry, and dependent-reward cleanup
-   remains open for a later pass.
-4. Complete the remaining Phase 11 item audit, then
-   audit and tune whole-game progression in Phase 12.
+1. Phase 10's implemented QoL set includes level-to-cap, Portable Healer, Repel
+   Toggle, global Set battle style, numeric IV summary, badge HM actions, Oldale
+   supplies, hidden-item removal, and trainer AI tiers. Remaining work is manual
+   gameplay and broader battle-scenario validation, not another implementation
+   layer for those features.
+2. Phase 11 implementation and correctness review are complete on
+   `romhack/nuzlocke-1.1.0`: visible item balls, eligible direct gifts, the
+   64-slot Items pocket, 50 unique randomized TM moves, protected transactions,
+   atomic vendor/reward handling, and the case-by-case special-reward audit are
+   committed. The consolidated manual checklist remains the release gate.
+3. Battle and item EV gains are disabled. The Route 117 Day Care entrance is
+   blocked, Shoal Cave is permanently low tide, and the documented finite-reward
+   redesigns are implemented. Full engine-level breeding/egg cleanup and broader
+   Phase 12 streamlining remain future work.
+4. Do not merge the release branch into `romhack/main` until the user explicitly
+   approves it. If implementation resumes before that decision, prioritize
+   clearly bounded Phase 12 work or defects found by manual validation.
 
 1. Foundation — complete on `romhack/main`:
    - Add a master compile-time config gate, enabled for this hack.

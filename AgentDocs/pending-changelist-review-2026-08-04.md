@@ -1,14 +1,17 @@
 # Pending Changelist Review — 2026-08-04
 
-## Purpose
+## Purpose and final status
 
-This document is the working queue for issues found while reviewing the uncommitted changes on branch `romhack/disable-battle-ev-gain`. The changelist is not ready to commit. Work through the issues below in priority order, recording decisions and validation as each item is resolved.
-
-No fixes were made during the second-pass review that produced this document.
+This document began as the working review queue for the former uncommitted
+changelist on `romhack/disable-battle-ev-gain`. The findings were resolved and
+the full release-sized change was committed on `romhack/nuzlocke-1.1.0` as
+`4ebbfa896c`. The document is now a historical design/review ledger, not an open
+implementation queue. Manual gameplay validation remains tracked separately in
+`AgentDocs/manual-validation-checklist.md`.
 
 ## Changelist design inventory
 
-This uncommitted changelist combines five headline gameplay changes with a
+The committed changelist combines five headline gameplay changes with a
 supporting item/reward audit and several progression decisions. Treat the list
 below as the release-note boundary for this CL; broader Phase 12 streamlining is
 still future work.
@@ -283,7 +286,9 @@ The affected events reportedly belong to unavailable cross-version maps, so they
 **Status:** Resolved. The implementation handoff records algorithm version 4 and
 the mapping changes that required versions 3 and 4.
 
-`include/config/randomizer.h` defines `RANDOMIZER_ALGORITHM_VERSION` as 4, while `AgentDocs/randomizer-implementation.md` says the algorithm version is now 3.
+At review time, `include/config/randomizer.h` defined
+`RANDOMIZER_ALGORITHM_VERSION` as 4 while the implementation handoff still said
+version 3. The handoff now records version 4 and its mapping changes.
 
 **Recommended resolution:** Update the implementation document to version 4 and briefly record which mapping changes required the bump.
 
@@ -333,28 +338,27 @@ These are not currently classified as defects, but should remain visible while c
 - E-Reader Enigma Berry delivery is restored. E-Reader-only items, events, and unlocks such as Deoxys need a future accessibility review.
 - All vendors should receive a future case-by-case review before expanding vendor randomization.
 
-## Validation snapshot
+## Final automated validation snapshot
 
-Validation performed during the second-pass review:
+Validation performed after resolving the review queue:
 
 - Production ROM build: passed.
 - `git diff --check`: passed.
-- Randomizer tests: 60/60 passed, but they do not cover the HM08 Dive boundary defect.
+- Randomizer tests: 60/60 passed, including authored-HM coverage and direct HM08
+  Dive resolution/reverse lookup.
+- Bag tests: 4/4 passed, including Kiri's full-existing-stack regression.
 - Save-layout tests: 4/4 passed.
 - EV and level-cap tests: 4/4 passed.
-- Trainer-control tests: 20/22 passed; see issue 5.
+- Trainer-control tests: 22/22 passed after classifying global randomized
+  abilities and updating the algorithm-version-4 deterministic mapping.
 - Production EWRAM usage: approximately 244,268 bytes, or 93.18%.
 
-The first attempt to run multiple emulator-backed test filters concurrently caused shared temporary-file collisions. The affected suites were rerun serially; only the two trainer-control assertions remain genuine failures.
+Emulator-backed filters must run serially because concurrent runs share temporary
+artifacts. The final serial runs passed.
 
-## Suggested order for the next session
+## Remaining release work
 
-1. Fix HM08 Dive bounds and add complete HM coverage.
-2. Make both randomized vendor purchases atomic.
-3. Fix Kiri's two-item preflight.
-4. Fix the Mystery Gift Battle Card full-Bag path.
-5. Investigate and resolve the two trainer-test failures.
-6. Decide the TM suitability policy.
-7. Decide the five-Poké-Ball quantity policy.
-8. Clean documentation and newline-only diffs.
-9. Run the production build, focused tests, and the complete manual validation checklist.
+1. Complete the gameplay checks in `AgentDocs/manual-validation-checklist.md`.
+2. Record any defects found by manual validation in a new dated review note;
+   preserve this file as the closed 1.1.0 implementation review.
+3. Merge into `romhack/main` only with explicit user approval.

@@ -11,7 +11,10 @@ stable version `1.16.2`. Expansion is a GBA Pokemon engine and development base,
 not a finished game by itself. This fork is building a deterministic,
 per-save gameplay randomizer while retaining Emerald's map and story for now.
 
-The expected integration branch is `romhack/main`.
+The expected integration branch is `romhack/main`. The active release branch is
+currently `romhack/nuzlocke-1.1.0`; its parent baseline is tagged
+`1.0.0-nuzlocke`. Do not infer permission to merge the release branch into the
+integration branch.
 
 ## Instruction and Documentation Precedence
 
@@ -56,6 +59,8 @@ intent. Confirm both against the source before editing.
 - `docs/`: upstream Expansion reference, style guide, install guides, and
   tutorials.
 - `AgentDocs/`: agent-facing plans, current handoffs, and operating guidance.
+- `PlayerDocs/`: player-facing gameplay and evolution references. Keep planned
+  behavior out of these documents until it is implemented.
 - `RomhackDocs/`: detailed documentation of implemented fork-specific systems.
 - `tools/`: build helpers and local development tooling.
 
@@ -118,11 +123,16 @@ The randomizer is runtime-resolved and deterministic per save:
 - Hash categories and behavior are save-format API; incompatible changes require
   an algorithm-version change.
 
-Foundation, ordinary and scripted encounter randomization, level caps and EV
-removal, starters, enemy trainer parties, evolution-family abilities, universal
-TM compatibility, deterministic level-weighted learnsets, and streamlined
-evolution rules are implemented on `romhack/main`. Consult the implementation
-handoff and evolution ledger for exact behavior and remaining manual checks.
+The `1.0.0-nuzlocke` baseline contains foundation, ordinary and scripted
+encounters, level caps and EV removal, starters, enemy trainers,
+evolution-family abilities, universal TM compatibility, deterministic
+level-weighted learnsets, streamlined evolutions, and the integrated QoL set.
+The active 1.1.0 release branch additionally contains unique per-save TM move
+mappings, deterministic visible world items and eligible direct gifts, the
+two-move level-1 learnset rebalance, a 64-slot Items pocket, practical Day Care
+closure, permanent-low-tide Shoal Cave, and the audited reward/transaction
+redesigns. Consult the implementation handoff and review ledger for exact
+behavior and remaining manual checks.
 
 The encounter system preserves vanilla encounter checks, method, weighted slot
 selection, and level, then replaces only the species. DexNav, visible overworld
@@ -140,8 +150,8 @@ For encounter internals, also read
 The authoritative phase status and remaining task order are in the roadmap section
 of `gameplay-randomizer-overview.md`. The implementation handoff records detailed
 completed behavior, validation, manual checks, and the safe next work on the active
-branch. Do not advertise a config gate or behavior as integrated until its code and
-validation are present on `romhack/main`.
+branch. Distinguish "implemented on the release branch" from "merged into
+`romhack/main`" in all status updates.
 
 ## Delegation
 

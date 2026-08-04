@@ -16,6 +16,10 @@ the user explicitly asks for manual validation. Keep appending new checklist ite
 code review or implementation uncovers additional behavior that should be verified
 later.
 
+Release note: this checklist is the remaining gameplay gate for commit
+`4ebbfa896c` on `romhack/nuzlocke-1.1.0`. It does not authorize merging the
+release branch into `romhack/main`.
+
 ## Test record
 
 - ROM commit:
