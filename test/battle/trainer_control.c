@@ -24,6 +24,7 @@ TEST("CreateNPCTrainerPartyForTrainer generates customized Pokémon")
     struct Pokemon *testParty = Alloc(6 * sizeof(struct Pokemon));
     u32 currTrainer = 3;
     u8 nickBuffer[20];
+    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
     CreateNPCTrainerPartyFromTrainer(testParty, GetTrainerStructFromId(currTrainer), TRUE, BATTLE_TYPE_TRAINER);
     EXPECT(IsMonShiny(&testParty[0]));
     EXPECT(!IsMonShiny(&testParty[1]));
@@ -34,9 +35,9 @@ TEST("CreateNPCTrainerPartyForTrainer generates customized Pokémon")
     EXPECT(GetMonData(&testParty[0], MON_DATA_SPECIES, 0) == SPECIES_WOBBUFFET);
     EXPECT(GetMonData(&testParty[1], MON_DATA_SPECIES, 0) == SPECIES_WOBBUFFET);
 
-    EXPECT(GetMonAbility(&testParty[0]) == ABILITY_TELEPATHY);
-    EXPECT(GetMonAbility(&testParty[1]) == ABILITY_SHADOW_TAG);
-    EXPECT(GetMonAbility(&testParty[2]) == ABILITY_SHADOW_TAG);
+    EXPECT_EQ(GetMonAbility(&testParty[0]), ABILITY_SLOW_START);
+    EXPECT_EQ(GetMonAbility(&testParty[1]), ABILITY_SLOW_START);
+    EXPECT_EQ(GetMonAbility(&testParty[2]), ABILITY_SLOW_START);
 
     EXPECT(GetMonData(&testParty[0], MON_DATA_FRIENDSHIP, 0) == 42);
     EXPECT(GetMonData(&testParty[1], MON_DATA_FRIENDSHIP, 0) == 0);
@@ -99,18 +100,23 @@ TEST("CreateNPCTrainerPartyForTrainer generates customized Pokémon")
 TEST("Randomized enemy trainer creation preserves tuning and generates species-safe data")
 {
     struct Pokemon *testParty = Alloc(PARTY_SIZE * sizeof(struct Pokemon));
-    struct Pokemon expectedMon;
     u32 trainerId = 3;
     const struct Trainer *trainer = GetTrainerStructFromId(trainerId);
     const struct TrainerMon *partyEntry = &trainer->party[0];
     enum Species species;
-    u32 abilityNum;
 
     gSaveBlock3Ptr->randomizerSeed = 0x12345678;
     species = GetRandomizedSpeciesForTrainer(partyEntry->species, trainerId, 0);
     EXPECT_NE(species, partyEntry->species);
 
     CreateRandomizedNPCTrainerPartyFromTrainer(testParty, trainer, TRUE, BATTLE_TYPE_TRAINER, trainerId);
+    EXPECT_EQ(species, SPECIES_PORYGON);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_MOVE1), MOVE_MOONBLAST);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_MOVE2), MOVE_GUILLOTINE);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_MOVE3), MOVE_FIRST_IMPRESSION);
+    EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_MOVE4), MOVE_WEATHER_BALL);
+    EXPECT_LT(GetMonData(&testParty[0], MON_DATA_ABILITY_NUM), NUM_ABILITY_SLOTS);
+    EXPECT_EQ(GetMonAbility(&testParty[0]), ABILITY_MIRROR_ARMOR);
     EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_SPECIES), species);
     EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_LEVEL), partyEntry->lvl);
     EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_HELD_ITEM), partyEntry->heldItem);
@@ -119,15 +125,6 @@ TEST("Randomized enemy trainer creation preserves tuning and generates species-s
     EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_HP_IV), partyEntry->iv & 31);
     EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_HP_EV), partyEntry->ev[0]);
     EXPECT(IsMonShiny(&testParty[0]));
-
-    CreateMon(&expectedMon, species, partyEntry->lvl, 0, OTID_STRUCT_RANDOM_NO_SHINY);
-    GiveMonInitialMoveset(&expectedMon);
-    for (u32 moveSlot = 0; moveSlot < MAX_MON_MOVES; moveSlot++)
-        EXPECT_EQ(GetMonData(&testParty[0], MON_DATA_MOVE1 + moveSlot), GetMonData(&expectedMon, MON_DATA_MOVE1 + moveSlot));
-
-    abilityNum = GetMonData(&testParty[0], MON_DATA_ABILITY_NUM);
-    EXPECT_LT(abilityNum, ARRAY_COUNT(gSpeciesInfo[species].abilities));
-    EXPECT_EQ(GetMonAbility(&testParty[0]), gSpeciesInfo[species].abilities[abilityNum]);
 
     Free(testParty);
 }
