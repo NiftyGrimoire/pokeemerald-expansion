@@ -626,13 +626,13 @@ replacement routes retain their intended target.
   randomized rewards; authored key items, HMs, and TMs remain their authored
   item slots. Hidden items remain disabled and invalid special templates remain
   unchanged.
-  The useful pool contains 61 equally weighted results: 11 evolution items and
-  50 held items. It includes standard evolution stones, Linking Cord, selected
+  The useful pool contains 63 equally weighted results: 11 evolution items and
+  52 held items. It includes standard evolution stones, Linking Cord, selected
   evolution-held items with independent utility, all 18 type boosters, the
   Choice trio, Focus/Band items, accuracy and critical-hit lenses, and selected
   general and lower-tier utility held items. The latter includes Quick Claw,
-  Loaded Dice, Bright Powder, Covert Cloak, Grip Claw, the four weather rocks,
-  Light Clay, and Terrain Extender. Medicine, X-items, berries, mixed-use
+  Loaded Dice, Bright Powder, White Herb, Power Herb, Covert Cloak, Grip Claw,
+  the four weather rocks, Light Clay, and Terrain Extender. Medicine, X-items, berries, mixed-use
   sellables, retired species-specific evolution items, respawn behavior, and
   broader distribution remain audit work. Emerald item balls and eligible direct Emerald gifts
   now share deterministic resolvers; key items, HMs, TM slots, and berries remain
@@ -652,7 +652,7 @@ replacement routes retain their intended target.
   The randomizer algorithm version is now 5. Version 3 introduced randomized TM
   mappings; version 4 added world/free-item hash categories and revised the
   randomized level-up schedule and opening-move weighting; version 5 expanded
-  the world/free-item result pool from 23 to 61 entries. Deterministic trainer,
+  the world/free-item result pool from 23 to 63 entries. Deterministic trainer,
   learnset, TM, and item mappings from earlier development versions are stale.
 
 ### TM move randomization versus level-up learnset randomization

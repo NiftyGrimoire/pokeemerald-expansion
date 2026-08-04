@@ -382,7 +382,7 @@ the remaining excluded item sources separately.
 - [ ] Confirm no evolution stone, Linking Cord, or other resource is guaranteed;
       record seeds where a needed resource is unavailable.
 - [ ] Confirm every replacement belongs to the approved Nuzlocke-useful pool.
-- [ ] Across recorded seeds, confirm the 61-result pool can produce evolution
+- [ ] Across recorded seeds, confirm the 63-result pool can produce evolution
       items, type boosters, Choice items, Focus/Band items, lenses, and general
       competitive held items, including weather, terrain, and screen extenders.
 - [ ] Confirm retired evolution items, redundant medicine, disallowed X-items,

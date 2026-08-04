@@ -203,10 +203,11 @@ pool contains:
 - Focus Sash, Focus Band, Muscle Band, Wise Glasses, and Expert Belt.
 - Scope Lens, Wide Lens, and Zoom Lens.
 - Eviolite, Leftovers, Life Orb, Assault Vest, and Clear Amulet.
-- Quick Claw, Loaded Dice, Bright Powder, Covert Cloak, and Grip Claw.
+- Quick Claw, Loaded Dice, Bright Powder, White Herb, Power Herb, Covert Cloak,
+  and Grip Claw.
 - Damp Rock, Heat Rock, Smooth Rock, Icy Rock, Light Clay, and Terrain Extender.
 
-The pool contains 61 results: 11 evolution items and 50 held items. Every entry
+The pool contains 63 results: 11 evolution items and 52 held items. Every entry
 has equal weight, so duplicates are possible and no category is guaranteed.
 
 The pool intentionally excludes Medicine, X-items, Berries, Poké Ball variants,
