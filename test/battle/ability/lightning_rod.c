@@ -1,6 +1,17 @@
 #include "global.h"
 #include "test/battle.h"
 
+// RANDOMIZER NOTE: The first four tests use Raichu's authored Lightning Rod
+// slot. The test runner therefore stores the slot rather than forcing the
+// literal ability, and the gameplay randomizer can resolve that slot to a
+// different family ability. Their failures currently reflect an invalid test
+// fixture, not a regression in Lightning Rod itself.
+// TODO: Reimplement these cases with a species that does not naturally have
+// Lightning Rod so Ability(ABILITY_LIGHTNING_ROD) is forced, or give each case
+// a fixed randomizer seed/species pair that resolves to Lightning Rod. Preserve
+// the intended absorption, redirection, spread-move, stat-boost, and history
+// coverage when replacing the fixtures.
+
 SINGLE_BATTLE_TEST("Lightning Rod absorbs Electric-type moves and increases the Sp. Attack")
 {
     u32 config;
