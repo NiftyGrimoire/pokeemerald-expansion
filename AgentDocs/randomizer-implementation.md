@@ -927,6 +927,13 @@ vendors.
   Pamtre, Watmel, Durin, and Belue); keep the e-Reader Enigma special slot out of
   normal distribution; and provide finite direct access to retained battle-useful
   berries after auditing Pokeblock and NPC dependencies.
+  Add a separate deterministic berry-acquisition resolver for eligible authored
+  berry trees, pickups, and direct gifts. It should draw only from retained
+  battle-useful berries, use the save seed plus stable source identity, allow
+  duplicates without mutable tracking, and never feed berries into the general
+  world-item pool. Planting and harvesting must not create renewable rerolls;
+  preserve any specifically required scripted berry until its dependency is
+  replaced.
   Also audit obsolete EV content, mandatory grinding against each cap, and
   optional plot detours before choosing concrete EXP, trainer, encounter, or
   script changes. The Powder Jar and all Berry Powder vendor purchases remain

@@ -404,6 +404,12 @@ the remaining excluded item sources separately.
       auditing Pokeblock recipes, NPC dialogue, tutorials, gifts, and encounters.
 - [ ] Keep the e-Reader Enigma Berry special slot out of ordinary distribution.
 - [ ] Provide direct finite acquisition paths for retained battle-useful berries.
+- [ ] Confirm eligible berry trees, pickups, and direct gifts randomize
+      deterministically from the retained battle-useful berry-only pool.
+- [ ] Confirm berry results are stable within a save, differ across seeds, permit
+      duplicates, and cannot be rerolled through planting or harvesting.
+- [ ] Confirm berries never enter the general useful-item pool and specific
+      scripted berries remain fixed until their dependencies are replaced.
 
 ### Streamlined progression
 

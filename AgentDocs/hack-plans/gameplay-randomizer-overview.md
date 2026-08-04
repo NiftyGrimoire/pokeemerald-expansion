@@ -381,6 +381,13 @@ uncovers them.
      dependencies before removing authored grants, and keep the e-Reader Enigma
      Berry special slot out of ordinary distribution. Define direct finite
      acquisition for the remaining battle-useful held berries.
+   - Randomize finite berry acquisition separately from the general useful-item
+     pool. Convert eligible authored berry trees, pickups, and direct berry gifts
+     into deterministic results drawn only from the retained battle-useful berry
+     set, keyed by save seed and stable source identity. Duplicates may remain
+     possible, but planting and harvesting must not provide renewable rerolls.
+     Preserve scripted berries when a specific berry is required for progression
+     or a retained reward until that dependency is explicitly replaced.
    - Complete the no-EV experience by removing or repurposing EV-focused items,
      rewards, dialogue, and UI that no longer provide useful choices.
    - Retire Berry Powder as a supported system in a later streamlining pass. For
