@@ -250,6 +250,53 @@ static bool32 IsSmartBattle(void)
     return gBattleTypeFlags & BATTLE_TYPE_HAS_AI || IsWildMonSmart();
 }
 
+static bool32 IsBossTrainerClass(enum TrainerClassID trainerClass)
+{
+    switch (trainerClass)
+    {
+    case TRAINER_CLASS_AQUA_ADMIN:
+    case TRAINER_CLASS_AQUA_LEADER:
+    case TRAINER_CLASS_ELITE_FOUR:
+    case TRAINER_CLASS_LEADER:
+    case TRAINER_CLASS_CHAMPION:
+    case TRAINER_CLASS_MAGMA_ADMIN:
+    case TRAINER_CLASS_MAGMA_LEADER:
+    case TRAINER_CLASS_RIVAL:
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
+u64 ResolveGameplayTrainerAIFlags(u32 trainerClass, u64 authoredFlags)
+{
+    u64 flags = AI_FLAG_BASIC_TRAINER
+              | AI_FLAG_SMART_MON_CHOICES
+              | AI_FLAG_RANDOMIZE_SWITCHIN;
+
+    if (IsBossTrainerClass(trainerClass))
+    {
+        flags = AI_FLAG_BASIC_TRAINER
+              | AI_FLAG_SMART_SWITCHING
+              | AI_FLAG_SMART_MON_CHOICES
+              | AI_FLAG_RANDOMIZE_SWITCHIN
+              | AI_FLAG_ASSUME_STAB
+              | AI_FLAG_ASSUME_STATUS_MOVES
+              | AI_FLAG_PP_STALL_PREVENTION;
+    }
+
+    // Risky is the only reviewed authored strategy modifier that remains useful
+    // after trainer species and movesets are randomized.
+    return flags | (authoredFlags & AI_FLAG_RISKY);
+}
+
+u64 GetGameplayTrainerAIFlags(u16 trainerId)
+{
+    const struct Trainer *trainer = GetTrainerStructFromId(trainerId);
+
+    return ResolveGameplayTrainerAIFlags(trainer->trainerClass, trainer->aiFlags);
+}
+
 static u64 GetAiFlags(u16 trainerId, enum BattlerId battler)
 {
     u64 flags = 0;
@@ -276,8 +323,10 @@ static u64 GetAiFlags(u16 trainerId, enum BattlerId battler)
             flags = GetAiScriptsInBattleFactory();
         else if (gBattleTypeFlags & (BATTLE_TYPE_FRONTIER | BATTLE_TYPE_EREADER_TRAINER | BATTLE_TYPE_TRAINER_HILL | BATTLE_TYPE_SECRET_BASE))
             flags = AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT;
-        else
+        else if ((gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER) && IsOnPlayerSide(battler))
             flags = GetTrainerAIFlagsFromId(trainerId);
+        else
+            flags = GetGameplayTrainerAIFlags(trainerId);
     }
 
     if (IsDoubleBattle() && flags != 0)

@@ -114,5 +114,7 @@ void AI_TrySwitchOrUseItem(enum BattlerId battler);
 void CalcBattlerAiMovesData(struct AiLogicData *aiData, enum BattlerId battlerAtk, enum BattlerId battlerDef, u32 weather, u32 fieldStatus);
 void AIDebugTimerStart(void);
 void AIDebugTimerEnd(void);
+u64 GetGameplayTrainerAIFlags(u16 trainerId);
+u64 ResolveGameplayTrainerAIFlags(u32 trainerClass, u64 authoredFlags);
 
 #endif // GUARD_BATTLE_AI_MAIN_H

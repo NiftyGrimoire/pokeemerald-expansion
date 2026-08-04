@@ -239,12 +239,12 @@ AI_FLAG_BASIC_TRAINER
 | AI_FLAG_ASSUME_STAB
 | AI_FLAG_ASSUME_STATUS_MOVES
 | AI_FLAG_PP_STALL_PREVENTION
-| AI_FLAG_SMART_TERA
 ```
 
 Smart Switching automatically adds Smart Mon Choices. This tier uses plausible
 assumptions instead of Omniscient knowledge and improves both voluntary switches
-and post-KO replacement choices.
+and post-KO replacement choices. Smart Tera is intentionally excluded because
+Terastallization is not available in this game.
 
 ### Tier 3: selected late rematches or optional superbosses
 
@@ -280,7 +280,7 @@ Keep facilities and player-controlled partners outside the first pass.
 - Bosses can make a beneficial voluntary switch.
 - Sequence and ace exceptions retain their documented behavior if preserved.
 - Double battles fall back safely where Smart Mon Choices is unsupported.
-- Smart Tera does not alter doubles unexpectedly.
+- Tera-related AI flags remain disabled.
 - Randomized abilities do not leak impossible authored-ability knowledge.
 
 ## Manual validation focus

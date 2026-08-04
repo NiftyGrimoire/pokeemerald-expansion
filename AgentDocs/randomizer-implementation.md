@@ -633,16 +633,15 @@ replacement routes retain their intended target.
   the free switch prompt after an opposing trainer Pokemon faints while leaving
   ordinary voluntary switching unchanged. The focused global-style test passes,
   and a normal ROM build succeeds.
-- Trainer AI review: audit the AI flags assigned across ordinary trainers,
-  bosses, and rematches after party and learnset randomization. Evaluate smart
-  mid-battle switching and post-KO replacement selection alongside move scoring
-  from `AI_FLAG_CHECK_BAD_MOVE`, `AI_FLAG_TRY_TO_FAINT`, and
-  `AI_FLAG_CHECK_VIABILITY`. Define and playtest difficulty tiers; consider
-  prediction or restricted knowledge flags for bosses, but do not enable
-  `AI_FLAG_OMNISCIENT` globally without a separate fairness decision.
-  The available modes, current assignment counts, and proposed fair tiers are
-  documented in `AgentDocs/trainer-ai-investigation.md`; no behavior change has
-  been made yet.
+- Trainer AI tiers are implemented on `romhack/trainer-ai-tiers`. Ordinary
+  trainers receive Basic Trainer scoring, Smart Mon Choices, and randomized
+  equivalent switch-ins without voluntary switching. Rivals, villain admins and
+  leaders, Gym Leaders, Elite Four, and Champion also receive Smart Switching,
+  plausible STAB/status assumptions, and PP-stall prevention. Omniscient and
+  Tera knowledge are excluded, authored Risky behavior is retained, and
+  facilities plus player-controlled partners keep their existing AI policy.
+  The investigation and follow-up validation targets are documented in
+  `AgentDocs/trainer-ai-investigation.md`.
 - Level-to-cap action: implementation is integrated into `romhack/main`.
   `TryAdvanceMonOneLevelToCap` provides the shared
   one-level stat/experience step and stops at the active cap. The field party
