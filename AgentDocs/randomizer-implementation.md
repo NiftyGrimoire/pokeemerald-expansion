@@ -19,6 +19,9 @@ Read `AgentDocs/hack-plans/gameplay-randomizer-overview.md` before implementing
 another phase. Its Architecture Decisions and Phase 1 Contract supersede the older
 broad summary where they differ.
 
+Use `AgentDocs/manual-validation-checklist.md` for the consolidated manual
+gameplay and release-validation procedure.
+
 ## Completed foundation
 
 - Master randomizer config gate in `include/config/randomizer.h`.
