@@ -197,8 +197,15 @@ pool contains:
 
 - The ten standard evolution stones.
 - Linking Cord.
-- Selected evolution-related held items that remain useful in battle.
-- Broadly useful held items.
+- Six former evolution-related held items that remain useful in battle.
+- All 18 single-type damage boosters.
+- Choice Band, Choice Specs, and Choice Scarf.
+- Focus Sash, Focus Band, Muscle Band, Wise Glasses, and Expert Belt.
+- Scope Lens, Wide Lens, and Zoom Lens.
+- Eviolite, Leftovers, Life Orb, Assault Vest, and Clear Amulet.
+
+The pool contains 50 results: 11 evolution items and 39 held items. Every entry
+has equal weight, so duplicates are possible and no category is guaranteed.
 
 The pool intentionally excludes Medicine, X-items, Berries, Poké Ball variants,
 pure money treasures, TMs, HMs, and Key Items as replacement results. Authored

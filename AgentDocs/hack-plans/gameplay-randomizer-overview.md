@@ -260,8 +260,10 @@ uncovers them.
      Authored key items and HMs remain unchanged. Authored TMs remain TM items
      and use the separate TM mapping policy below. Invalid special templates and
      hidden items remain unchanged or disabled respectively.
-   - The initial useful pool contains standard evolution stones, Linking Cord,
-     selected evolution-related held items, and broadly useful held items. Keep
+   - The useful pool contains 11 evolution items and 39 held items: standard
+     evolution stones, Linking Cord, independently useful former evolution-held
+     items, all 18 type boosters, the Choice trio, Focus/Band items, accuracy and
+     critical-hit lenses, and selected general competitive held items. Keep
      medicine, X-items, berries, and other ruleset-sensitive rewards out until
      separately approved. Exclude retired species-specific evolution items unless
      they retain independent battle utility.

@@ -626,11 +626,13 @@ replacement routes retain their intended target.
   randomized rewards; authored key items, HMs, and TMs remain their authored
   item slots. Hidden items remain disabled and invalid special templates remain
   unchanged.
-  The initial useful pool contains standard evolution stones, Linking Cord,
-  selected evolution-held items with independent utility, and broadly useful
-  held items. Medicine, X-items, berries, mixed-use sellables, retired
-  species-specific evolution items, respawn behavior, and broader distribution
-  remain audit work. Emerald item balls and eligible direct Emerald gifts
+  The useful pool contains 50 equally weighted results: 11 evolution items and
+  39 held items. It includes standard evolution stones, Linking Cord, selected
+  evolution-held items with independent utility, all 18 type boosters, the
+  Choice trio, Focus/Band items, accuracy and critical-hit lenses, and selected
+  general competitive held items. Medicine, X-items, berries, mixed-use
+  sellables, retired species-specific evolution items, respawn behavior, and
+  broader distribution remain audit work. Emerald item balls and eligible direct Emerald gifts
   now share deterministic resolvers; key items, HMs, TM slots, and berries remain
   authored. Shops, exchanges, prize tables, Battle Pyramid items, FRLG content,
   and internal transfers remain outside this randomizer. No new pickup spots are
@@ -645,9 +647,10 @@ replacement routes retain their intended target.
   penalties. The randomized mapping flows through descriptions, Bag use,
   compatibility, Move Reminder, Pokedex, reverse lookups, and debug helpers.
   HM move mappings and compatibility remain authored.
-  The randomizer algorithm version is now 4. Version 3 introduced randomized TM
+  The randomizer algorithm version is now 5. Version 3 introduced randomized TM
   mappings; version 4 added world/free-item hash categories and revised the
-  randomized level-up schedule and opening-move weighting. Deterministic trainer,
+  randomized level-up schedule and opening-move weighting; version 5 expanded
+  the world/free-item result pool from 23 to 50 entries. Deterministic trainer,
   learnset, TM, and item mappings from earlier development versions are stale.
 
 ### TM move randomization versus level-up learnset randomization
