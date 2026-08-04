@@ -240,6 +240,13 @@ changes form correctly without losing data, crashing, or becoming stuck.
 - [ ] Exercise one former held-item trade replacement.
 - [ ] Exercise Karrablast and Shelmet replacement routes.
 - [ ] Exercise at least two Pumpkaboo sizes.
+- [ ] Evolve Primeape into Annihilape at level 40 without Rage Fist.
+- [ ] Exercise one replacement each from the former party/weather,
+      battle-counter, walking, and unavailable-item/script groups.
+- [ ] Confirm male and female White-Striped Basculin still evolve into their
+      matching Basculegion forms at level 40.
+- [ ] Confirm Nincada still requires a Poké Ball and an open party slot to create
+      Shedinja when it evolves.
 - [ ] Open Captain Stern's Scanner exchange and confirm the scrollable menu lists
       all ten retained evolution stones, the Linking Cord, and Exit.
 - [ ] Select and confirm both a representative stone and the Linking Cord on

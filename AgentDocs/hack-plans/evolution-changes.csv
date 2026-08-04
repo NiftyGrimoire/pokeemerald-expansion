@@ -116,3 +116,19 @@ Special item,Charcadet,Ceruledge,Malicious Armor,Dusk Stone,Player-controlled br
 Special item,Duraludon,Archaludon,Metal Alloy,Thunder Stone,None
 Special item,Counterfeit Poltchageist,Unremarkable Sinistcha,Unremarkable Teacup,Ice Stone,Source form preserves outcome
 Special item,Artisan Poltchageist,Masterpiece Sinistcha,Masterpiece Teacup,Ice Stone,Source form preserves outcome
+Battle counter,Galarian Farfetch'd,Sirfetch'd,Land three critical hits in one battle,Level 30,None
+Party,Mantyke,Mantine,Have Remoraid in the party,Level 30,None
+Move counter,Primeape,Annihilape,Use Rage Fist 20 times,Level 40,Randomized learnsets cannot guarantee Rage Fist
+Move counter,Stantler,Wyrdeer,Use Psyshield Bash 20 times,Level 40,Randomized learnsets cannot guarantee Psyshield Bash
+Damage counter,White-Striped Basculin,Male Basculegion,Accumulate 294 recoil damage,Level 40,Male gender condition retained
+Damage counter,White-Striped Basculin,Female Basculegion,Accumulate 294 recoil damage,Level 40,Female gender condition retained
+Script,Galarian Yamask,Runerigus,Accumulate 49 damage and pass beneath the Dusty Bowl arch,Level 34,Dusty Bowl script is unavailable in Emerald
+Party,Pancham,Pangoro,Reach level 32 with a Dark type in the party,Level 32,None
+Weather,Sliggoo,Goodra,Reach level 50 in rain or fog,Level 50,None
+Weather,Hisuian Sliggoo,Hisuian Goodra,Reach level 50 in rain or fog,Level 50,Regional form retained
+Battle item,Bisharp,Kingambit,Defeat three Leader's Crest Bisharp,Level 55,Leader's Crest acquisition is unavailable
+Walking,Pawmo,Pawmot,Walk 1000 overworld steps,Level 30,None
+Walking,Bramblin,Brambleghast,Walk 1000 overworld steps,Level 30,None
+Walking,Rellor,Rabsca,Walk 1000 overworld steps,Level 30,None
+Currency,Chest Form Gimmighoul,Gholdengo,Collect 999 Gimmighoul Coins,Level 50,Gimmighoul Coin acquisition is unavailable
+Currency,Roaming Form Gimmighoul,Gholdengo,Collect 999 Gimmighoul Coins,Level 50,Gimmighoul Coin acquisition is unavailable

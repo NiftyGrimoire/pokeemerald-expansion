@@ -610,7 +610,7 @@ TEST("Eevee selects exactly one level 30 evolution without move requirements")
     EXPECT(IsRandomizerEvolutionTargetSelected(SPECIES_EEVEE, SPECIES_JOLTEON));
 }
 
-TEST("Evolution tables contain no move requirements")
+TEST("Evolution tables contain no inaccessible or grind-heavy special requirements")
 {
     for (enum Species species = SPECIES_NONE; species < NUM_SPECIES; species++)
     {
@@ -626,6 +626,21 @@ TEST("Evolution tables contain no move requirements")
             {
                 EXPECT_NE(params[j].condition, IF_KNOWS_MOVE);
                 EXPECT_NE(params[j].condition, IF_KNOWS_MOVE_TYPE);
+                EXPECT_NE(params[j].condition, IF_SPECIES_IN_PARTY);
+                EXPECT_NE(params[j].condition, IF_TYPE_IN_PARTY);
+                EXPECT_NE(params[j].condition, IF_WEATHER);
+                EXPECT_NE(params[j].condition, IF_RECOIL_DAMAGE_GE);
+                EXPECT_NE(params[j].condition, IF_CURRENT_DAMAGE_GE);
+                EXPECT_NE(params[j].condition, IF_CRITICAL_HITS_GE);
+                EXPECT_NE(params[j].condition, IF_USED_MOVE_X_TIMES);
+                EXPECT_NE(params[j].condition, IF_DEFEAT_X_WITH_ITEMS);
+                EXPECT_NE(params[j].condition, IF_MIN_OVERWORLD_STEPS);
+                if (params[j].condition == IF_BAG_ITEM_COUNT)
+                {
+                    EXPECT_EQ(species, SPECIES_NINCADA);
+                    EXPECT_EQ(evolutions[i].targetSpecies, SPECIES_SHEDINJA);
+                    EXPECT_EQ(params[j].arg1, ITEM_POKE_BALL);
+                }
             }
         }
     }
@@ -644,6 +659,22 @@ TEST("Evolution tables contain no move requirements")
     EXPECT(HasTestLevelEvolution(SPECIES_POIPOLE, SPECIES_NAGANADEL, 40));
     EXPECT(HasTestLevelEvolution(SPECIES_DIPPLIN, SPECIES_HYDRAPPLE, 40));
     EXPECT(HasTestLevelEvolution(SPECIES_CLOBBOPUS, SPECIES_GRAPPLOCT, 35));
+    EXPECT(HasTestLevelEvolution(SPECIES_PRIMEAPE, SPECIES_ANNIHILAPE, 40));
+    EXPECT(HasTestLevelEvolution(SPECIES_FARFETCHD_GALAR, SPECIES_SIRFETCHD, 30));
+    EXPECT(HasTestLevelEvolution(SPECIES_MANTYKE, SPECIES_MANTINE, 30));
+    EXPECT(HasTestLevelEvolution(SPECIES_STANTLER, SPECIES_WYRDEER, 40));
+    EXPECT(HasTestLevelEvolution(SPECIES_BASCULIN_WHITE_STRIPED, SPECIES_BASCULEGION_M, 40));
+    EXPECT(HasTestLevelEvolution(SPECIES_BASCULIN_WHITE_STRIPED, SPECIES_BASCULEGION_F, 40));
+    EXPECT(HasTestLevelEvolution(SPECIES_YAMASK_GALAR, SPECIES_RUNERIGUS, 34));
+    EXPECT(HasTestLevelEvolution(SPECIES_BISHARP, SPECIES_KINGAMBIT, 55));
+    EXPECT(HasTestLevelEvolution(SPECIES_PANCHAM, SPECIES_PANGORO, 32));
+    EXPECT(HasTestLevelEvolution(SPECIES_SLIGGOO, SPECIES_GOODRA, 50));
+    EXPECT(HasTestLevelEvolution(SPECIES_SLIGGOO_HISUI, SPECIES_GOODRA_HISUI, 50));
+    EXPECT(HasTestLevelEvolution(SPECIES_PAWMO, SPECIES_PAWMOT, 30));
+    EXPECT(HasTestLevelEvolution(SPECIES_BRAMBLIN, SPECIES_BRAMBLEGHAST, 30));
+    EXPECT(HasTestLevelEvolution(SPECIES_RELLOR, SPECIES_RABSCA, 30));
+    EXPECT(HasTestLevelEvolution(SPECIES_GIMMIGHOUL_CHEST, SPECIES_GHOLDENGO, 50));
+    EXPECT(HasTestLevelEvolution(SPECIES_GIMMIGHOUL_ROAMING, SPECIES_GHOLDENGO, 50));
 }
 
 TEST("Both Dartrix branches evolve at level 34")

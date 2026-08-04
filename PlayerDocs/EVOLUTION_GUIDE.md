@@ -6,9 +6,8 @@ base game or `pokeemerald-expansion`.
 
 The hack removes requirements that are unreliable or inconvenient in a short
 randomized run: trading, friendship grinding, specific moves, time windows,
-regions, and evolution locations. Gender, stats, weather, party composition,
-battle counters, and other special conditions remain unchanged unless this guide
-says otherwise.
+regions, evolution locations, unavailable currencies or scripts, and lengthy
+battle or walking counters. Conditions not listed in this guide remain unchanged.
 
 ## How deterministic branches work
 
@@ -128,6 +127,29 @@ The Pokémon does not need to know the former move or move type.
 | Poipole | Naganadel | Level 40 | Know Dragon Pulse |
 | Dipplin | Hydrapple | Level 40 | Know Dragon Cheer |
 | Clobbopus | Grapploct | Level 35 | Know Taunt |
+
+## Other special requirements become levels
+
+These routes no longer require party composition, weather, walking, battle
+counters, unavailable currency, or an unsupported map script.
+
+| Source | Evolves into | New requirement | Former requirement removed |
+| --- | --- | ---: | --- |
+| Galarian Farfetch'd | Sirfetch'd | Level 30 | Land three critical hits in one battle |
+| Mantyke | Mantine | Level 30 | Have Remoraid in the party |
+| Primeape | Annihilape | Level 40 | Use Rage Fist 20 times |
+| Stantler | Wyrdeer | Level 40 | Use Psyshield Bash 20 times |
+| White-Striped Basculin | Basculegion | Level 40 | Take 294 recoil damage; gender still determines the evolved form |
+| Galarian Yamask | Runerigus | Level 34 | Take 49 damage and pass beneath the Dusty Bowl arch |
+| Pancham | Pangoro | Level 32 | Have a Dark-type Pokémon in the party |
+| Sliggoo | Goodra | Level 50 | Level up in rain or fog |
+| Hisuian Sliggoo | Hisuian Goodra | Level 50 | Level up in rain or fog |
+| Bisharp | Kingambit | Level 55 | Defeat three Leader's Crest Bisharp |
+| Pawmo | Pawmot | Level 30 | Walk 1,000 steps together |
+| Bramblin | Brambleghast | Level 30 | Walk 1,000 steps together |
+| Rellor | Rabsca | Level 30 | Walk 1,000 steps together |
+| Chest Form Gimmighoul | Gholdengo | Level 50 | Collect 999 Gimmighoul Coins |
+| Roaming Form Gimmighoul | Gholdengo | Level 50 | Collect 999 Gimmighoul Coins |
 
 ## Location evolutions become stones
 
@@ -276,8 +298,8 @@ particular:
 
 - Gender-based evolutions remain gender-based.
 - Tyrogue's stat-comparison outcomes remain intact.
-- Weather, party-composition, battle-tracker, walking, recoil, and script-based
-  requirements remain intact unless explicitly replaced above.
+- Other weather, party-composition, battle-tracker, walking, recoil, and
+  script-based requirements remain intact unless explicitly replaced above.
 - Dunsparce retains its personality-based Dudunsparce segment outcome.
 - Own Tempo Rockruff still evolves only into Dusk Lycanroc.
 - Ordinary evolution stones not mentioned as replacements continue to work as

@@ -19,6 +19,8 @@ Integrated on `romhack/main`:
   location-free evolution stones.
 - Trade routes are removed in favor of standard stones or the Linking Cord.
 - Move and move-type requirements are replaced by explicit levels.
+- Inaccessible or grind-heavy party, weather, battle-counter, walking,
+  currency, and script requirements are replaced by explicit levels.
 
 No other evolution mechanic is globally broadened.
 
@@ -148,6 +150,30 @@ Other form-selection conditions remain as noted.
 | Poipole | Naganadel | Dragon Pulse | 40 | None |
 | Dipplin | Hydrapple | Dragon Cheer | 40 | None |
 | Clobbopus | Grapploct | Taunt | 35 | None |
+
+## Other inaccessible or grind-heavy requirements replaced
+
+| Source | Target | Former requirement | Replacement level | Preserved behavior |
+| --- | --- | --- | ---: | --- |
+| Galarian Farfetch'd | Sirfetch'd | Three critical hits in one battle | 30 | None |
+| Mantyke | Mantine | Remoraid in party | 30 | None |
+| Primeape | Annihilape | Use Rage Fist 20 times | 40 | None |
+| Stantler | Wyrdeer | Use Psyshield Bash 20 times | 40 | None |
+| White-Striped Basculin | Basculegion | Accumulate 294 recoil damage | 40 | Gender-based target retained |
+| Galarian Yamask | Runerigus | Accumulate 49 damage and invoke Dusty Bowl script | 34 | None |
+| Pancham | Pangoro | Dark type in party | 32 | None |
+| Sliggoo | Goodra | Rain or fog | 50 | None |
+| Hisuian Sliggoo | Hisuian Goodra | Rain or fog | 50 | Regional form retained |
+| Bisharp | Kingambit | Defeat three Leader's Crest Bisharp | 55 | None |
+| Pawmo | Pawmot | 1,000 overworld steps | 30 | None |
+| Bramblin | Brambleghast | 1,000 overworld steps | 30 | None |
+| Rellor | Rabsca | 1,000 overworld steps | 30 | None |
+| Chest Form Gimmighoul | Gholdengo | 999 Gimmighoul Coins | 50 | None |
+| Roaming Form Gimmighoul | Gholdengo | 999 Gimmighoul Coins | 50 | None |
+
+Nincada's split evolution into Shedinja intentionally retains its one Poké Ball
+requirement. Poké Balls are guaranteed by the opening-game supply changes, and
+the requirement is integral to creating the extra party member.
 
 ## Location restrictions removed
 
@@ -314,7 +340,9 @@ Focused tests cover:
   remaining level-up route.
 - Every enabled evolution table containing no trade method, with representative
   Linking Cord and stone replacement routes retained.
-- Every enabled evolution table containing no move or move-type condition.
+- Every enabled evolution table containing no inaccessible or grind-heavy
+  condition from the audited categories; Shedinja's Poké Ball check is the sole
+  allowed Bag-item-count condition.
 
 Manual gameplay checks still required:
 

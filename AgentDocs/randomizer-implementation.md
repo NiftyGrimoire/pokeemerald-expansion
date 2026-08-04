@@ -575,6 +575,9 @@ The authoritative species-by-species behavior is documented in
 - All move and move-type evolution checks are replaced by explicit levels so
   randomized learnsets cannot block evolution. Sylveon joins Espeon and Umbreon
   in one seeded level-30 Eevee choice; Eevee's stone routes remain available.
+- Audited party, weather, battle-counter, walking, unavailable-currency, and
+  unsupported-script routes use explicit levels. Gender still selects the two
+  Basculegion forms, and Nincada retains its intentional Poké Ball requirement.
 - Applin uses Fire, Sun, and Leaf Stones for Flapple, Appletun, and Dipplin
   respectively; Dipplin then evolves into Hydrapple at level 40.
 - Every remaining species-specific evolution item is replaced by an ordinary
@@ -588,8 +591,9 @@ and a region-independent Pikachu stone evolution. Milcery coverage verifies one
 stable flavor across all decorations and an actual stone evolution. The
 location-route test verifies all six targets retain their
 item evolution and no longer have a level-up route. An exhaustive enabled-species
-scan verifies that no trade or move-dependent evolution methods remain, every
-item evolution uses a standard stone or Linking Cord, and all declared
+scan verifies that no trade, move-dependent, inaccessible, or grind-heavy
+evolution condition remains outside the intentional Shedinja Poké Ball check,
+every item evolution uses a standard stone or Linking Cord, and all declared
 replacement routes retain their intended target.
 
 ## Other unresolved architecture

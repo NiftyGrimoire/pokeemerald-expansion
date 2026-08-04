@@ -199,9 +199,11 @@ uncovers them.
      Nuzlocke: replace day/night dependencies and deterministically randomize the
      available branch or form, including regional forms, under an explicit
      species-by-species policy.
-   - Replace move requirements with explicit levels, remove location and trade
-     requirements, and consolidate item evolutions into standard stones or the
-     Linking Cord. Preserve player choice for stone-based branches.
+   - Replace move requirements and audited inaccessible or grind-heavy special
+     conditions with explicit levels, remove location and trade requirements,
+     and consolidate item evolutions into standard stones or the Linking Cord.
+     Preserve player choice for stone-based branches and the intentional
+     Shedinja Poké Ball requirement.
 10. Quality of life — partially complete on `romhack/main`:
    - Add a button to the party menu and Pokemon Storage that raises a selected
      Pokemon to the current level cap without requiring a boxed Pokemon to be moved
