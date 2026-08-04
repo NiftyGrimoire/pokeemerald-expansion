@@ -374,6 +374,13 @@ uncovers them.
      paths for any berries that remain important to Nuzlocke gameplay. If
      harvesting remains supported, consider a separate berry-only harvest pool;
      never mix berries into the general useful-item pool.
+   - As part of that berry rework, disable or retire berries with no held-item
+     effect: Razz, Bluk, Nanab, Wepear, Pinap, Pomeg, Kelpsy, Qualot, Hondew,
+     Grepa, Tamato, Cornn, Magost, Rabuta, Nomel, Spelon, Pamtre, Watmel, Durin,
+     and Belue. Remove their planting and harvest paths, audit Pokeblock and NPC
+     dependencies before removing authored grants, and keep the e-Reader Enigma
+     Berry special slot out of ordinary distribution. Define direct finite
+     acquisition for the remaining battle-useful held berries.
    - Complete the no-EV experience by removing or repurposing EV-focused items,
      rewards, dialogue, and UI that no longer provide useful choices.
    - Retire Berry Powder as a supported system in a later streamlining pass. For

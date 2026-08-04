@@ -397,6 +397,14 @@ the remaining excluded item sources separately.
       scope.
 - [ ] Confirm any future pickup spots are visible and optional rather than hidden.
 
+### Future berry-system rework
+
+- [ ] Disable berry planting, watering, growth, and harvesting interactions.
+- [ ] Remove the 20 no-held-effect berries from ordinary acquisition after
+      auditing Pokeblock recipes, NPC dialogue, tutorials, gifts, and encounters.
+- [ ] Keep the e-Reader Enigma Berry special slot out of ordinary distribution.
+- [ ] Provide direct finite acquisition paths for retained battle-useful berries.
+
 ### Streamlined progression
 
 - [ ] Confirm the Route 117 Day Care closure NPC blocks the entrance and explains

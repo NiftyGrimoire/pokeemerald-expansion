@@ -921,6 +921,12 @@ vendors.
   Care, eggs, inherited moves,
   breeding-only content, berry plots, berry tutorials and NPCs, and any dependent
   rewards or encounters so important content receives a direct replacement path.
+  The berry pass must disable planting, watering, growth, and harvesting; retire
+  the 20 berries with no held effect (Razz, Bluk, Nanab, Wepear, Pinap, Pomeg,
+  Kelpsy, Qualot, Hondew, Grepa, Tamato, Cornn, Magost, Rabuta, Nomel, Spelon,
+  Pamtre, Watmel, Durin, and Belue); keep the e-Reader Enigma special slot out of
+  normal distribution; and provide finite direct access to retained battle-useful
+  berries after auditing Pokeblock and NPC dependencies.
   Also audit obsolete EV content, mandatory grinding against each cap, and
   optional plot detours before choosing concrete EXP, trainer, encounter, or
   script changes. The Powder Jar and all Berry Powder vendor purchases remain
