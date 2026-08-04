@@ -60,6 +60,12 @@ integrated into `romhack/main`.
   and 58-100 respectively. This produces exactly 20 moves without increasing
   the engine's normal level-up table capacity. Moves are deterministic per save,
   species, and slot, with no duplicates.
+- Follow-up balance decision: reduce the generated level-1 starting set from
+  four moves to two. Give those two slots a dedicated, more aggressive opening
+  bucket policy instead of treating them like the rest of the early-game curve:
+  strongly concentrate damaging choices in the lowest practical power bands and
+  status choices in the basic tier. Define the exact bucket boundaries and
+  fallback expansion during implementation, then regenerate seeded expectations.
 - Damaging-move weights follow a level-based target power from roughly 40 in the
   opening game to 115 at level 80. STAB moves use a 4x multiplier and coverage
   moves use 2x, strengthening the preference for same-type attacks. Before level
@@ -520,13 +526,15 @@ Manual gameplay validation still required:
 
 After integration into `romhack/main`:
 
-1. Manually verify initial moves, ordinary level-up learning, evolution learning,
+1. Implement the two-move level-1 starting set and its dedicated aggressive
+   low-power/basic-status bucket policy; update deterministic seeded tests.
+2. Manually verify initial moves, ordinary level-up learning, evolution learning,
    Move Reminder output, Pokedex output, and trainer/wild/gift initial moves.
-2. Check representative early-, middle-, and late-game species across multiple
+3. Check representative early-, middle-, and late-game species across multiple
    seeds for useful move variety and the intended power/status progression.
-3. Profile learnset access only if gameplay shows visible delay; retain the single
+4. Profile learnset access only if gameplay shows visible delay; retain the single
    shared EWRAM buffer unless measurement justifies a broader cache.
-4. Leave egg moves authored while breeding is slated for removal. Define a new
+5. Leave egg moves authored while breeding is slated for removal. Define a new
    policy only if egg moves receive a non-breeding acquisition path.
 
 ## Evolution phase complete

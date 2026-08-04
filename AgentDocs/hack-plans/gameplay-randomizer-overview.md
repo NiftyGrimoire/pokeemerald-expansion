@@ -126,6 +126,11 @@ Current execution order:
      across the configured cap bands while retaining the normal 20-move table
      capacity. Deterministically replace each move per save, species, and slot
      without duplicates.
+   - Planned balance revision: reduce the level-1 starting set to two moves and
+     select those slots through a dedicated, more aggressive opening bucket that
+     strongly favors the lowest practical damaging-power bands and basic status
+     effects. Specify fallback expansion and update seeded expectations when this
+     revision is implemented.
    - Weight damaging moves toward a level-scaled target power and shift status
      weighting from basic to strong and elite effects as levels rise. Keep every
      eligible tier possible at nonzero weight, use a 4x STAB multiplier versus 2x
