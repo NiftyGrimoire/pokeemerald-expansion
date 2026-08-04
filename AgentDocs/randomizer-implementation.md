@@ -640,6 +640,9 @@ replacement routes retain their intended target.
   `AI_FLAG_CHECK_VIABILITY`. Define and playtest difficulty tiers; consider
   prediction or restricted knowledge flags for bosses, but do not enable
   `AI_FLAG_OMNISCIENT` globally without a separate fairness decision.
+  The available modes, current assignment counts, and proposed fair tiers are
+  documented in `AgentDocs/trainer-ai-investigation.md`; no behavior change has
+  been made yet.
 - Level-to-cap action: implementation is integrated into `romhack/main`.
   `TryAdvanceMonOneLevelToCap` provides the shared
   one-level stat/experience step and stops at the active cap. The field party
