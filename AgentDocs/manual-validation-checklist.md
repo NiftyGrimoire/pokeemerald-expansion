@@ -382,9 +382,11 @@ the remaining excluded item sources separately.
 - [ ] Confirm no evolution stone, Linking Cord, or other resource is guaranteed;
       record seeds where a needed resource is unavailable.
 - [ ] Confirm every replacement belongs to the approved Nuzlocke-useful pool.
-- [ ] Across recorded seeds, confirm the 63-result pool can produce evolution
+- [ ] Across recorded seeds, confirm the 67-result pool can produce evolution
       items, type boosters, Choice items, Focus/Band items, lenses, and general
       competitive held items, including weather, terrain, and screen extenders.
+- [ ] Confirm each terrain seed activates under its matching terrain from both a
+      randomized terrain move and a randomized Surge ability.
 - [ ] Confirm retired evolution items, redundant medicine, disallowed X-items,
       and unapproved mixed-use sellables do not appear.
 - [ ] Confirm invalid special templates remain unchanged and hidden items remain

@@ -128,10 +128,14 @@ static const enum Item sRandomizerWorldItemPool[] =
     ITEM_ICY_ROCK,
     ITEM_LIGHT_CLAY,
     ITEM_TERRAIN_EXTENDER,
+    ITEM_ELECTRIC_SEED,
+    ITEM_GRASSY_SEED,
+    ITEM_MISTY_SEED,
+    ITEM_PSYCHIC_SEED,
     ITEM_LINKING_CORD,
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sRandomizerWorldItemPool) == 63, RandomizerWorldItemPoolCount);
+STATIC_ASSERT(ARRAY_COUNT(sRandomizerWorldItemPool) == 67, RandomizerWorldItemPoolCount);
 
 static void InitRandomizerMoveBuckets(void);
 static void InitRandomizerTMMapping(void);

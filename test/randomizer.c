@@ -521,6 +521,18 @@ TEST("Level-up learnsets reject special-case moves and preserve invalid species 
     EXPECT_EQ(GetSpeciesLevelUpLearnset(SPECIES_EGG)[0].move, gSpeciesInfo[SPECIES_EGG].levelUpLearnset[0].move);
 }
 
+TEST("Terrain moves and abilities remain available to the randomizer")
+{
+    EXPECT(IsMoveRandomizerEligible(MOVE_ELECTRIC_TERRAIN));
+    EXPECT(IsMoveRandomizerEligible(MOVE_GRASSY_TERRAIN));
+    EXPECT(IsMoveRandomizerEligible(MOVE_MISTY_TERRAIN));
+    EXPECT(IsMoveRandomizerEligible(MOVE_PSYCHIC_TERRAIN));
+    EXPECT(IsAbilityRandomizerEligible(ABILITY_ELECTRIC_SURGE));
+    EXPECT(IsAbilityRandomizerEligible(ABILITY_GRASSY_SURGE));
+    EXPECT(IsAbilityRandomizerEligible(ABILITY_MISTY_SURGE));
+    EXPECT(IsAbilityRandomizerEligible(ABILITY_PSYCHIC_SURGE));
+}
+
 TEST("Randomizer evolution families include linear and branched evolutions")
 {
     EXPECT_EQ(GetRandomizerEvolutionFamily(SPECIES_BULBASAUR), SPECIES_BULBASAUR);
