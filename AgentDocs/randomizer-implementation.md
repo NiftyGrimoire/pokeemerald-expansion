@@ -594,6 +594,12 @@ replacement routes retain their intended target.
 
 ## Other unresolved architecture
 
+- Move-bucket effective-power valuation remains a future task. Beneficial
+  attacking stat changes should add 10 effective power per stage (including 20
+  for a sharp two-stage change and summed multi-stat stages), while two-turn
+  attacks should subtract 10. The authoritative task, required effect audit, and
+  test cases are recorded under Phase 8 in
+  `AgentDocs/hack-plans/gameplay-randomizer-overview.md`.
 - Low-priority move-description cleanup: Blazing Torque is mechanically implemented correctly
   (80 power, 100% accuracy, 30% burn chance), but its description is still the
   upstream `"---"` placeholder. Audit and replace the player-facing placeholders

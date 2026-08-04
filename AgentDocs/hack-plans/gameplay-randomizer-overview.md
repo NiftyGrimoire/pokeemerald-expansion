@@ -172,6 +172,22 @@ uncovers them.
      buckets and subtracts prior selections instead of repeatedly scanning and
      reclassifying the complete move table. Only add a broader cache after
      measuring the remaining access cost.
+   - Future move-bucket valuation task: derive an effective power used only for
+     randomizer bucketing; never modify the move's real battle power. For a
+     damaging move that beneficially raises the user's stats or lowers the
+     target's stats, add one 10-power bucket per affected stat stage. A one-stage
+     change adds 10, a "sharply" two-stage change adds 20, and multi-stat effects
+     sum their beneficial stages. Give attacks that normally require two turns a
+     one-bucket / 10-power penalty. Before implementation, audit the complete
+     effect table and define comparable modifiers for activation chance,
+     self-stat drops, recharge turns, recoil, self-KO, drain, priority,
+     multi-hit/fixed-damage behavior, accuracy, weather bypasses, and damaging
+     status effects. Avoid double-counting a drawback already handled by another
+     weighting rule. Use the adjusted value consistently when constructing
+     damaging-move buckets so TM and learnset selection share the classification,
+     while retaining their existing feature-specific type, level, status-tier,
+     and drawback multipliers. Add focused boundary tests for +1, +2, multi-stat,
+     and two-turn adjustments plus representative mixed-benefit/drawback moves.
    - Do not expand egg-move support while breeding is planned for removal. Revisit
      egg moves only if a non-breeding acquisition path is retained or added.
 9. Evolution rules — complete on `romhack/main`; manual gameplay checks remain:
