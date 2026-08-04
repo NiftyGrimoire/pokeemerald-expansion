@@ -292,6 +292,9 @@ u64 ResolveGameplayTrainerAIFlags(u32 trainerClass, u64 authoredFlags)
 
 u64 GetGameplayTrainerAIFlags(u16 trainerId)
 {
+    if (trainerId == TRAINER_NONE)
+        return 0;
+
     const struct Trainer *trainer = GetTrainerStructFromId(trainerId);
 
     return ResolveGameplayTrainerAIFlags(trainer->trainerClass, trainer->aiFlags);

@@ -40,3 +40,8 @@ TEST("Trainer AI tiers retain only the reviewed authored Risky modifier")
     EXPECT(flags & AI_FLAG_RISKY);
     EXPECT(!(flags & AI_FLAG_FORCE_SETUP_FIRST_TURN));
 }
+
+TEST("An absent second trainer contributes no AI flags")
+{
+    EXPECT_EQ(GetGameplayTrainerAIFlags(TRAINER_NONE), 0);
+}
