@@ -640,6 +640,8 @@ replacement routes retain their intended target.
   plausible STAB/status assumptions, and PP-stall prevention. Omniscient and
   Tera knowledge are excluded, authored Risky behavior is retained, and
   facilities plus player-controlled partners keep their existing AI policy.
+  Opposing abilities remain unknown until revealed in battle; afterward,
+  recorded abilities such as Lightning Rod inform subsequent move selection.
   The investigation and follow-up validation targets are documented in
   `AgentDocs/trainer-ai-investigation.md`.
 - Level-to-cap action: implementation is integrated into `romhack/main`.

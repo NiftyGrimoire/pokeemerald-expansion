@@ -389,11 +389,6 @@ void SetBattlerData(enum BattlerId battlerId)
         // Use the known battler's ability.
         if (gAiPartyData->mons[side][gBattlerPartyIndexes[battlerId]].ability != ABILITY_NONE)
             gBattleMons[battlerId].ability = gAiPartyData->mons[side][gBattlerPartyIndexes[battlerId]].ability;
-        // Check if mon can only have one ability.
-        else if (GetSpeciesAbility(species, 1) == ABILITY_NONE
-                || GetSpeciesAbility(species, 1) == GetSpeciesAbility(species, 0))
-            gBattleMons[battlerId].ability = GetSpeciesAbility(species, 0);
-        // The ability is unknown.
         else
             gBattleMons[battlerId].ability = ABILITY_NONE;
 
@@ -1764,11 +1759,7 @@ bool32 AI_IsAbilityOnSide(enum BattlerId battlerId, enum Ability ability)
 // does NOT include ability suppression checks
 enum Ability AI_DecideKnownAbilityForTurn(enum BattlerId battlerId)
 {
-    enum Ability validAbilities[NUM_ABILITY_SLOTS];
-    u8 numValidAbilities = 0;
     enum Ability knownAbility = GetBattlerAbilityIgnoreMoldBreaker(battlerId);
-    enum Ability indexAbility;
-    enum Ability abilityAiRatings[NUM_ABILITY_SLOTS] = {0};
 
     // We've had ability overwritten by e.g. Worry Seed. It is not part of gAiPartyData in case of switching
     if (gBattleMons[battlerId].volatiles.overwrittenAbility)
@@ -1789,23 +1780,9 @@ enum Ability AI_DecideKnownAbilityForTurn(enum BattlerId battlerId)
     if (knownAbility == ABILITY_SHADOW_TAG || knownAbility == ABILITY_MAGNET_PULL || knownAbility == ABILITY_ARENA_TRAP)
         return knownAbility;
 
-    for (u32 abilityIndex = 0; abilityIndex < NUM_ABILITY_SLOTS; abilityIndex++)
-    {
-        indexAbility = GetSpeciesAbility(gBattleMons[battlerId].species, abilityIndex);
-        if (indexAbility != ABILITY_NONE)
-        {
-            abilityAiRatings[numValidAbilities] = gAbilitiesInfo[indexAbility].aiRating;
-            validAbilities[numValidAbilities++] = indexAbility;
-        }
-    }
-
-    if (numValidAbilities > 0 && IsAiBattlerPredictingAbility(battlerId))
-        return validAbilities[RandomWeighted(RNG_AI_PREDICT_ABILITY, abilityAiRatings[0], abilityAiRatings[1], abilityAiRatings[2])];
-
-    if (numValidAbilities > 0)
-        return validAbilities[RandomUniform(RNG_AI_ABILITY, 0, numValidAbilities - 1)];
-
-    return ABILITY_NONE; // Unknown.
+    // Randomized abilities cannot be inferred from the species. Wait until an
+    // activation or another battle event records the actual ability.
+    return ABILITY_NONE;
 }
 
 enum HoldEffect AI_DecideHoldEffectForTurn(enum BattlerId battlerId)

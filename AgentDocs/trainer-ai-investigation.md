@@ -171,13 +171,12 @@ current fairness goal.
 - `AI_FLAG_KNOW_OPPONENT_PARTY`: knows party species and fainted status but not
   unseen moves, items, or abilities.
 
-Randomized family abilities currently invalidate unseen-ability guesses.
-`AI_DecideKnownAbilityForTurn` builds both its ordinary and weighted prediction
-lists with `GetSpeciesAbility`, so it guesses among the species' authored slots
-rather than the save's resolved family ability. Revealed abilities and the AI's
-own ability remain available through battle state, but do not enable weighted
-ability prediction as a tier upgrade until this path is made randomizer-aware.
-Restricted move assumptions are safe from this specific mismatch.
+Randomized family abilities invalidate species-based unseen-ability guesses.
+The AI therefore treats an opposing ability as unknown until an activation or
+another battle event records the actual ability. Once recorded, existing AI
+history makes later move choices respect Lightning Rod, Volt Absorb, and similar
+immunities. The AI still knows its own ability, and restricted move assumptions
+remain independent of this policy.
 
 ### Prediction
 
