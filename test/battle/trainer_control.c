@@ -14,6 +14,11 @@
 #include "constants/battle.h"
 #include "constants/battle_ai.h"
 
+TEST("Battle style is globally locked to Set")
+{
+    EXPECT(GetEffectiveBattleStyle() == OPTIONS_BATTLE_STYLE_SET);
+}
+
 TEST("CreateNPCTrainerPartyForTrainer generates customized Pokémon")
 {
     struct Pokemon *testParty = Alloc(6 * sizeof(struct Pokemon));

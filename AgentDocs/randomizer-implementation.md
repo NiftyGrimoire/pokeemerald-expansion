@@ -624,10 +624,12 @@ replacement routes retain their intended target.
   stationary girl in Oldale gives 200 Ultra Balls followed by ¥200,000 exactly
   once. A dedicated flag is set only after the item grant succeeds, so a full Bag
   does not consume the reward and the player can retry after making room.
-- No-free-switch trainer modifier: add an optional modifier that suppresses the
-  switch prompt after the player knocks out an opposing trainer's Pokemon. While
-  enabled, the trainer sends out the replacement before the player can switch;
-  do not change wild-battle flow or ordinary voluntary switching.
+- Battle style is globally locked to Set on `romhack/qol-no-free-switch`. New
+  saves default to Set, existing saves resolve as Set when a battle starts, and
+  the obsolete Battle Style row is removed from the Options menu. This suppresses
+  the free switch prompt after an opposing trainer Pokemon faints while leaving
+  ordinary voluntary switching unchanged. The focused global-style test passes,
+  and a normal ROM build succeeds.
 - Trainer AI review: audit the AI flags assigned across ordinary trainers,
   bosses, and rematches after party and learnset randomization. Evaluate smart
   mid-battle switching and post-KO replacement selection alongside move scoring

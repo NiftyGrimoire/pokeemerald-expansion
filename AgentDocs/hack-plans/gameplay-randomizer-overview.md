@@ -180,9 +180,9 @@ Current execution order:
      overworld pickups are visibly represented to the player.
    - The Portable Healer Key Item is implemented and granted with the starter. It
      fully restores every party Pokemon outside battle without being consumed.
-   - Add an optional trainer-battle modifier that removes the prompt to switch
-     after an opposing Pokemon faints. When enabled, replacement Pokemon enter
-     before the player can make a free switch, matching Set-style battle flow.
+   - Battle style is globally locked to Set on `romhack/qol-no-free-switch`.
+     Replacement Pokemon enter before the player can make a free switch, and the
+     obsolete Battle Style option is removed from the Options menu.
    - Review trainer AI flag assignments for randomized teams and learnsets. Test
      smart mid-battle switching, post-KO replacement choices, and smart move
      scoring; define fair AI tiers for ordinary trainers, bosses, and rematches
@@ -325,9 +325,9 @@ Current execution order:
   - The stationary girl in Oldale Town grants 200 Ultra Balls and ¥200,000 once on
     `romhack/qol-oldale-supplies`. The reward flag is set only after the balls fit
     in the Bag, allowing a failed attempt to be retried.
-  - Add a trainer-battle modifier that suppresses the free switch prompt after an
-    opposing Pokemon faints. The modifier should affect trainer battles only and
-    use Set-style replacement flow while enabled.
+  - Battle style is globally locked to Set on `romhack/qol-no-free-switch`; new
+    and existing saves use Set-style replacement flow, and the Battle Style row
+    is removed from the Options menu.
   - Audit trainer AI flags and playtest `AI_FLAG_SMART_SWITCHING`,
     `AI_FLAG_SMART_MON_CHOICES`, and the move-selection flags. Establish separate
     ordinary-trainer and boss tiers, preferring strong scoring and limited

@@ -2998,6 +2998,11 @@ static void BattleMainCB1(void)
         gBattlerControllerFuncs[battler](battler);
 }
 
+u8 GetEffectiveBattleStyle(void)
+{
+    return OPTIONS_BATTLE_STYLE_SET;
+}
+
 static void ClearSetBScriptingStruct(void)
 {
     // windowsType is set up earlier in BattleInitBgsAndWindows, so we need to save the value
@@ -3006,7 +3011,7 @@ static void ClearSetBScriptingStruct(void)
     memset(&gBattleScripting, 0, sizeof(gBattleScripting));
 
     gBattleScripting.windowsType = temp;
-    gBattleScripting.battleStyle = gSaveBlock2Ptr->optionsBattleStyle;
+    gBattleScripting.battleStyle = GetEffectiveBattleStyle();
     #if TESTING
     gBattleScripting.battleStyle = OPTIONS_BATTLE_STYLE_SET;
     #endif
