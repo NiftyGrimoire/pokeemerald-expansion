@@ -115,10 +115,21 @@ static const enum Item sRandomizerWorldItemPool[] =
     ITEM_SCOPE_LENS,
     ITEM_WIDE_LENS,
     ITEM_ZOOM_LENS,
+    ITEM_QUICK_CLAW,
+    ITEM_LOADED_DICE,
+    ITEM_BRIGHT_POWDER,
+    ITEM_COVERT_CLOAK,
+    ITEM_GRIP_CLAW,
+    ITEM_DAMP_ROCK,
+    ITEM_HEAT_ROCK,
+    ITEM_SMOOTH_ROCK,
+    ITEM_ICY_ROCK,
+    ITEM_LIGHT_CLAY,
+    ITEM_TERRAIN_EXTENDER,
     ITEM_LINKING_CORD,
 };
 
-STATIC_ASSERT(ARRAY_COUNT(sRandomizerWorldItemPool) == 50, RandomizerWorldItemPoolCount);
+STATIC_ASSERT(ARRAY_COUNT(sRandomizerWorldItemPool) == 61, RandomizerWorldItemPoolCount);
 
 static void InitRandomizerMoveBuckets(void);
 static void InitRandomizerTMMapping(void);
