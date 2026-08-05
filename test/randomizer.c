@@ -585,19 +585,31 @@ TEST("Evolution randomizer removes declared clock and region barriers")
 
 TEST("Alternate evolution target selection is deterministic and seed separated")
 {
-    bool32 firstSeedMidday;
+    static const enum Species targets[] = {SPECIES_LYCANROC_MIDDAY, SPECIES_LYCANROC_MIDNIGHT, SPECIES_LYCANROC_DUSK};
+    enum Species firstSeedTarget = SPECIES_NONE;
     bool32 foundDifferentSeed = FALSE;
+    u32 selectedCount = 0;
 
     gSaveBlock3Ptr->randomizerSeed = 0x12345678;
-    firstSeedMidday = IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDDAY);
-    EXPECT_NE(firstSeedMidday, IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDNIGHT));
-    EXPECT_EQ(firstSeedMidday, IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDDAY));
-    EXPECT(IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_DUSK));
+    for (u32 i = 0; i < ARRAY_COUNT(targets); i++)
+    {
+        EXPECT(HasTestLevelEvolution(SPECIES_ROCKRUFF, targets[i], 25));
+        EXPECT(HasTestLevelEvolution(SPECIES_ROCKRUFF_OWN_TEMPO, targets[i], 25));
+        if (IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, targets[i]))
+        {
+            firstSeedTarget = targets[i];
+            selectedCount++;
+        }
+        EXPECT_EQ(IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, targets[i]),
+                  IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF_OWN_TEMPO, targets[i]));
+    }
+    EXPECT_EQ(selectedCount, 1);
+    EXPECT_NE(firstSeedTarget, SPECIES_NONE);
 
     for (u32 seed = 1; seed <= 64; seed++)
     {
         gSaveBlock3Ptr->randomizerSeed = seed;
-        if (firstSeedMidday != IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDDAY))
+        if (!IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, firstSeedTarget))
         {
             foundDifferentSeed = TRUE;
             break;
@@ -701,11 +713,17 @@ TEST("Selected time branch evolves without consulting the clock")
     enum Species expectedTarget;
 
     gSaveBlock3Ptr->randomizerSeed = 0x12345678;
-    expectedTarget = IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDDAY)
-                   ? SPECIES_LYCANROC_MIDDAY
-                   : SPECIES_LYCANROC_MIDNIGHT;
+    if (IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDDAY))
+        expectedTarget = SPECIES_LYCANROC_MIDDAY;
+    else if (IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDNIGHT))
+        expectedTarget = SPECIES_LYCANROC_MIDNIGHT;
+    else
+        expectedTarget = SPECIES_LYCANROC_DUSK;
     CreateMon(&mon, SPECIES_ROCKRUFF, 25, 0, OTID_STRUCT_PLAYER_ID);
 
+    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_NORMAL, ITEM_NONE, NULL, NULL, CHECK_EVO), expectedTarget);
+
+    CreateMon(&mon, SPECIES_ROCKRUFF_OWN_TEMPO, 25, 0, OTID_STRUCT_PLAYER_ID);
     EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_NORMAL, ITEM_NONE, NULL, NULL, CHECK_EVO), expectedTarget);
 }
 

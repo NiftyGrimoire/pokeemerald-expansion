@@ -35,6 +35,6 @@
 #define RANDOMIZER_LEARNSETS TRUE
 
 // Changing the hash algorithm or category meanings requires a new version.
-#define RANDOMIZER_ALGORITHM_VERSION 5
+#define RANDOMIZER_ALGORITHM_VERSION 6
 
 #endif // GUARD_CONFIG_RANDOMIZER_H

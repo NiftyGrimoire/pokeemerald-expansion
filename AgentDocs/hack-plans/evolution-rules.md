@@ -97,8 +97,8 @@ level, item, move, form, and other non-clock requirements remain intact.
 | Tyrunt | Tyrantrum | Level 39 |
 | Amaura | Aurorus | Level 39 |
 | Yungoos | Gumshoos | Level 20 |
-| Rockruff | Midday or Midnight Lycanroc | Level 25; deterministic pair |
-| Own Tempo Rockruff | Dusk Lycanroc | Level 25 |
+| Rockruff | Midday, Midnight, or Dusk Lycanroc | Level 25; deterministic three-way choice |
+| Own Tempo Rockruff | Midday, Midnight, or Dusk Lycanroc | Same seeded choice as ordinary Rockruff |
 | Fomantis | Lurantis | Level 34 |
 | Cosmoem | Solgaleo or Lunala | Level 53; deterministic pair |
 | Snom | Frosmoth | Level 30 replacement for friendship |
@@ -320,8 +320,8 @@ after the Portable Healer design is finalized.
 - Eevee's Jolteon, Vaporeon, Flareon, Leafeon, and Glaceon routes remain
   player-controlled. Sylveon, Espeon, and Umbreon form one deterministic
   level-30 choice.
-- Own Tempo Rockruff still evolves only into Dusk Lycanroc; only its evening
-  restriction is removed.
+- Ordinary and Own Tempo Rockruff share one seeded Midday, Midnight, or Dusk
+  Lycanroc result; no clock or ability-form exception remains.
 - Using the listed stone on Milcery determines its Strawberry, Berry, Love,
   Star, Clover, Flower, or Ribbon decoration. The save seed selects one common
   cream flavor from Vanilla, Ruby, Matcha, Mint, Lemon, Salted, Ruby Swirl,

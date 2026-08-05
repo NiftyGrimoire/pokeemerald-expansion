@@ -457,6 +457,23 @@ static bool32 IsSelectedEeveeLevelEvolutionTarget(enum Species targetSpecies)
     return TRUE;
 }
 
+static bool32 IsSelectedRockruffEvolutionTarget(enum Species targetSpecies)
+{
+    static const enum Species targets[] =
+    {
+        SPECIES_LYCANROC_MIDDAY,
+        SPECIES_LYCANROC_MIDNIGHT,
+        SPECIES_LYCANROC_DUSK,
+    };
+
+    for (u32 i = 0; i < ARRAY_COUNT(targets); i++)
+    {
+        if (targetSpecies == targets[i])
+            return i == RandomizerHash(GetRandomizerSeed(), RANDOMIZER_CATEGORY_EVOLUTION, SPECIES_ROCKRUFF, ARRAY_COUNT(targets), 0) % ARRAY_COUNT(targets);
+    }
+    return TRUE;
+}
+
 static s32 GetAlcremieFlavorIndex(enum Species targetSpecies)
 {
     if (targetSpecies == SPECIES_ALCREMIE_STRAWBERRY_VANILLA_CREAM)
@@ -487,7 +504,8 @@ bool32 IsRandomizerEvolutionTargetSelected(enum Species species, enum Species ta
     case SPECIES_EEVEE:
         return IsSelectedEeveeLevelEvolutionTarget(targetSpecies);
     case SPECIES_ROCKRUFF:
-        return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_LYCANROC_MIDDAY, SPECIES_LYCANROC_MIDNIGHT);
+    case SPECIES_ROCKRUFF_OWN_TEMPO:
+        return IsSelectedRockruffEvolutionTarget(targetSpecies);
     case SPECIES_COSMOEM:
         return IsSelectedRandomizerEvolutionTarget(species, targetSpecies, SPECIES_SOLGALEO, SPECIES_LUNALA);
     case SPECIES_PIKACHU:

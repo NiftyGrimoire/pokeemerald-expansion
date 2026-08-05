@@ -556,6 +556,8 @@ The authoritative species-by-species behavior is documented in
   consolidated into ordinary stones.
 - Paired clock and regional outcomes are selected deterministically from the
   saved seed through the dedicated evolution hash category.
+- Ordinary and Own Tempo Rockruff share one deterministic three-way choice among
+  Midday, Midnight, and Dusk Lycanroc at level 25.
 - The target filter is used by normal, trade, item, battle-special, overworld,
   and script-trigger evolution scans so a non-selected form cannot leak through
   another access mode.
@@ -651,10 +653,12 @@ replacement routes retain their intended target.
   penalties. The randomized mapping flows through descriptions, Bag use,
   compatibility, Move Reminder, Pokedex, reverse lookups, and debug helpers.
   HM move mappings and compatibility remain authored.
-  The randomizer algorithm version is now 5. Version 3 introduced randomized TM
+  The randomizer algorithm version is now 6. Version 3 introduced randomized TM
   mappings; version 4 added world/free-item hash categories and revised the
   randomized level-up schedule and opening-move weighting; version 5 expanded
-  the world/free-item result pool from 23 to 67 entries. Deterministic trainer,
+  the world/free-item result pool from 23 to 67 entries; version 6 replaced the
+  Rockruff binary/fixed-form policy with one shared three-way seeded choice.
+  Deterministic trainer,
   learnset, TM, and item mappings from earlier development versions are stale.
 
 ### TM move randomization versus level-up learnset randomization

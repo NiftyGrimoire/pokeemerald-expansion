@@ -73,8 +73,8 @@ day, night, or evening. Friendship cases already listed above are not repeated.
 | Tyrunt | Tyrantrum | Level 39 | Day removed |
 | Amaura | Aurorus | Level 39 | Night removed |
 | Yungoos | Gumshoos | Level 20 | Day removed |
-| Rockruff | Midday or Midnight Lycanroc | Level 25 | One form selected per save; clock removed |
-| Own Tempo Rockruff | Dusk Lycanroc | Level 25 | Evening removed; Dusk form remains fixed |
+| Rockruff | Midday, Midnight, or Dusk Lycanroc | Level 25 | One form selected per save; clock removed |
+| Own Tempo Rockruff | Midday, Midnight, or Dusk Lycanroc | Level 25 | Uses the same selected form as ordinary Rockruff |
 | Fomantis | Lurantis | Level 34 | Day removed |
 | Cosmoem | Solgaleo or Lunala | Level 53 | One target selected per save; clock removed |
 | Greavard | Houndstone | Level 30 | Night removed |
@@ -312,7 +312,8 @@ particular:
 - Other weather, party-composition, battle-tracker, walking, recoil, and
   script-based requirements remain intact unless explicitly replaced above.
 - Dunsparce retains its personality-based Dudunsparce segment outcome.
-- Own Tempo Rockruff still evolves only into Dusk Lycanroc.
+- Ordinary and Own Tempo Rockruff share one seeded Midday, Midnight, or Dusk
+  Lycanroc result.
 - Ordinary evolution stones not mentioned as replacements continue to work as
   authored.
 

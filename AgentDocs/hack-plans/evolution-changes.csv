@@ -28,8 +28,8 @@ Clock,Galarian Linoone,Obstagoon,Level 35 at night,Level 35,Clock restriction re
 Clock,Tyrunt,Tyrantrum,Level 39 during the day,Level 39,Clock restriction removed
 Clock,Amaura,Aurorus,Level 39 at night,Level 39,Clock restriction removed
 Clock,Yungoos,Gumshoos,Level 20 during the day,Level 20,Clock restriction removed
-Clock and seeded branch,Rockruff,Midday or Midnight Lycanroc,Level 25 during the corresponding time,Level 25,One target is selected per save; clock restriction removed
-Clock,Own Tempo Rockruff,Dusk Lycanroc,Level 25 during evening,Level 25,Clock restriction removed
+Clock and seeded branch,Rockruff,Midday Midnight or Dusk Lycanroc,Level 25 during the corresponding time,Level 25,One target is selected per save; clock restriction removed
+Clock and seeded branch,Own Tempo Rockruff,Midday Midnight or Dusk Lycanroc,Level 25 during evening,Level 25,Shares ordinary Rockruff's selected target; Own Tempo exception removed
 Clock,Fomantis,Lurantis,Level 34 during the day,Level 34,Clock restriction removed
 Clock and seeded branch,Cosmoem,Solgaleo or Lunala,Level 53 during the corresponding time,Level 53,One target is selected per save; clock restriction removed
 Clock,Greavard,Houndstone,Level 30 at night,Level 30,Clock restriction removed
