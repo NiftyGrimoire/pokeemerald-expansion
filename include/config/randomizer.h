@@ -13,6 +13,10 @@
 // Randomize the three Hoenn starter choices.
 #define RANDOMIZER_STARTERS TRUE
 
+// Guaranteed perfect IVs for special player encounters.
+#define RANDOMIZER_STARTER_PERFECT_IV_COUNT 4
+#define RANDOMIZER_LEGENDARY_PERFECT_IV_COUNT 3
+
 // Randomize species selected by supported enemy trainer parties.
 #define RANDOMIZER_TRAINERS TRUE
 

@@ -41,14 +41,16 @@ Legendary, Mythical, Ultra Beast, Paradox, battle-only, and unusable forms.
 Emerald's scripted Legendary encounters are randomized separately. A qualifying
 Legendary, sub-Legendary, or Paradox encounter becomes another usable Pokémon
 from those classifications. Its authored level and story behavior remain intact.
-Mythical Pokémon and Ultra Beasts are not part of this pool.
+Mythical Pokémon and Ultra Beasts are not part of this pool. Every Pokémon from
+one of these special encounters has at least three perfect IVs.
 
 ### Starters
 
 The three starter choices are randomized and distinct. Choices are balanced
 base-stage Pokémon with a complete three-stage evolution line and an appropriate
 starter-level base-stat total. The selection screen, granted Pokémon, and other
-starter references all use the same result.
+starter references all use the same result. The chosen starter has at least four
+perfect IVs.
 
 ## Trainers and battles
 

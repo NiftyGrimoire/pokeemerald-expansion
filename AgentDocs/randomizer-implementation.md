@@ -208,6 +208,9 @@ The scripted encounter implementation was merged through PR #3. It includes:
 - A deterministic resolver keyed by map ID, original species, and battle slot.
 - A `ScrCmd_setwildbattle` hook that replaces only qualifying species before the
   existing creation flow.
+- Each qualifying scripted opponent receives at least three perfect IVs after
+  creation, followed by a stat recalculation. This explicitly covers Paradox
+  replacements as well as Legendary species.
 - Ordinary `setwildbattle` encounters route through the regular BST-scaled
   resolver, using the scripted level as difficulty and a distinct scripted
   encounter type.
@@ -344,6 +347,8 @@ The player-facing starter resolver is implemented:
   and battle-only species/forms.
 - Resolve through `GetStarterPokemon`, keeping the selection UI, label, sprite,
   cry, granted Pokemon, party check, and credits consistent.
+- After granting the starter, give it at least four perfect IVs and recalculate
+  its stats before the opening battle.
 - Build the pre-evolution lookup once and cache all three choices by save seed so
   repeated UI lookups do not rescan the evolution graph.
 

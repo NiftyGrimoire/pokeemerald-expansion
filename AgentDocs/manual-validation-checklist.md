@@ -99,6 +99,8 @@ correct.
 - [ ] Regice: battle, capture/defeat flag, and repeat-entry behavior.
 - [ ] Registeel: battle, capture/defeat flag, and repeat-entry behavior.
 - [ ] Confirm Mythical Pokemon and Ultra Beasts do not appear in this pool.
+- [ ] Capture a randomized special encounter and confirm at least three of its
+      six IVs are 31, including a Paradox result when available.
 - [ ] Exercise a non-special `setwildbattle` encounter and confirm it uses the
       ordinary level/BST-scaled pool.
 - [-] FRLG static maps are outside Emerald gameplay scope; no FRLG coverage is
@@ -129,6 +131,7 @@ correct.
       and complete three-stage-line policy.
 - [ ] For all three slots, confirm label, sprite, cry, and confirmation text agree.
 - [ ] Confirm the selected Pokemon is the Pokemon granted to the party.
+- [ ] Confirm the granted starter has at least four IVs of 31.
 - [ ] Confirm starter-dependent party checks recognize the granted Pokemon.
 - [ ] Confirm credits display the selected randomized starter correctly.
 - [ ] Compare Seed A and Seed B and confirm the choices vary.

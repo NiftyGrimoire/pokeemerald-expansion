@@ -2512,15 +2512,17 @@ bool8 ScrCmd_setwildbattle(struct ScriptContext *ctx)
     u8 level2 = ScriptReadByte(ctx);
     enum Item item2 = ScriptReadHalfword(ctx);
     u16 mapId = (gSaveBlock1Ptr->location.mapGroup << 8) | gSaveBlock1Ptr->location.mapNum;
+    bool32 isLegendaryEncounter = IsSpeciesRandomizerLegendaryEncounterEligible(species);
+    bool32 isLegendaryEncounter2 = IsSpeciesRandomizerLegendaryEncounterEligible(species2);
 
     Script_RequestEffects(SCREFF_V1);
 
-    if (IsSpeciesRandomizerLegendaryEncounterEligible(species))
+    if (isLegendaryEncounter)
         species = GetRandomizedSpeciesForLegendaryEncounter(species, mapId, 0);
     else if (species != SPECIES_NONE)
         species = GetRandomizedSpeciesForEncounter(species, mapId, RANDOMIZER_ENCOUNTER_SCRIPTED, 0, level);
 
-    if (IsSpeciesRandomizerLegendaryEncounterEligible(species2))
+    if (isLegendaryEncounter2)
         species2 = GetRandomizedSpeciesForLegendaryEncounter(species2, mapId, 1);
     else if (species2 != SPECIES_NONE)
         species2 = GetRandomizedSpeciesForEncounter(species2, mapId, RANDOMIZER_ENCOUNTER_SCRIPTED, 1, level2);
@@ -2528,11 +2530,30 @@ bool8 ScrCmd_setwildbattle(struct ScriptContext *ctx)
     if (species2 == SPECIES_NONE)
     {
         CreateScriptedWildMon(species, level, item);
+#if RANDOMIZER_ENABLED && RANDOMIZER_LEGENDARY_ENCOUNTERS
+        if (isLegendaryEncounter)
+        {
+            SetBoxMonPerfectIVs(&gParties[B_TRAINER_OPPONENT_A][0].box, RANDOMIZER_LEGENDARY_PERFECT_IV_COUNT);
+            CalculateMonStats(&gParties[B_TRAINER_OPPONENT_A][0]);
+        }
+#endif
         sIsScriptedWildDouble = FALSE;
     }
     else
     {
         CreateScriptedDoubleWildMon(species, level, item, species2, level2, item2);
+#if RANDOMIZER_ENABLED && RANDOMIZER_LEGENDARY_ENCOUNTERS
+        if (isLegendaryEncounter)
+        {
+            SetBoxMonPerfectIVs(&gParties[B_TRAINER_OPPONENT_A][0].box, RANDOMIZER_LEGENDARY_PERFECT_IV_COUNT);
+            CalculateMonStats(&gParties[B_TRAINER_OPPONENT_A][0]);
+        }
+        if (isLegendaryEncounter2)
+        {
+            SetBoxMonPerfectIVs(&gParties[B_TRAINER_OPPONENT_A][1].box, RANDOMIZER_LEGENDARY_PERFECT_IV_COUNT);
+            CalculateMonStats(&gParties[B_TRAINER_OPPONENT_A][1]);
+        }
+#endif
         sIsScriptedWildDouble = TRUE;
     }
 

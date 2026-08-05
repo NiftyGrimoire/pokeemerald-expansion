@@ -88,6 +88,8 @@ uncovers them.
      expanded later.
    - Preserve the scripted encounter's level, battle setup, flags, and progression
      behavior while replacing only its species.
+   - Guarantee at least three perfect IVs on each qualifying encounter, including
+     Paradox replacements without a species-level Legendary IV guarantee.
    - Manually verify the Emerald Legendary encounters, including capture/defeat
      flags and repeat-entry behavior.
 4. Level caps and EV removal — complete on `romhack/main`; manual gameplay checks
@@ -105,6 +107,7 @@ uncovers them.
      with BST 300-350 and a complete three-stage evolution line.
    - Resolve all player-facing starter uses through `GetStarterPokemon` so the
      selection UI, granted Pokemon, party checks, and credits agree.
+   - Guarantee at least four perfect IVs on the starter granted to the player.
    - The rival is not required to choose or retain one of these species; rival
      parties follow the enemy-trainer policy below.
    - Manually verify selection labels, sprites, cries, confirmation, the granted

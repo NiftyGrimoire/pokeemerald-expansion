@@ -965,6 +965,10 @@ static void CB2_GiveStarter(void)
     *GetVarPointer(VAR_STARTER_MON) = gSpecialVar_Result;
     starterMon = GetStarterPokemon(gSpecialVar_Result);
     ScriptGiveMon(starterMon, 5, ITEM_NONE);
+#if RANDOMIZER_ENABLED && RANDOMIZER_STARTERS
+    SetBoxMonPerfectIVs(&gParties[B_TRAINER_PLAYER][0].box, RANDOMIZER_STARTER_PERFECT_IV_COUNT);
+    CalculateMonStats(&gParties[B_TRAINER_PLAYER][0]);
+#endif
     AddBagItem(ITEM_PORTABLE_HEALER, 1);
     AddBagItem(ITEM_REPEL_TOGGLE, 1);
     ResetTasks();
