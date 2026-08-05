@@ -578,60 +578,82 @@ TEST("Evolution randomizer removes declared clock and region barriers")
 {
     EXPECT(ShouldRandomizerIgnoreEvolutionCondition(SPECIES_RIOLU, IF_NOT_TIME));
     EXPECT(ShouldRandomizerIgnoreEvolutionCondition(SPECIES_GLIGAR, IF_TIME));
-    EXPECT(ShouldRandomizerIgnoreEvolutionCondition(SPECIES_PIKACHU, IF_REGION));
-    EXPECT(ShouldRandomizerIgnoreEvolutionCondition(SPECIES_DARTRIX, IF_NOT_REGION));
+    EXPECT(!ShouldRandomizerIgnoreEvolutionCondition(SPECIES_PIKACHU, IF_REGION));
+    EXPECT(!ShouldRandomizerIgnoreEvolutionCondition(SPECIES_DARTRIX, IF_NOT_REGION));
     EXPECT(!ShouldRandomizerIgnoreEvolutionCondition(SPECIES_BULBASAUR, IF_REGION));
 }
 
-TEST("Alternate evolution target selection is deterministic and seed separated")
+TEST("Rockruff forms use one level route and two stone routes")
 {
-    static const enum Species targets[] = {SPECIES_LYCANROC_MIDDAY, SPECIES_LYCANROC_MIDNIGHT, SPECIES_LYCANROC_DUSK};
-    enum Species firstSeedTarget = SPECIES_NONE;
-    bool32 foundDifferentSeed = FALSE;
-    u32 selectedCount = 0;
-
-    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
-    for (u32 i = 0; i < ARRAY_COUNT(targets); i++)
-    {
-        EXPECT(HasTestLevelEvolution(SPECIES_ROCKRUFF, targets[i], 25));
-        EXPECT(HasTestLevelEvolution(SPECIES_ROCKRUFF_OWN_TEMPO, targets[i], 25));
-        if (IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, targets[i]))
-        {
-            firstSeedTarget = targets[i];
-            selectedCount++;
-        }
-        EXPECT_EQ(IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, targets[i]),
-                  IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF_OWN_TEMPO, targets[i]));
-    }
-    EXPECT_EQ(selectedCount, 1);
-    EXPECT_NE(firstSeedTarget, SPECIES_NONE);
-
-    for (u32 seed = 1; seed <= 64; seed++)
-    {
-        gSaveBlock3Ptr->randomizerSeed = seed;
-        if (!IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, firstSeedTarget))
-        {
-            foundDifferentSeed = TRUE;
-            break;
-        }
-    }
-    EXPECT(foundDifferentSeed);
+    EXPECT(HasTestLevelEvolution(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDDAY, 25));
+    EXPECT(HasTestItemEvolution(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDNIGHT, ITEM_MOON_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_ROCKRUFF, SPECIES_LYCANROC_DUSK, ITEM_SUN_STONE));
+    EXPECT(HasTestLevelEvolution(SPECIES_ROCKRUFF_OWN_TEMPO, SPECIES_LYCANROC_MIDDAY, 25));
+    EXPECT(HasTestItemEvolution(SPECIES_ROCKRUFF_OWN_TEMPO, SPECIES_LYCANROC_MIDNIGHT, ITEM_MOON_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_ROCKRUFF_OWN_TEMPO, SPECIES_LYCANROC_DUSK, ITEM_SUN_STONE));
 }
 
-TEST("Eevee selects exactly one level 30 evolution without move requirements")
+TEST("Former seeded evolution families expose every documented player choice")
 {
-    static const enum Species targets[] = {SPECIES_SYLVEON, SPECIES_ESPEON, SPECIES_UMBREON};
-    u32 selectedCount = 0;
-
-    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
-    for (u32 i = 0; i < ARRAY_COUNT(targets); i++)
+    static const struct
     {
-        EXPECT(HasTestLevelEvolution(SPECIES_EEVEE, targets[i], 30));
-        if (IsRandomizerEvolutionTargetSelected(SPECIES_EEVEE, targets[i]))
-            selectedCount++;
-    }
-    EXPECT_EQ(selectedCount, 1);
-    EXPECT(IsRandomizerEvolutionTargetSelected(SPECIES_EEVEE, SPECIES_JOLTEON));
+        enum Species source;
+        enum Species target;
+        enum Item item;
+    } itemCases[] =
+    {
+        {SPECIES_PIKACHU, SPECIES_RAICHU, ITEM_THUNDER_STONE},
+        {SPECIES_PIKACHU, SPECIES_RAICHU_ALOLA, ITEM_SHINY_STONE},
+        {SPECIES_EXEGGCUTE, SPECIES_EXEGGUTOR, ITEM_LEAF_STONE},
+        {SPECIES_EXEGGCUTE, SPECIES_EXEGGUTOR_ALOLA, ITEM_SUN_STONE},
+        {SPECIES_CUBONE, SPECIES_MAROWAK_ALOLA, ITEM_FIRE_STONE},
+        {SPECIES_KOFFING, SPECIES_WEEZING_GALAR, ITEM_SHINY_STONE},
+        {SPECIES_MIME_JR, SPECIES_MR_MIME_GALAR, ITEM_ICE_STONE},
+        {SPECIES_QUILAVA, SPECIES_TYPHLOSION_HISUI, ITEM_DUSK_STONE},
+        {SPECIES_DEWOTT, SPECIES_SAMUROTT_HISUI, ITEM_DAWN_STONE},
+        {SPECIES_PETILIL, SPECIES_LILLIGANT, ITEM_SUN_STONE},
+        {SPECIES_PETILIL, SPECIES_LILLIGANT_HISUI, ITEM_LEAF_STONE},
+        {SPECIES_RUFFLET, SPECIES_BRAVIARY_HISUI, ITEM_DAWN_STONE},
+        {SPECIES_GOOMY, SPECIES_SLIGGOO_HISUI, ITEM_THUNDER_STONE},
+        {SPECIES_BERGMITE, SPECIES_AVALUGG_HISUI, ITEM_DUSK_STONE},
+        {SPECIES_DARTRIX, SPECIES_DECIDUEYE_HISUI, ITEM_DUSK_STONE},
+        {SPECIES_COSMOEM, SPECIES_SOLGALEO, ITEM_SUN_STONE},
+        {SPECIES_COSMOEM, SPECIES_LUNALA, ITEM_MOON_STONE},
+    };
+    static const struct
+    {
+        enum Species source;
+        enum Species target;
+        u16 level;
+    } levelCases[] =
+    {
+        {SPECIES_CUBONE, SPECIES_MAROWAK, 28},
+        {SPECIES_KOFFING, SPECIES_WEEZING, 35},
+        {SPECIES_MIME_JR, SPECIES_MR_MIME, 32},
+        {SPECIES_QUILAVA, SPECIES_TYPHLOSION, 36},
+        {SPECIES_DEWOTT, SPECIES_SAMUROTT, 36},
+        {SPECIES_RUFFLET, SPECIES_BRAVIARY, 54},
+        {SPECIES_GOOMY, SPECIES_SLIGGOO, 40},
+        {SPECIES_BERGMITE, SPECIES_AVALUGG, 37},
+        {SPECIES_DARTRIX, SPECIES_DECIDUEYE, 34},
+    };
+
+    for (u32 i = 0; i < ARRAY_COUNT(itemCases); i++)
+        EXPECT(HasTestItemEvolution(itemCases[i].source, itemCases[i].target, itemCases[i].item));
+    for (u32 i = 0; i < ARRAY_COUNT(levelCases); i++)
+        EXPECT(HasTestLevelEvolution(levelCases[i].source, levelCases[i].target, levelCases[i].level));
+}
+
+TEST("All Eevee forms use distinct stones")
+{
+    EXPECT(HasTestItemEvolution(SPECIES_EEVEE, SPECIES_JOLTEON, ITEM_THUNDER_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_EEVEE, SPECIES_VAPOREON, ITEM_WATER_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_EEVEE, SPECIES_FLAREON, ITEM_FIRE_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_EEVEE, SPECIES_LEAFEON, ITEM_LEAF_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_EEVEE, SPECIES_GLACEON, ITEM_ICE_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_EEVEE, SPECIES_ESPEON, ITEM_SUN_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_EEVEE, SPECIES_UMBREON, ITEM_MOON_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_EEVEE, SPECIES_SYLVEON, ITEM_SHINY_STONE));
 }
 
 TEST("Evolution tables contain no inaccessible or grind-heavy special requirements")
@@ -701,44 +723,29 @@ TEST("Evolution tables contain no inaccessible or grind-heavy special requiremen
     EXPECT(HasTestLevelEvolution(SPECIES_GIMMIGHOUL_ROAMING, SPECIES_GHOLDENGO, 50));
 }
 
-TEST("Both Dartrix branches evolve at level 34")
+TEST("Dartrix has a level default and stone alternate")
 {
     EXPECT(HasTestLevelEvolution(SPECIES_DARTRIX, SPECIES_DECIDUEYE, 34));
-    EXPECT(HasTestLevelEvolution(SPECIES_DARTRIX, SPECIES_DECIDUEYE_HISUI, 34));
+    EXPECT(HasTestItemEvolution(SPECIES_DARTRIX, SPECIES_DECIDUEYE_HISUI, ITEM_DUSK_STONE));
 }
 
-TEST("Selected time branch evolves without consulting the clock")
+TEST("Rockruff routes evolve without consulting the clock or seed")
 {
     struct Pokemon mon;
-    enum Species expectedTarget;
 
-    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
-    if (IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDDAY))
-        expectedTarget = SPECIES_LYCANROC_MIDDAY;
-    else if (IsRandomizerEvolutionTargetSelected(SPECIES_ROCKRUFF, SPECIES_LYCANROC_MIDNIGHT))
-        expectedTarget = SPECIES_LYCANROC_MIDNIGHT;
-    else
-        expectedTarget = SPECIES_LYCANROC_DUSK;
     CreateMon(&mon, SPECIES_ROCKRUFF, 25, 0, OTID_STRUCT_PLAYER_ID);
-
-    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_NORMAL, ITEM_NONE, NULL, NULL, CHECK_EVO), expectedTarget);
-
-    CreateMon(&mon, SPECIES_ROCKRUFF_OWN_TEMPO, 25, 0, OTID_STRUCT_PLAYER_ID);
-    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_NORMAL, ITEM_NONE, NULL, NULL, CHECK_EVO), expectedTarget);
+    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_NORMAL, ITEM_NONE, NULL, NULL, CHECK_EVO), SPECIES_LYCANROC_MIDDAY);
+    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_ITEM_CHECK, ITEM_MOON_STONE, NULL, NULL, CHECK_EVO), SPECIES_LYCANROC_MIDNIGHT);
+    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_ITEM_CHECK, ITEM_SUN_STONE, NULL, NULL, CHECK_EVO), SPECIES_LYCANROC_DUSK);
 }
 
-TEST("Selected regional stone branch evolves outside its authored region")
+TEST("Regional Pikachu forms use distinct stones")
 {
     struct Pokemon mon;
-    enum Species expectedTarget;
-
-    gSaveBlock3Ptr->randomizerSeed = 0x87654321;
-    expectedTarget = IsRandomizerEvolutionTargetSelected(SPECIES_PIKACHU, SPECIES_RAICHU)
-                   ? SPECIES_RAICHU
-                   : SPECIES_RAICHU_ALOLA;
     CreateMon(&mon, SPECIES_PIKACHU, 30, 0, OTID_STRUCT_PLAYER_ID);
 
-    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_ITEM_CHECK, ITEM_THUNDER_STONE, NULL, NULL, CHECK_EVO), expectedTarget);
+    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_ITEM_CHECK, ITEM_THUNDER_STONE, NULL, NULL, CHECK_EVO), SPECIES_RAICHU);
+    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_ITEM_CHECK, ITEM_SHINY_STONE, NULL, NULL, CHECK_EVO), SPECIES_RAICHU_ALOLA);
 }
 
 TEST("Former location evolutions use location-free stones only")
@@ -876,81 +883,33 @@ TEST("Remaining species-specific item evolutions use ordinary stones")
     EXPECT(HasTestItemEvolution(SPECIES_MILCERY, SPECIES_ALCREMIE_LOVE_VANILLA_CREAM, ITEM_SHINY_STONE));
     EXPECT(HasTestItemEvolution(SPECIES_MILCERY, SPECIES_ALCREMIE_STAR_VANILLA_CREAM, ITEM_THUNDER_STONE));
     EXPECT(HasTestItemEvolution(SPECIES_MILCERY, SPECIES_ALCREMIE_CLOVER_VANILLA_CREAM, ITEM_LEAF_STONE));
-    EXPECT(HasTestItemEvolution(SPECIES_MILCERY, SPECIES_ALCREMIE_FLOWER_VANILLA_CREAM, ITEM_SUN_STONE));
+    EXPECT(HasTestItemEvolution(SPECIES_MILCERY, SPECIES_ALCREMIE_FLOWER_VANILLA_CREAM, ITEM_ICE_STONE));
     EXPECT(HasTestItemEvolution(SPECIES_MILCERY, SPECIES_ALCREMIE_RIBBON_VANILLA_CREAM, ITEM_DAWN_STONE));
 }
 
-TEST("Milcery selects one stable cream flavor for every Sweet")
+TEST("Milcery stone routes always produce the documented Vanilla Cream forms")
 {
-    static const enum Species strawberryTargets[] =
+    static const struct
     {
-        SPECIES_ALCREMIE_STRAWBERRY_VANILLA_CREAM,
-        SPECIES_ALCREMIE_STRAWBERRY_RUBY_CREAM,
-        SPECIES_ALCREMIE_STRAWBERRY_MATCHA_CREAM,
-        SPECIES_ALCREMIE_STRAWBERRY_MINT_CREAM,
-        SPECIES_ALCREMIE_STRAWBERRY_LEMON_CREAM,
-        SPECIES_ALCREMIE_STRAWBERRY_SALTED_CREAM,
-        SPECIES_ALCREMIE_STRAWBERRY_RUBY_SWIRL,
-        SPECIES_ALCREMIE_STRAWBERRY_CARAMEL_SWIRL,
-        SPECIES_ALCREMIE_STRAWBERRY_RAINBOW_SWIRL,
-    };
-    static const enum Species berryTargets[] =
+        enum Item item;
+        enum Species target;
+    } cases[] =
     {
-        SPECIES_ALCREMIE_BERRY_VANILLA_CREAM,
-        SPECIES_ALCREMIE_BERRY_RUBY_CREAM,
-        SPECIES_ALCREMIE_BERRY_MATCHA_CREAM,
-        SPECIES_ALCREMIE_BERRY_MINT_CREAM,
-        SPECIES_ALCREMIE_BERRY_LEMON_CREAM,
-        SPECIES_ALCREMIE_BERRY_SALTED_CREAM,
-        SPECIES_ALCREMIE_BERRY_RUBY_SWIRL,
-        SPECIES_ALCREMIE_BERRY_CARAMEL_SWIRL,
-        SPECIES_ALCREMIE_BERRY_RAINBOW_SWIRL,
-    };
-    u32 selectedFlavor = ARRAY_COUNT(strawberryTargets);
-    u32 selectedCount = 0;
-
-    gSaveBlock3Ptr->randomizerSeed = 0x12345678;
-    for (u32 flavor = 0; flavor < ARRAY_COUNT(strawberryTargets); flavor++)
-    {
-        if (IsRandomizerEvolutionTargetSelected(SPECIES_MILCERY, strawberryTargets[flavor]))
-        {
-            selectedFlavor = flavor;
-            selectedCount++;
-        }
-    }
-
-    EXPECT_EQ(selectedCount, 1);
-    EXPECT_LT(selectedFlavor, ARRAY_COUNT(berryTargets));
-    EXPECT(IsRandomizerEvolutionTargetSelected(SPECIES_MILCERY, berryTargets[selectedFlavor]));
-}
-
-TEST("Milcery evolves to its selected Strawberry form with a Fire Stone")
-{
-    static const enum Species strawberryTargets[] =
-    {
-        SPECIES_ALCREMIE_STRAWBERRY_VANILLA_CREAM,
-        SPECIES_ALCREMIE_STRAWBERRY_RUBY_CREAM,
-        SPECIES_ALCREMIE_STRAWBERRY_MATCHA_CREAM,
-        SPECIES_ALCREMIE_STRAWBERRY_MINT_CREAM,
-        SPECIES_ALCREMIE_STRAWBERRY_LEMON_CREAM,
-        SPECIES_ALCREMIE_STRAWBERRY_SALTED_CREAM,
-        SPECIES_ALCREMIE_STRAWBERRY_RUBY_SWIRL,
-        SPECIES_ALCREMIE_STRAWBERRY_CARAMEL_SWIRL,
-        SPECIES_ALCREMIE_STRAWBERRY_RAINBOW_SWIRL,
+        {ITEM_FIRE_STONE, SPECIES_ALCREMIE_STRAWBERRY_VANILLA_CREAM},
+        {ITEM_WATER_STONE, SPECIES_ALCREMIE_BERRY_VANILLA_CREAM},
+        {ITEM_SHINY_STONE, SPECIES_ALCREMIE_LOVE_VANILLA_CREAM},
+        {ITEM_THUNDER_STONE, SPECIES_ALCREMIE_STAR_VANILLA_CREAM},
+        {ITEM_LEAF_STONE, SPECIES_ALCREMIE_CLOVER_VANILLA_CREAM},
+        {ITEM_ICE_STONE, SPECIES_ALCREMIE_FLOWER_VANILLA_CREAM},
+        {ITEM_DAWN_STONE, SPECIES_ALCREMIE_RIBBON_VANILLA_CREAM},
     };
     struct Pokemon mon;
-    enum Species expectedTarget = SPECIES_NONE;
 
-    gSaveBlock3Ptr->randomizerSeed = 0x87654321;
-    for (u32 flavor = 0; flavor < ARRAY_COUNT(strawberryTargets); flavor++)
+    for (u32 i = 0; i < ARRAY_COUNT(cases); i++)
     {
-        if (IsRandomizerEvolutionTargetSelected(SPECIES_MILCERY, strawberryTargets[flavor]))
-            expectedTarget = strawberryTargets[flavor];
+        CreateMon(&mon, SPECIES_MILCERY, 20, 0, OTID_STRUCT_PLAYER_ID);
+        EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_ITEM_CHECK, cases[i].item, NULL, NULL, CHECK_EVO), cases[i].target);
     }
-    CreateMon(&mon, SPECIES_MILCERY, 20, 0, OTID_STRUCT_PLAYER_ID);
-
-    EXPECT_NE(expectedTarget, SPECIES_NONE);
-    EXPECT_EQ(GetEvolutionTargetSpecies(&mon, EVO_MODE_ITEM_CHECK, ITEM_FIRE_STONE, NULL, NULL, CHECK_EVO), expectedTarget);
 }
 
 TEST("Ability randomizer excludes unsafe and unimplemented abilities")

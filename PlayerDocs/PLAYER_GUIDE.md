@@ -165,17 +165,15 @@ trading, friendship grinding, or specific locations do not block a run.
 
 - Friendship evolutions use explicit levels, generally 20, 30, or 40 according
   to their intended stage.
-- Move, move-type, clock, and location requirements are replaced by levels,
-  ordinary evolution stones, or deterministic branches.
+- Move, move-type, clock, and location requirements are replaced by levels or
+  ordinary evolution stones.
 - Trade evolutions use the **Linking Cord**.
 - Former held-item trades and species-specific evolution items use ordinary
   stones or the Linking Cord.
-- Day/night and regional branches that cannot remain player-selected are chosen
-  deterministically for the save.
-- Eevee's level-based Espeon, Umbreon, and Sylveon outcome is selected per save;
-  its stone evolutions remain player-controlled.
-- Milcery uses ordinary evolution stones. The stone controls its decoration and
-  the save determines its cream form.
+- Regional and day/night branches use distinct stones so the player chooses the
+  result; ordinary forms often remain the default level evolution.
+- All eight Eevee outcomes are selected with distinct stones.
+- Milcery uses seven stones to select a Vanilla Cream decoration.
 
 The exact species-by-species rules are intentionally discoverable through play,
 but every enabled evolution has been audited to remove unsupported trade and

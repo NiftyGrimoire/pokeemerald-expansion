@@ -443,8 +443,8 @@ uncovers them.
   - No EV gain.
   - Friendship evolutions replaced by level evolutions.
   - Move-, clock-, location-, trade-, and species-specific-item evolution barriers
-    replaced by explicit levels, deterministic seeded branches, standard stones,
-    or the Linking Cord according to the authoritative evolution ledger.
+    replaced by explicit levels, player-selected stone branches, or the Linking
+    Cord according to the authoritative evolution ledger.
 - Store one `u32 randomizerSeed` in save data and initialize it during new-game setup.
 - Add deterministic helper functions:
   - `GetRandomizerSeed()`

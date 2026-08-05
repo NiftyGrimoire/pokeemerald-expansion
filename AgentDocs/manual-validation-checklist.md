@@ -227,12 +227,12 @@ changes form correctly without losing data, crashing, or becoming stuck.
 - [ ] Evolve Dipplin into Hydrapple at level 40.
 - [ ] Exercise a stone-based regional pair on Seeds A and B.
 - [ ] Exercise a level-based regional pair on Seeds A and B.
-- [ ] Confirm Eevee selects exactly one of Espeon, Umbreon, or Sylveon at level 30.
-- [ ] Confirm Eevee's five stone branches remain player-controlled.
-- [ ] Cancel a seeded evolution and retry; confirm the target does not change.
+- [ ] Confirm all eight Eevee stone branches are player-controlled.
+- [ ] Cancel an ordinary level evolution, then use its alternate-form stone;
+      confirm the chosen alternate evolves correctly.
 - [ ] Use at least two different stones on Milcery and confirm the decoration
       follows the stone.
-- [ ] Confirm Milcery's cream flavor remains fixed within the save.
+- [ ] Confirm every Milcery stone route produces Vanilla Cream.
 - [ ] Use the Thunder Stone replacement route outside New Mauville.
 - [ ] Use the Leaf Stone replacement route outside Petalburg Woods.
 - [ ] Use the Ice Stone replacement route outside Shoal Cave.

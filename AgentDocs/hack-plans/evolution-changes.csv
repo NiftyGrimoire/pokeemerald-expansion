@@ -9,8 +9,9 @@ Friendship,Chingling,Chimecho,High friendship at night,Level 20,Clock restrictio
 Friendship,Munchlax,Snorlax,High friendship,Level 20,None
 Friendship,Golbat,Crobat,High friendship,Level 30,None
 Friendship,Alolan Meowth,Alolan Persian,High friendship,Level 30,None
-Friendship and move,Eevee,Sylveon,High friendship while knowing a Fairy-type move,Level 30,One of Sylveon Espeon or Umbreon is selected per save
-Friendship and seeded branch,Eevee,Espeon or Umbreon,High friendship during the corresponding time,Level 30,One of Sylveon Espeon or Umbreon is selected per save; clock restriction removed
+Friendship and move,Eevee,Sylveon,High friendship while knowing a Fairy-type move,Shiny Stone,Player-controlled route
+Friendship and clock,Eevee,Espeon,High friendship during the day,Sun Stone,Player-controlled route
+Friendship and clock,Eevee,Umbreon,High friendship at night,Moon Stone,Player-controlled route
 Friendship,Buneary,Lopunny,High friendship,Level 30,None
 Friendship,Riolu,Lucario,High friendship during the day,Level 30,Clock restriction removed
 Friendship,Woobat,Swoobat,High friendship,Level 30,None
@@ -19,7 +20,8 @@ Friendship,Snom,Frosmoth,High friendship at night,Level 30,Clock restriction rem
 Friendship,Chansey,Blissey,High friendship,Level 40,None
 Friendship,Type: Null,Silvally,High friendship,Level 40,None
 Clock,Alolan Rattata,Alolan Raticate,Level 20 at night,Level 20,Clock restriction removed
-Clock and seeded branch,Cubone,Marowak or Alolan Marowak,Level 28 with time and region deciding form,Level 28,One target is selected per save; clock and region restrictions removed
+Clock and region,Cubone,Marowak,Level 28 outside Alola,Level 28,Ordinary default
+Clock and region,Cubone,Alolan Marowak,Level 28 at night in Alola,Fire Stone,Player-controlled alternate
 Held item and clock,Happiny,Chansey,Oval Stone during the day,Shiny Stone,Special item and clock restriction removed
 Held item and clock,Gligar,Gliscor,Razor Fang at night,Moon Stone,Special item and clock restriction removed
 Held item and clock,Sneasel,Weavile,Razor Claw at night,Dusk Stone,Special item and clock restriction removed
@@ -28,23 +30,39 @@ Clock,Galarian Linoone,Obstagoon,Level 35 at night,Level 35,Clock restriction re
 Clock,Tyrunt,Tyrantrum,Level 39 during the day,Level 39,Clock restriction removed
 Clock,Amaura,Aurorus,Level 39 at night,Level 39,Clock restriction removed
 Clock,Yungoos,Gumshoos,Level 20 during the day,Level 20,Clock restriction removed
-Clock and seeded branch,Rockruff,Midday Midnight or Dusk Lycanroc,Level 25 during the corresponding time,Level 25,One target is selected per save; clock restriction removed
-Clock and seeded branch,Own Tempo Rockruff,Midday Midnight or Dusk Lycanroc,Level 25 during evening,Level 25,Shares ordinary Rockruff's selected target; Own Tempo exception removed
+Clock branch,Rockruff,Midday Lycanroc,Level 25 during the day,Level 25,Ordinary default
+Clock branch,Rockruff,Midnight Lycanroc,Level 25 at night,Moon Stone,Player-controlled alternate
+Clock branch,Rockruff,Dusk Lycanroc,Level 25 during evening with Own Tempo,Sun Stone,Player-controlled alternate
+Clock branch,Own Tempo Rockruff,Midday Lycanroc,Level 25 during the day,Level 25,Ordinary default
+Clock branch,Own Tempo Rockruff,Midnight Lycanroc,Level 25 at night,Moon Stone,Player-controlled alternate
+Clock branch,Own Tempo Rockruff,Dusk Lycanroc,Level 25 during evening,Sun Stone,Player-controlled alternate
 Clock,Fomantis,Lurantis,Level 34 during the day,Level 34,Clock restriction removed
-Clock and seeded branch,Cosmoem,Solgaleo or Lunala,Level 53 during the corresponding time,Level 53,One target is selected per save; clock restriction removed
+Clock branch,Cosmoem,Solgaleo,Level 53 during the day,Sun Stone,Player-controlled route
+Clock branch,Cosmoem,Lunala,Level 53 at night,Moon Stone,Player-controlled route
 Clock,Greavard,Houndstone,Level 30 at night,Level 30,Clock restriction removed
 Special item clock and region,Ursaring,Ursaluna,Peat Block at night in Hisui,Moon Stone,Special item clock and region restrictions removed
-Seeded regional branch,Pikachu,Raichu or Alolan Raichu,Thunder Stone with region deciding form,Thunder Stone,One target is selected per save
-Seeded regional branch,Exeggcute,Exeggutor or Alolan Exeggutor,Leaf Stone with region deciding form,Leaf Stone,One target is selected per save
-Seeded regional branch,Koffing,Weezing or Galarian Weezing,Level 35 with region deciding form,Level 35,One target is selected per save
-Move and seeded regional branch,Mime Jr.,Mr. Mime or Galarian Mr. Mime,Know Mimic with region deciding form,Level 32,One target is selected per save
-Seeded regional branch,Quilava,Typhlosion or Hisuian Typhlosion,Level 36 with region deciding form,Level 36,One target is selected per save
-Seeded regional branch,Dewott,Samurott or Hisuian Samurott,Level 36 with region deciding form,Level 36,One target is selected per save
-Seeded regional branch,Petilil,Lilligant or Hisuian Lilligant,Sun Stone with region deciding form,Sun Stone,One target is selected per save
-Seeded regional branch,Rufflet,Braviary or Hisuian Braviary,Level 54 with region deciding form,Level 54,One target is selected per save
-Seeded regional branch,Goomy,Sliggoo or Hisuian Sliggoo,Level 40 with region deciding form,Level 40,One target is selected per save
-Seeded regional branch,Bergmite,Avalugg or Hisuian Avalugg,Level 37 with region deciding form,Level 37,One target is selected per save
-Seeded regional branch,Dartrix,Decidueye or Hisuian Decidueye,Level 34 or 36 with region deciding form,Level 34,One target is selected per save; both forms standardized
+Regional branch,Pikachu,Raichu,Thunder Stone outside Alola,Thunder Stone,Player-controlled route
+Regional branch,Pikachu,Alolan Raichu,Thunder Stone in Alola,Shiny Stone,Player-controlled route
+Regional branch,Exeggcute,Exeggutor,Leaf Stone outside Alola,Leaf Stone,Player-controlled route
+Regional branch,Exeggcute,Alolan Exeggutor,Leaf Stone in Alola,Sun Stone,Player-controlled route
+Regional branch,Koffing,Weezing,Level 35 outside Galar,Level 35,Ordinary default
+Regional branch,Koffing,Galarian Weezing,Level 35 in Galar,Shiny Stone,Player-controlled alternate
+Move and regional branch,Mime Jr.,Mr. Mime,Know Mimic outside Galar,Level 32,Ordinary default
+Move and regional branch,Mime Jr.,Galarian Mr. Mime,Know Mimic in Galar,Ice Stone,Player-controlled alternate
+Regional branch,Quilava,Typhlosion,Level 36 outside Hisui,Level 36,Ordinary default
+Regional branch,Quilava,Hisuian Typhlosion,Level 36 in Hisui,Dusk Stone,Player-controlled alternate
+Regional branch,Dewott,Samurott,Level 36 outside Hisui,Level 36,Ordinary default
+Regional branch,Dewott,Hisuian Samurott,Level 36 in Hisui,Dawn Stone,Player-controlled alternate
+Regional branch,Petilil,Lilligant,Sun Stone outside Hisui,Sun Stone,Player-controlled route
+Regional branch,Petilil,Hisuian Lilligant,Sun Stone in Hisui,Leaf Stone,Player-controlled route
+Regional branch,Rufflet,Braviary,Level 54 outside Hisui,Level 54,Ordinary default
+Regional branch,Rufflet,Hisuian Braviary,Level 54 in Hisui,Dawn Stone,Player-controlled alternate
+Regional branch,Goomy,Sliggoo,Level 40 outside Hisui,Level 40,Ordinary default
+Regional branch,Goomy,Hisuian Sliggoo,Level 40 in Hisui,Thunder Stone,Player-controlled alternate
+Regional branch,Bergmite,Avalugg,Level 37 outside Hisui,Level 37,Ordinary default
+Regional branch,Bergmite,Hisuian Avalugg,Level 37 in Hisui,Dusk Stone,Player-controlled alternate
+Regional branch,Dartrix,Decidueye,Level 34 outside Hisui,Level 34,Ordinary default
+Regional branch,Dartrix,Hisuian Decidueye,Level 36 in Hisui,Dusk Stone,Player-controlled alternate
 Location,Magneton,Magnezone,Level up in New Mauville,Thunder Stone,Location route removed
 Location,Nosepass,Probopass,Level up in New Mauville,Thunder Stone,Location route removed
 Location,Charjabug,Vikavolt,Level up in New Mauville,Thunder Stone,Location route removed
@@ -81,13 +99,13 @@ Held-item trade,Clamperl,Huntail,Trade while holding Deep Sea Tooth,Water Stone,
 Held-item trade,Clamperl,Gorebyss,Trade while holding Deep Sea Scale,Shiny Stone,None
 Held-item trade,Spritzee,Aromatisse,Trade while holding Sachet,Shiny Stone,None
 Held-item trade,Swirlix,Slurpuff,Trade while holding Whipped Dream,Sun Stone,None
-Special item,Milcery,Strawberry Alcremie,Hold Strawberry Sweet and perform a matching spin at the correct time,Fire Stone,Cream flavor is selected per save
-Special item,Milcery,Berry Alcremie,Hold Berry Sweet and perform a matching spin at the correct time,Water Stone,Cream flavor is selected per save
-Special item,Milcery,Love Alcremie,Hold Love Sweet and perform a matching spin at the correct time,Shiny Stone,Cream flavor is selected per save
-Special item,Milcery,Star Alcremie,Hold Star Sweet and perform a matching spin at the correct time,Thunder Stone,Cream flavor is selected per save
-Special item,Milcery,Clover Alcremie,Hold Clover Sweet and perform a matching spin at the correct time,Leaf Stone,Cream flavor is selected per save
-Special item,Milcery,Flower Alcremie,Hold Flower Sweet and perform a matching spin at the correct time,Sun Stone,Cream flavor is selected per save
-Special item,Milcery,Ribbon Alcremie,Hold Ribbon Sweet and perform a matching spin at the correct time,Dawn Stone,Cream flavor is selected per save
+Special item,Milcery,Strawberry Vanilla Cream Alcremie,Hold Strawberry Sweet and perform a matching spin at the correct time,Fire Stone,Player-controlled decoration
+Special item,Milcery,Berry Vanilla Cream Alcremie,Hold Berry Sweet and perform a matching spin at the correct time,Water Stone,Player-controlled decoration
+Special item,Milcery,Love Vanilla Cream Alcremie,Hold Love Sweet and perform a matching spin at the correct time,Shiny Stone,Player-controlled decoration
+Special item,Milcery,Star Vanilla Cream Alcremie,Hold Star Sweet and perform a matching spin at the correct time,Thunder Stone,Player-controlled decoration
+Special item,Milcery,Clover Vanilla Cream Alcremie,Hold Clover Sweet and perform a matching spin at the correct time,Leaf Stone,Player-controlled decoration
+Special item,Milcery,Flower Vanilla Cream Alcremie,Hold Flower Sweet and perform a matching spin at the correct time,Ice Stone,Player-controlled decoration
+Special item,Milcery,Ribbon Vanilla Cream Alcremie,Hold Ribbon Sweet and perform a matching spin at the correct time,Dawn Stone,Player-controlled decoration
 Move,Lickitung,Lickilicky,Know Rollout,Level 30,Move requirement removed
 Move,Tangela,Tangrowth,Know Ancient Power,Level 24,Move requirement removed
 Move,Bonsly,Sudowoodo,Know Mimic,Level 16,Move requirement removed

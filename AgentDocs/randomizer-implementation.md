@@ -554,16 +554,13 @@ The authoritative species-by-species behavior is documented in
 - Audited clock-only restrictions are removed. Move and move-type requirements
   are replaced by explicit levels, and species-specific item requirements are
   consolidated into ordinary stones.
-- Paired clock and regional outcomes are selected deterministically from the
-  saved seed through the dedicated evolution hash category.
-- Ordinary and Own Tempo Rockruff share one deterministic three-way choice among
-  Midday, Midnight, and Dusk Lycanroc at level 25.
-- The target filter is used by normal, trade, item, battle-special, overworld,
-  and script-trigger evolution scans so a non-selected form cannot leak through
-  another access mode.
+- Regional and clock branches are player-controlled through distinct level and
+  stone routes; no evolution target is selected from the save seed. The former
+  evolution hash category remains reserved so later category IDs stay stable.
+- Ordinary and Own Tempo Rockruff share level-25 Midday, Moon Stone Midnight,
+  and Sun Stone Dusk routes.
 - Milcery evolves with one of seven ordinary stones. The stone chooses its
-  decoration and the save seed selects one of nine cream flavors, with no Sweet,
-  spin, or clock requirement.
+  Vanilla Cream decoration, with no Sweet, spin, clock, or seed requirement.
 - The six New Mauville, Petalburg Woods, and Shoal Cave evolution routes are
   location-free: their duplicate level-up entries are removed and their existing
   Thunder, Leaf, or Ice Stone entries are the sole triggers.
@@ -572,11 +569,11 @@ The authoritative species-by-species behavior is documented in
   ordinary evolution stones to balance their usefulness.
 - Happiny's Oval Stone, Gligar's Razor Fang, and both Sneasel forms' Razor Claw
   routes are likewise consolidated into Shiny, Moon, Dusk, and Dawn Stones.
-- Dartrix evolves into either selected Decidueye form at level 34; the Hisuian
-  route no longer waits until level 36.
+- Dartrix evolves into Decidueye at level 34 or Hisuian Decidueye with a Dusk
+  Stone; the Hisuian route no longer waits until level 36.
 - All move and move-type evolution checks are replaced by explicit levels so
-  randomized learnsets cannot block evolution. Sylveon joins Espeon and Umbreon
-  in one seeded level-30 Eevee choice; Eevee's stone routes remain available.
+  randomized learnsets cannot block evolution. Eevee uses distinct stones for
+  all eight outcomes: Sun for Espeon, Moon for Umbreon, and Shiny for Sylveon.
 - Audited party, weather, battle-counter, walking, unavailable-currency, and
   unsupported-script routes use explicit levels. Gender still selects the two
   Basculegion forms, and Nincada retains its intentional Poké Ball requirement.
@@ -587,10 +584,10 @@ The authoritative species-by-species behavior is documented in
   masterpiece outcomes, and `I_USE_EVO_HELD_ITEMS_FROM_BAG` is disabled.
 
 Focused validation currently covers the explicit friendship tiers, an actual
-zero-friendship level evolution, allowlisted condition bypasses, deterministic
-and seed-separated branch selection, a clock-independent Rockruff evolution,
-and a region-independent Pikachu stone evolution. Milcery coverage verifies one
-stable flavor across all decorations and an actual stone evolution. The
+zero-friendship level evolution, allowlisted condition bypasses, explicit
+alternate-form level and stone routes, clock-independent Rockruff evolutions,
+and both Pikachu stone evolutions. Milcery coverage verifies all seven Vanilla
+Cream decoration routes. The
 location-route test verifies all six targets retain their
 item evolution and no longer have a level-up route. An exhaustive enabled-species
 scan verifies that no trade, move-dependent, inaccessible, or grind-heavy
@@ -653,11 +650,13 @@ replacement routes retain their intended target.
   penalties. The randomized mapping flows through descriptions, Bag use,
   compatibility, Move Reminder, Pokedex, reverse lookups, and debug helpers.
   HM move mappings and compatibility remain authored.
-  The randomizer algorithm version is now 6. Version 3 introduced randomized TM
+  The randomizer algorithm version is now 7. Version 3 introduced randomized TM
   mappings; version 4 added world/free-item hash categories and revised the
   randomized level-up schedule and opening-move weighting; version 5 expanded
   the world/free-item result pool from 23 to 67 entries; version 6 replaced the
-  Rockruff binary/fixed-form policy with one shared three-way seeded choice.
+  Rockruff binary/fixed-form policy with one shared three-way seeded choice;
+  version 7 replaced every seed-selected evolution outcome with explicit level
+  and stone routes.
   Deterministic trainer,
   learnset, TM, and item mappings from earlier development versions are stale.
 

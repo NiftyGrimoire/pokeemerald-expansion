@@ -9,19 +9,13 @@ randomized run: trading, friendship grinding, specific moves, time windows,
 regions, evolution locations, unavailable currencies or scripts, and lengthy
 battle or walking counters. Conditions not listed in this guide remain unchanged.
 
-## How deterministic branches work
+## How alternate forms work
 
-Some Pokémon can evolve into regional, clock-based, or otherwise alternate
-forms. Where the original condition is unavailable, one target is selected by
-the save's randomizer seed.
-
-- The selected target is stable for the entire save.
-- Cancelling and retrying an evolution does not reroll it.
-- A different new game may select the other target.
-- Only the listed branch is restricted. Other item evolutions remain available.
-
-For example, one save may make level-30 Eevee evolve into Espeon, while another
-selects Umbreon or Sylveon. Eevee's stone evolutions remain player-controlled.
+Evolution outcomes are never selected by the randomizer seed. Alternate forms
+use different stones so the player can choose the result. Where a family has a
+sensible ordinary form, that form generally remains the automatic level-up
+evolution and a stone selects the alternate form. Use the alternate stone before
+the level threshold, or cancel the level evolution and use the stone afterward.
 
 ## Friendship evolutions become levels
 
@@ -46,7 +40,6 @@ Friendship is not checked for these evolutions.
 | --- | --- | --- |
 | Golbat | Crobat | No friendship requirement |
 | Alolan Meowth | Alolan Persian | No friendship requirement |
-| Eevee | Espeon, Umbreon, or Sylveon | One target selected per save; clock and Fairy-move requirements removed |
 | Buneary | Lopunny | No friendship requirement |
 | Riolu | Lucario | Day restriction also removed |
 | Woobat | Swoobat | No friendship requirement |
@@ -68,40 +61,35 @@ day, night, or evening. Friendship cases already listed above are not repeated.
 | Source | Evolves into | New requirement | Notes |
 | --- | --- | --- | --- |
 | Alolan Rattata | Alolan Raticate | Level 20 | Night removed |
-| Cubone | Marowak or Alolan Marowak | Level 28 | One form selected per save; clock and region removed |
 | Galarian Linoone | Obstagoon | Level 35 | Night removed |
 | Tyrunt | Tyrantrum | Level 39 | Day removed |
 | Amaura | Aurorus | Level 39 | Night removed |
 | Yungoos | Gumshoos | Level 20 | Day removed |
-| Rockruff | Midday, Midnight, or Dusk Lycanroc | Level 25 | One form selected per save; clock removed |
-| Own Tempo Rockruff | Midday, Midnight, or Dusk Lycanroc | Level 25 | Uses the same selected form as ordinary Rockruff |
 | Fomantis | Lurantis | Level 34 | Day removed |
-| Cosmoem | Solgaleo or Lunala | Level 53 | One target selected per save; clock removed |
 | Greavard | Houndstone | Level 30 | Night removed |
 
 Happiny, Gligar, both Sneasel forms, Ursaring, and Milcery also lose clock
 requirements, but their replacement stones are listed in the item sections
 below.
 
-## Regional outcomes selected per save
+## Player-chosen alternate outcomes
 
-Using the item or reaching the level below produces one of the listed forms,
-selected permanently by the save seed. No region check remains.
-
-| Source | Possible targets | Requirement |
+| Source | Target | Requirement |
 | --- | --- | --- |
-| Pikachu | Raichu or Alolan Raichu | Thunder Stone |
-| Exeggcute | Exeggutor or Alolan Exeggutor | Leaf Stone |
-| Cubone | Marowak or Alolan Marowak | Level 28 |
-| Koffing | Weezing or Galarian Weezing | Level 35 |
-| Mime Jr. | Mr. Mime or Galarian Mr. Mime | Level 32 |
-| Quilava | Typhlosion or Hisuian Typhlosion | Level 36 |
-| Dewott | Samurott or Hisuian Samurott | Level 36 |
-| Petilil | Lilligant or Hisuian Lilligant | Sun Stone |
-| Rufflet | Braviary or Hisuian Braviary | Level 54 |
-| Goomy | Sliggoo or Hisuian Sliggoo | Level 40 |
-| Bergmite | Avalugg or Hisuian Avalugg | Level 37 |
-| Dartrix | Decidueye or Hisuian Decidueye | Level 34 |
+| Pikachu | Raichu / Alolan Raichu | Thunder Stone / Shiny Stone |
+| Exeggcute | Exeggutor / Alolan Exeggutor | Leaf Stone / Sun Stone |
+| Cubone | Marowak / Alolan Marowak | Level 28 / Fire Stone |
+| Koffing | Weezing / Galarian Weezing | Level 35 / Shiny Stone |
+| Mime Jr. | Mr. Mime / Galarian Mr. Mime | Level 32 / Ice Stone |
+| Quilava | Typhlosion / Hisuian Typhlosion | Level 36 / Dusk Stone |
+| Dewott | Samurott / Hisuian Samurott | Level 36 / Dawn Stone |
+| Petilil | Lilligant / Hisuian Lilligant | Sun Stone / Leaf Stone |
+| Rufflet | Braviary / Hisuian Braviary | Level 54 / Dawn Stone |
+| Goomy | Sliggoo / Hisuian Sliggoo | Level 40 / Thunder Stone |
+| Bergmite | Avalugg / Hisuian Avalugg | Level 37 / Dusk Stone |
+| Dartrix | Decidueye / Hisuian Decidueye | Level 34 / Dusk Stone |
+| Rockruff (either form) | Midday / Midnight / Dusk Lycanroc | Level 25 / Moon Stone / Sun Stone |
+| Cosmoem | Solgaleo / Lunala | Sun Stone / Moon Stone |
 
 Ursaring's region restriction is removed as part of its Moon Stone evolution to
 Ursaluna.
@@ -114,8 +102,7 @@ The Pokémon does not need to know the former move or move type.
 | --- | --- | ---: | --- |
 | Lickitung | Lickilicky | Level 30 | Know Rollout |
 | Tangela | Tangrowth | Level 24 | Know Ancient Power |
-| Mime Jr. | Mr. Mime or Galarian Mr. Mime | Level 32 | Know Mimic; target selected per save |
-| Eevee | Espeon, Umbreon, or Sylveon | Level 30 | Friendship, clock, and Fairy-type move; target selected per save |
+| Mime Jr. | Mr. Mime | Level 32 | Know Mimic |
 | Bonsly | Sudowoodo | Level 16 | Know Mimic |
 | Aipom | Ambipom | Level 32 | Know Double Hit |
 | Yanma | Yanmega | Level 33 | Know Ancient Power |
@@ -276,14 +263,11 @@ choose the Alcremie decoration:
 | Love | Shiny Stone |
 | Star | Thunder Stone |
 | Clover | Leaf Stone |
-| Flower | Sun Stone |
+| Flower | Ice Stone |
 | Ribbon | Dawn Stone |
 
-The save seed independently selects one cream flavor shared by every decoration
-in that save: Vanilla, Ruby, Matcha, Mint, Lemon, Salted, Ruby Swirl, Caramel
-Swirl, or Rainbow Swirl.
-
-Changing the stone changes the decoration, not the save's selected cream flavor.
+All seven routes produce the Vanilla Cream color. The stone selects the visible
+decoration; the other eight cream colors are not evolution outcomes in this hack.
 
 ## Eevee quick reference
 
@@ -296,11 +280,12 @@ Eevee's available routes are:
 | Flareon | Fire Stone |
 | Leafeon | Leaf Stone |
 | Glaceon | Ice Stone |
-| Espeon, Umbreon, or Sylveon | Level 30; one of these three is selected per save |
+| Espeon | Sun Stone |
+| Umbreon | Moon Stone |
+| Sylveon | Shiny Stone |
 
-The five stone routes are always player-controlled. The former Petalburg Woods
-and Shoal Cave location routes are removed so they cannot unexpectedly preempt
-the save's level-30 branch.
+All eight routes are player-controlled. The friendship, clock, Fairy-move,
+Petalburg Woods, and Shoal Cave requirements are removed.
 
 ## Requirements that remain unchanged
 
@@ -312,8 +297,7 @@ particular:
 - Other weather, party-composition, battle-tracker, walking, recoil, and
   script-based requirements remain intact unless explicitly replaced above.
 - Dunsparce retains its personality-based Dudunsparce segment outcome.
-- Ordinary and Own Tempo Rockruff share one seeded Midday, Midnight, or Dusk
-  Lycanroc result.
+- Ordinary and Own Tempo Rockruff use the same three player-controlled routes.
 - Ordinary evolution stones not mentioned as replacements continue to work as
   authored.
 

@@ -4828,15 +4828,13 @@ const struct SpeciesInfo gSpeciesInfoGen8[] =
         .teachableLearnset = sMilceryTeachableLearnset,
         .eggMoveLearnset = sMilceryEggMoveLearnset,
 #if RANDOMIZER_ENABLED && RANDOMIZER_EVOLUTIONS
-        .evolutions = EVOLUTION(
-                                ALCREMIE_ITEM_EVOLUTIONS(STRAWBERRY, ITEM_FIRE_STONE),
-                                ALCREMIE_ITEM_EVOLUTIONS(BERRY, ITEM_WATER_STONE),
-                                ALCREMIE_ITEM_EVOLUTIONS(LOVE, ITEM_SHINY_STONE),
-                                ALCREMIE_ITEM_EVOLUTIONS(STAR, ITEM_THUNDER_STONE),
-                                ALCREMIE_ITEM_EVOLUTIONS(CLOVER, ITEM_LEAF_STONE),
-                                ALCREMIE_ITEM_EVOLUTIONS(FLOWER, ITEM_SUN_STONE),
-                                ALCREMIE_ITEM_EVOLUTIONS(RIBBON, ITEM_DAWN_STONE)
-                        )
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_FIRE_STONE, SPECIES_ALCREMIE_STRAWBERRY_VANILLA_CREAM},
+                                {EVO_ITEM, ITEM_WATER_STONE, SPECIES_ALCREMIE_BERRY_VANILLA_CREAM},
+                                {EVO_ITEM, ITEM_SHINY_STONE, SPECIES_ALCREMIE_LOVE_VANILLA_CREAM},
+                                {EVO_ITEM, ITEM_THUNDER_STONE, SPECIES_ALCREMIE_STAR_VANILLA_CREAM},
+                                {EVO_ITEM, ITEM_LEAF_STONE, SPECIES_ALCREMIE_CLOVER_VANILLA_CREAM},
+                                {EVO_ITEM, ITEM_ICE_STONE, SPECIES_ALCREMIE_FLOWER_VANILLA_CREAM},
+                                {EVO_ITEM, ITEM_DAWN_STONE, SPECIES_ALCREMIE_RIBBON_VANILLA_CREAM})
 #else
         .evolutions = EVOLUTION(
                                 {EVO_SPIN, SPIN_CW_SHORT, SPECIES_ALCREMIE_STRAWBERRY_VANILLA_CREAM,

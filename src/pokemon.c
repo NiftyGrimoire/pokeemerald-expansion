@@ -4662,8 +4662,6 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
             bool32 conditionsMet = FALSE;
             if (SanitizeSpeciesId(evolutions[i].targetSpecies) == SPECIES_NONE)
                 continue;
-            if (!IsRandomizerEvolutionTargetSelected(species, evolutions[i].targetSpecies))
-                continue;
 
             // Check main primary evolution method
             switch (evolutions[i].method)
@@ -4694,8 +4692,6 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
             bool32 conditionsMet = FALSE;
             if (SanitizeSpeciesId(evolutions[i].targetSpecies) == SPECIES_NONE)
                 continue;
-            if (!IsRandomizerEvolutionTargetSelected(species, evolutions[i].targetSpecies))
-                continue;
 
             switch (evolutions[i].method)
             {
@@ -4720,8 +4716,6 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
         {
             bool32 conditionsMet = FALSE;
             if (SanitizeSpeciesId(evolutions[i].targetSpecies) == SPECIES_NONE)
-                continue;
-            if (!IsRandomizerEvolutionTargetSelected(species, evolutions[i].targetSpecies))
                 continue;
 
             switch (evolutions[i].method)
@@ -4751,8 +4745,6 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
             bool32 conditionsMet = FALSE;
             if (SanitizeSpeciesId(evolutions[i].targetSpecies) == SPECIES_NONE)
                 continue;
-            if (!IsRandomizerEvolutionTargetSelected(species, evolutions[i].targetSpecies))
-                continue;
 
             switch (evolutions[i].method)
             {
@@ -4778,8 +4770,6 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
             bool32 conditionsMet = FALSE;
             if (SanitizeSpeciesId(evolutions[i].targetSpecies) == SPECIES_NONE)
                 continue;
-            if (!IsRandomizerEvolutionTargetSelected(species, evolutions[i].targetSpecies))
-                continue;
 
             switch (evolutions[i].method)
             {
@@ -4803,8 +4793,6 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
         for (i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
         {
             if (SanitizeSpeciesId(evolutions[i].targetSpecies) == SPECIES_NONE)
-                continue;
-            if (!IsRandomizerEvolutionTargetSelected(species, evolutions[i].targetSpecies))
                 continue;
             if (evolutions[i].method != EVO_SCRIPT_TRIGGER)
                 continue;
