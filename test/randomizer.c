@@ -1093,6 +1093,31 @@ TEST("Encounter randomization low difficulty BST stays under high-difficulty flo
     EXPECT_GE(highBST, 480);
 }
 
+TEST("Encounter randomization counts cosmetic form families once")
+{
+    EXPECT(IsRandomizerOrdinarySpeciesGroupRepresentative(SPECIES_SCATTERBUG, 180, 360));
+    EXPECT(!IsRandomizerOrdinarySpeciesGroupRepresentative(SPECIES_SCATTERBUG_POLAR, 180, 360));
+    EXPECT(IsRandomizerOrdinarySpeciesGroupRepresentative(SPECIES_SPEWPA, 180, 360));
+    EXPECT(!IsRandomizerOrdinarySpeciesGroupRepresentative(SPECIES_SPEWPA_POLAR, 180, 360));
+    EXPECT(IsRandomizerOrdinarySpeciesGroupRepresentative(SPECIES_VIVILLON, 240, 420));
+    EXPECT(!IsRandomizerOrdinarySpeciesGroupRepresentative(SPECIES_VIVILLON_POLAR, 240, 420));
+
+    // Mechanically distinct regional forms remain independent pool entries.
+    EXPECT(IsRandomizerOrdinarySpeciesGroupRepresentative(SPECIES_MEOWTH, 180, 360));
+    EXPECT(IsRandomizerOrdinarySpeciesGroupRepresentative(SPECIES_MEOWTH_ALOLA, 180, 360));
+    EXPECT(IsRandomizerOrdinarySpeciesGroupRepresentative(SPECIES_VULPIX, 180, 360));
+    EXPECT(IsRandomizerOrdinarySpeciesGroupRepresentative(SPECIES_VULPIX_ALOLA, 180, 360));
+
+    EXPECT(IsRandomizerOrdinarySpeciesGroupRepresentative(SPECIES_DEERLING, 240, 420));
+    EXPECT(!IsRandomizerOrdinarySpeciesGroupRepresentative(SPECIES_DEERLING_SUMMER, 240, 420));
+}
+
+TEST("Legendary form weighting preserves mechanically distinct forms")
+{
+    EXPECT(IsRandomizerLegendarySpeciesGroupRepresentative(SPECIES_TORNADUS));
+    EXPECT(IsRandomizerLegendarySpeciesGroupRepresentative(SPECIES_TORNADUS_THERIAN));
+}
+
 TEST("Legendary encounter eligibility includes restricted, sub, and Paradox species")
 {
     EXPECT(gSpeciesInfo[SPECIES_MEWTWO].isRestrictedLegendary);

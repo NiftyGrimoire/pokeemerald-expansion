@@ -1059,6 +1059,88 @@ static bool32 IsOrdinaryEncounterCandidate(enum Species species, u16 minBST, u16
     return TRUE;
 }
 
+static bool32 IsRandomizerCosmeticFormGroup(enum Species species)
+{
+    if (!IsSpeciesEnabled(species))
+        return FALSE;
+
+    switch (GET_BASE_SPECIES_ID(species))
+    {
+    case SPECIES_UNOWN:
+    case SPECIES_SHELLOS:
+    case SPECIES_GASTRODON:
+    case SPECIES_DEERLING:
+    case SPECIES_SAWSBUCK:
+    case SPECIES_SCATTERBUG:
+    case SPECIES_SPEWPA:
+    case SPECIES_VIVILLON:
+    case SPECIES_ALCREMIE:
+    case SPECIES_MAUSHOLD:
+    case SPECIES_DUDUNSPARCE:
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
+static u16 GetOrdinaryCandidateFormCount(enum Species baseSpecies, u16 minBST, u16 maxBST)
+{
+    const u16 *formTable;
+    u16 count = 0;
+
+    if (!IsSpeciesEnabled(baseSpecies))
+        return 0;
+
+    if (!IsRandomizerCosmeticFormGroup(baseSpecies))
+        return IsOrdinaryEncounterCandidate(baseSpecies, minBST, maxBST) ? 1 : 0;
+    if (baseSpecies != GET_BASE_SPECIES_ID(baseSpecies))
+        return 0;
+
+    formTable = GetSpeciesFormTable(baseSpecies);
+    if (formTable == NULL)
+        return IsOrdinaryEncounterCandidate(baseSpecies, minBST, maxBST) ? 1 : 0;
+
+    for (u32 i = 0; formTable[i] != FORM_SPECIES_END; i++)
+    {
+        if (IsOrdinaryEncounterCandidate(formTable[i], minBST, maxBST))
+            count++;
+    }
+    return count;
+}
+
+static enum Species GetOrdinaryCandidateForm(enum Species baseSpecies, u16 minBST, u16 maxBST, u16 formIndex)
+{
+    const u16 *formTable = GetSpeciesFormTable(baseSpecies);
+
+    if (!IsRandomizerCosmeticFormGroup(baseSpecies) || formTable == NULL)
+        return baseSpecies;
+
+    for (u32 i = 0; formTable[i] != FORM_SPECIES_END; i++)
+    {
+        if (!IsOrdinaryEncounterCandidate(formTable[i], minBST, maxBST))
+            continue;
+        if (formIndex == 0)
+            return formTable[i];
+        formIndex--;
+    }
+    return baseSpecies;
+}
+
+static enum Species SelectOrdinaryCandidateForm(enum Species baseSpecies, u16 minBST, u16 maxBST, enum RandomizerCategory category, u32 key1, u32 key2, u32 key3)
+{
+    u16 formCount = GetOrdinaryCandidateFormCount(baseSpecies, minBST, maxBST);
+    u16 formIndex = RandomizerHash(GetRandomizerSeed(), category, key1, key2, key3 | (1u << 31)) % formCount;
+
+    return GetOrdinaryCandidateForm(baseSpecies, minBST, maxBST, formIndex);
+}
+
+#if TESTING
+bool32 IsRandomizerOrdinarySpeciesGroupRepresentative(enum Species species, u16 minBST, u16 maxBST)
+{
+    return GetOrdinaryCandidateFormCount(species, minBST, maxBST) > 0;
+}
+#endif
+
 enum Species GetRandomizedSpeciesForEncounter(enum Species originalSpecies, u16 mapId, enum RandomizerEncounterType encounterType, u8 slot, u8 encounterDifficulty)
 {
 #if RANDOMIZER_ENABLED && RANDOMIZER_ENCOUNTERS
@@ -1103,7 +1185,7 @@ enum Species GetRandomizedSpeciesForEncounter(enum Species originalSpecies, u16 
         ordinaryCount = 0;
         for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
         {
-            if (IsOrdinaryEncounterCandidate(species, minBST, maxBST))
+            if (GetOrdinaryCandidateFormCount(species, minBST, maxBST) > 0)
                 ordinaryCount++;
         }
 
@@ -1133,10 +1215,16 @@ enum Species GetRandomizedSpeciesForEncounter(enum Species originalSpecies, u16 
 
     for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
     {
-        if (IsOrdinaryEncounterCandidate(species, minBST, maxBST))
+        if (GetOrdinaryCandidateFormCount(species, minBST, maxBST) > 0)
         {
             if (selectedIndex == 0)
-                return species;
+                return SelectOrdinaryCandidateForm(species,
+                                                   minBST,
+                                                   maxBST,
+                                                   RANDOMIZER_CATEGORY_ENCOUNTER,
+                                                   mapId,
+                                                   originalSpecies,
+                                                   ((u32)encounterType << 8) | slot);
             selectedIndex--;
         }
     }
@@ -1166,10 +1254,40 @@ bool32 IsSpeciesRandomizerLegendaryEncounterEligible(enum Species species)
     return TRUE;
 }
 
+static u16 GetLegendaryCandidateFormCount(enum Species species)
+{
+    const u16 *formTable;
+    u16 count = 0;
+
+    if (!IsSpeciesEnabled(species))
+        return 0;
+    if (!IsRandomizerCosmeticFormGroup(species))
+        return IsSpeciesRandomizerLegendaryEncounterEligible(species) ? 1 : 0;
+    if (species != GET_BASE_SPECIES_ID(species))
+        return 0;
+
+    formTable = GetSpeciesFormTable(species);
+    if (formTable == NULL)
+        return IsSpeciesRandomizerLegendaryEncounterEligible(species) ? 1 : 0;
+    for (u32 i = 0; formTable[i] != FORM_SPECIES_END; i++)
+    {
+        if (IsSpeciesRandomizerLegendaryEncounterEligible(formTable[i]))
+            count++;
+    }
+    return count;
+}
+
+#if TESTING
+bool32 IsRandomizerLegendarySpeciesGroupRepresentative(enum Species species)
+{
+    return GetLegendaryCandidateFormCount(species) > 0;
+}
+#endif
+
 enum Species GetRandomizedSpeciesForLegendaryEncounter(enum Species originalSpecies, u16 mapId, u8 slot)
 {
 #if RANDOMIZER_ENABLED && RANDOMIZER_LEGENDARY_ENCOUNTERS
-    u32 eligibleCount = 0;
+    u32 eligibleGroupCount = 0;
     u32 selectedIndex;
 
     if (!IsSpeciesRandomizerLegendaryEncounterEligible(originalSpecies))
@@ -1177,11 +1295,11 @@ enum Species GetRandomizedSpeciesForLegendaryEncounter(enum Species originalSpec
 
     for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
     {
-        if (IsSpeciesRandomizerLegendaryEncounterEligible(species))
-            eligibleCount++;
+        if (GetLegendaryCandidateFormCount(species) > 0)
+            eligibleGroupCount++;
     }
 
-    if (eligibleCount == 0)
+    if (eligibleGroupCount == 0)
         return originalSpecies;
 
     selectedIndex = RandomizerHash(GetRandomizerSeed(),
@@ -1189,14 +1307,35 @@ enum Species GetRandomizedSpeciesForLegendaryEncounter(enum Species originalSpec
                                    mapId,
                                    (u32)originalSpecies,
                                    slot)
-                  % eligibleCount;
+                  % eligibleGroupCount;
 
     for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
     {
-        if (IsSpeciesRandomizerLegendaryEncounterEligible(species))
+        const u16 *formTable = GetSpeciesFormTable(species);
+        u16 eligibleFormCount = GetLegendaryCandidateFormCount(species);
+
+        if (eligibleFormCount > 0)
         {
             if (selectedIndex == 0)
-                return species;
+            {
+                u16 formIndex = RandomizerHash(GetRandomizerSeed(),
+                                               RANDOMIZER_CATEGORY_LEGENDARY_ENCOUNTER,
+                                               mapId,
+                                               (u32)originalSpecies,
+                                               (1u << 31) | slot)
+                              % eligibleFormCount;
+
+                if (!IsRandomizerCosmeticFormGroup(species) || formTable == NULL)
+                    return species;
+                for (u32 i = 0; formTable[i] != FORM_SPECIES_END; i++)
+                {
+                    if (!IsSpeciesRandomizerLegendaryEncounterEligible(formTable[i]))
+                        continue;
+                    if (formIndex == 0)
+                        return formTable[i];
+                    formIndex--;
+                }
+            }
             selectedIndex--;
         }
     }
@@ -1231,7 +1370,7 @@ enum Species GetRandomizedSpeciesForTrainer(enum Species originalSpecies, u16 tr
         ordinaryCount = 0;
         for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
         {
-            if (IsOrdinaryEncounterCandidate(species, minBST, maxBST))
+            if (GetOrdinaryCandidateFormCount(species, minBST, maxBST) > 0)
                 ordinaryCount++;
         }
 
@@ -1261,10 +1400,16 @@ enum Species GetRandomizedSpeciesForTrainer(enum Species originalSpecies, u16 tr
 
     for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
     {
-        if (IsOrdinaryEncounterCandidate(species, minBST, maxBST))
+        if (GetOrdinaryCandidateFormCount(species, minBST, maxBST) > 0)
         {
             if (selectedIndex == 0)
-                return species;
+                return SelectOrdinaryCandidateForm(species,
+                                                   minBST,
+                                                   maxBST,
+                                                   RANDOMIZER_CATEGORY_TRAINER,
+                                                   trainerId,
+                                                   originalSpecies,
+                                                   ((u32)RANDOMIZER_ALGORITHM_VERSION << 8) | partySlot);
             selectedIndex--;
         }
     }
@@ -1347,6 +1492,50 @@ bool32 IsSpeciesRandomizerStarterEligible(enum Species species)
     return IsSpeciesRandomizerStarterEligibleInternal(species, GetSpeciesPreEvolution(species) != SPECIES_NONE);
 }
 
+static u16 GetStarterCandidateFormCount(enum Species baseSpecies, const bool8 *hasPreEvolution)
+{
+    const u16 *formTable;
+    u16 count = 0;
+
+    if (!IsSpeciesEnabled(baseSpecies))
+        return 0;
+    if (!IsRandomizerCosmeticFormGroup(baseSpecies))
+        return IsSpeciesRandomizerStarterEligibleInternal(baseSpecies, hasPreEvolution[baseSpecies]) ? 1 : 0;
+    if (baseSpecies != GET_BASE_SPECIES_ID(baseSpecies))
+        return 0;
+    formTable = GetSpeciesFormTable(baseSpecies);
+    if (formTable == NULL)
+        return IsSpeciesRandomizerStarterEligibleInternal(baseSpecies, hasPreEvolution[baseSpecies]) ? 1 : 0;
+
+    for (u32 i = 0; formTable[i] != FORM_SPECIES_END; i++)
+    {
+        enum Species form = formTable[i];
+
+        if (IsSpeciesRandomizerStarterEligibleInternal(form, hasPreEvolution[form]))
+            count++;
+    }
+    return count;
+}
+
+static enum Species GetStarterCandidateForm(enum Species baseSpecies, const bool8 *hasPreEvolution, u16 formIndex)
+{
+    const u16 *formTable = GetSpeciesFormTable(baseSpecies);
+
+    if (!IsRandomizerCosmeticFormGroup(baseSpecies) || formTable == NULL)
+        return baseSpecies;
+    for (u32 i = 0; formTable[i] != FORM_SPECIES_END; i++)
+    {
+        enum Species form = formTable[i];
+
+        if (!IsSpeciesRandomizerStarterEligibleInternal(form, hasPreEvolution[form]))
+            continue;
+        if (formIndex == 0)
+            return form;
+        formIndex--;
+    }
+    return baseSpecies;
+}
+
 enum Species GetRandomizedStarterSpecies(enum Species originalSpecies, u8 slot)
 {
 #if RANDOMIZER_ENABLED && RANDOMIZER_STARTERS
@@ -1354,6 +1543,7 @@ enum Species GetRandomizedStarterSpecies(enum Species originalSpecies, u8 slot)
     static enum Species sCachedChoices[RANDOMIZER_STARTER_COUNT];
     static bool32 sCacheValid;
     enum Species selected[RANDOMIZER_STARTER_COUNT] = {SPECIES_NONE};
+    enum Species selectedGroups[RANDOMIZER_STARTER_COUNT] = {SPECIES_NONE};
     bool8 hasPreEvolution[NUM_SPECIES] = {FALSE};
     u32 seed = GetRandomizerSeed();
     u32 eligibleCount = 0;
@@ -1390,7 +1580,7 @@ enum Species GetRandomizedStarterSpecies(enum Species originalSpecies, u8 slot)
 
     for (enum Species species = SPECIES_NONE + 1; species < NUM_SPECIES; species++)
     {
-        if (IsSpeciesRandomizerStarterEligibleInternal(species, hasPreEvolution[species]))
+        if (GetStarterCandidateFormCount(species, hasPreEvolution) > 0)
             eligibleCount++;
     }
 
@@ -1410,12 +1600,12 @@ enum Species GetRandomizedStarterSpecies(enum Species originalSpecies, u8 slot)
         {
             bool32 alreadySelected = FALSE;
 
-            if (!IsSpeciesRandomizerStarterEligibleInternal(species, hasPreEvolution[species]))
+            if (GetStarterCandidateFormCount(species, hasPreEvolution) == 0)
                 continue;
 
             for (u32 previous = 0; previous < choice; previous++)
             {
-                if (selected[previous] == species)
+                if (selectedGroups[previous] == species)
                 {
                     alreadySelected = TRUE;
                     break;
@@ -1424,7 +1614,16 @@ enum Species GetRandomizedStarterSpecies(enum Species originalSpecies, u8 slot)
 
             if (!alreadySelected && selectedIndex == 0)
             {
-                selected[choice] = species;
+                u16 formCount = GetStarterCandidateFormCount(species, hasPreEvolution);
+                u16 formIndex = RandomizerHash(seed,
+                                               RANDOMIZER_CATEGORY_STARTER,
+                                               choice,
+                                               species,
+                                               (1u << 31) | RANDOMIZER_ALGORITHM_VERSION)
+                              % formCount;
+
+                selectedGroups[choice] = species;
+                selected[choice] = GetStarterCandidateForm(species, hasPreEvolution, formIndex);
                 break;
             }
             if (!alreadySelected)

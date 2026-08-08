@@ -44,6 +44,10 @@ bool32 IsSpeciesRandomizerEligible(enum Species species);
 bool32 IsSpeciesRandomizerLegendaryEncounterEligible(enum Species species);
 bool32 IsSpeciesRandomizerStarterEligible(enum Species species);
 enum Species GetRandomizedSpeciesForEncounter(enum Species originalSpecies, u16 mapId, enum RandomizerEncounterType encounterType, u8 slot, u8 encounterDifficulty);
+#if TESTING
+bool32 IsRandomizerOrdinarySpeciesGroupRepresentative(enum Species species, u16 minBST, u16 maxBST);
+bool32 IsRandomizerLegendarySpeciesGroupRepresentative(enum Species species);
+#endif
 enum Species GetRandomizedSpeciesForLegendaryEncounter(enum Species originalSpecies, u16 mapId, u8 slot);
 enum Species GetRandomizedSpeciesForTrainer(enum Species originalSpecies, u16 trainerId, u8 partySlot);
 enum Species GetRandomizedStarterSpecies(enum Species originalSpecies, u8 slot);

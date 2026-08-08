@@ -35,6 +35,9 @@ Replacement Pokémon are selected from a base-stat range suited to the encounter
 table's level. Early areas therefore favor weaker species, while later and
 stronger encounter tables can produce stronger species. Ordinary pools exclude
 Legendary, Mythical, Ultra Beast, Paradox, battle-only, and unusable forms.
+Cosmetic forms do not make a species family more likely: the game selects that
+species group first, then deterministically chooses an eligible appearance.
+Mechanically distinct forms, including regional forms, remain separate choices.
 
 ### Legendary encounters
 

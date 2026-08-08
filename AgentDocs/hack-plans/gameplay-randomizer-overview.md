@@ -22,6 +22,9 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
   Burst forms, Gigantamax forms, Tera forms, Totem forms, and other forms found to be
   unusable outside their special context. Feature-specific filters may narrow this
   pool further.
+- Species pools count explicitly cosmetic form groups once. A separately hashed
+  form choice preserves cosmetic variety without giving those families extra
+  weight; regional and other mechanically distinct forms remain independent.
 - Evolution-family identity and randomized ability resolution are implemented
   through the shared deterministic family policy documented in the handoff.
 - Randomized learnsets resolve at runtime on `romhack/main`. The version-1 move

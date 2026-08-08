@@ -161,6 +161,15 @@ The intended core behavior is to preserve the vanilla encounter method, selected
 slot rarity, and level, then deterministically replace only the species with an
 eligible species derived from the save seed and explicit encounter context.
 
+Cosmetic-form families are uniform by base-species form group rather than raw
+form entry. After a cosmetic group is selected, a second deterministic hash
+chooses among its eligible forms. This prevents families such as Scatterbug,
+Spewpa, Vivillon, Deerling, Sawsbuck, and Alcremie from receiving extra weight
+while retaining form variety. Mechanically distinct forms, including regional
+forms and battle-relevant alternate forms, remain separate pool entries. The
+policy is shared by ordinary encounters, trainers, starters, and special
+Legendary pools.
+
 The BST branch derives difficulty from the weighted average of the fixed level
 ranges in each land, Surf, Rock Smash, or rod-specific encounter table. Ordinary
 encounters select uniformly from the corresponding inclusive BST band:
