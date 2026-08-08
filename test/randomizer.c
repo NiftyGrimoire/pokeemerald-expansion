@@ -425,14 +425,14 @@ TEST("Learnset weights favor appropriate damaging move power by level")
     u32 lateFireBlast = GetRandomizerMoveWeightForLevel(SPECIES_CHARMANDER, MOVE_FIRE_BLAST, 80);
 
     EXPECT_GT(earlyEmber, earlyFireBlast);
-    EXPECT_EQ(earlyEmber, 48);
-    EXPECT_EQ(earlyFireBlast, 8);
+    EXPECT_EQ(earlyEmber, 72);
+    EXPECT_EQ(earlyFireBlast, 12);
     EXPECT_GT(lateFireBlast, lateEmber);
     EXPECT_GT(earlyFireBlast, 0);
     EXPECT_GT(lateEmber, 0);
     EXPECT_EQ(earlySelfDestruct, 2);
     EXPECT_EQ(earlyExplosion, 2);
-    EXPECT_EQ(earlyVCreate, 4);
+    EXPECT_EQ(earlyVCreate, 6);
     EXPECT_GT(earlyFireBlast, earlySelfDestruct);
     EXPECT_GT(earlyFireBlast, earlyExplosion);
     EXPECT_GT(earlyFireBlast, earlyVCreate);
@@ -450,12 +450,12 @@ TEST("Learnset weights shift status moves from basic to elite by level")
     EXPECT_GT(earlyGrowl, earlyQuiverDance);
     EXPECT_GT(middleCalmMind, middleGrowl);
     EXPECT_GT(lateQuiverDance, lateGrowl);
-    EXPECT_EQ(earlyGrowl, 13);
-    EXPECT_EQ(earlyQuiverDance, 4);
-    EXPECT_EQ(middleGrowl, 3);
-    EXPECT_EQ(middleCalmMind, 32);
-    EXPECT_EQ(lateGrowl, 1);
-    EXPECT_EQ(lateQuiverDance, 48);
+    EXPECT_EQ(earlyGrowl, 20);
+    EXPECT_EQ(earlyQuiverDance, 6);
+    EXPECT_EQ(middleGrowl, 5);
+    EXPECT_EQ(middleCalmMind, 48);
+    EXPECT_EQ(lateGrowl, 2);
+    EXPECT_EQ(lateQuiverDance, 72);
 }
 
 TEST("Learnset weights treat weather-setting status moves as strong tier")
@@ -470,17 +470,17 @@ TEST("Learnset weights treat weather-setting status moves as strong tier")
     EXPECT_GT(earlyGrowl, earlyRainDance);
     EXPECT_GT(middleRainDance, middleGrowl);
     EXPECT_GT(lateQuiverDance, lateRainDance);
-    EXPECT_EQ(earlyRainDance, 8);
-    EXPECT_EQ(middleRainDance, 32);
-    EXPECT_EQ(lateRainDance, 13);
+    EXPECT_EQ(earlyRainDance, 12);
+    EXPECT_EQ(middleRainDance, 48);
+    EXPECT_EQ(lateRainDance, 20);
 }
 
 TEST("Learnset weights treat Protect-like moves as strong tier")
 {
-    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_PROTECT, 5), 8);
-    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_DETECT, 24), 32);
-    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_KINGS_SHIELD, 80), 13);
-    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_SPIKY_SHIELD, 80), 13);
+    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_PROTECT, 5), 12);
+    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_DETECT, 24), 48);
+    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_KINGS_SHIELD, 80), 20);
+    EXPECT_EQ(GetRandomizerMoveWeightForLevel(SPECIES_BULBASAUR, MOVE_SPIKY_SHIELD, 80), 20);
 }
 
 TEST("Level-up learnsets separate seed and species identity")

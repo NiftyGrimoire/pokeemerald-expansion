@@ -96,10 +96,11 @@ Each species has a 20-move schedule designed around the level caps:
 - Opening attacks strongly favor 40 power or less. Attacks from 41 through 60
   are uncommon fallbacks, and stronger attacks cannot be starting moves.
 - Only basic status moves can appear at level 1.
-- Later damaging moves trend upward in power and strongly favor same-type
-  attacks, with a smaller preference for coverage.
+- Later damaging moves trend upward in power. Equivalent same-type attacks are
+  three times as likely as coverage attacks.
 - Strong setup, recovery, weather, hazard, protection, and utility moves become
-  more likely later in the game.
+  more likely later in the game; elite late-game status moves can be weighted as
+  highly as the best on-target same-type attacks.
 - Moves are not duplicated within one species' learnset.
 - Unusable or species-dependent special cases such as Transform, Sketch, Dark
   Void, Aura Wheel, Tera Blast, and Struggle are excluded.

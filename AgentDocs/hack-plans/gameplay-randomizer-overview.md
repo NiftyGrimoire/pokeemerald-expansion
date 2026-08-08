@@ -28,6 +28,12 @@ Build a per-save deterministic gameplay randomizer on top of `pokeemerald-expans
   pool, weighting, duplicate policy, schedule, and access seam are documented in
   the implementation handoff. Add a broader cache only if profiling shows it is
   needed.
+- Randomized level-up learnsets weight STAB attacks at 6x and coverage attacks at
+  2x, so equivalent same-type attacks are three times as likely. TM move
+  randomization remains species-independent and does not use STAB weighting.
+- Status weights scale upward by potency and progression tier, reaching 72 for
+  late elite moves so the best late-game status options can match the maximum
+  weight of an on-target STAB attack.
 
 ## Roadmap and Task List
 

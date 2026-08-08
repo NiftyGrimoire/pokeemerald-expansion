@@ -71,9 +71,10 @@ below.
   Only basic-tier status moves are eligible at level 1. Later slots return to the
   normal level-scaled damaging and status-tier curves.
 - Damaging-move weights follow a level-based target power from roughly 40 in the
-  opening game to 115 at level 80. STAB moves use a 4x multiplier and coverage
-  moves use 2x, strengthening the preference for same-type attacks. Before level
-  24, each seven points away from the target removes one base-weight point;
+  opening game to 115 at level 80. STAB moves use a 6x multiplier and coverage
+  moves use 2x, making an equivalent same-type attack three times as likely as a
+  coverage attack. Before level 24, each seven points away from the target
+  removes one base-weight point;
   afterward the band widens to ten points. This makes the early curve reject
   overpowered attacks more aggressively without imposing a hard power clamp. All
   eligible power bands retain nonzero weight, so an unusually strong early move
@@ -92,9 +93,9 @@ below.
   set weather, including weather-plus-switch moves, belong to the strong tier.
   Protect-like effects, including Protect, Detect, guard moves, and damaging or
   stat-lowering shield variants, also belong to the strong tier.
-  Per-move basic/strong/elite weights are 13/8/4 early, 3/32/11 from level 24,
-  and 1/13/48 from level 42. These are approximately 4/3 of the prior values so
-  status moves retain their relationship to the increased STAB multiplier.
+  Per-move basic/strong/elite weights are 20/12/6 early, 5/48/17 from level 24,
+  and 2/20/72 from level 42. These scale with the 6x STAB weighting; the late
+  elite-status weight matches the maximum weight of an on-target STAB attack.
   Elevated strong and elite weights compensate for the larger basic-status
   candidate pool while every tier remains possible.
 - Placeholder, Transform, Sketch, Dark Void, Hyperspace Fury, Aura Wheel,
